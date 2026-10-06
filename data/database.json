@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "game": "EA SPORTS FC 27",
+
+  "players": [],
+
+  "clubs": [],
+
+  "leagues": [],
+
+  "nationalTeams": [],
+
+  "competitions": [],
+
+  "managers": [],
+
+  "metadata": {
+    "playersImported": 0,
+    "clubsImported": 0,
+    "leaguesImported": 0,
+    "lastUpdated": null
+  }
+}
