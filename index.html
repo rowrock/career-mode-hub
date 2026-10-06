@@ -8,62 +8,68 @@
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #0b0d10;
-      color: #f5f5f5;
-      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b0f14;
+      color: #f5f7fa;
     }
 
     header {
-      background: #12161b;
-      border-bottom: 1px solid #252a31;
-      padding: 20px 30px;
+      background: #111720;
+      border-bottom: 1px solid #252d38;
+      padding: 18px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     header h1 {
-      font-size: 28px;
+      margin: 0;
+      font-size: 24px;
     }
 
     header p {
-      color: #8d96a0;
-      margin-top: 5px;
+      margin: 5px 0 0;
+      color: #8f9baa;
+      font-size: 13px;
     }
 
     nav {
       display: flex;
       gap: 8px;
+      padding: 12px 20px;
+      background: #0f141b;
+      border-bottom: 1px solid #252d38;
       overflow-x: auto;
-      padding: 15px 30px;
-      background: #0f1216;
-      border-bottom: 1px solid #252a31;
     }
 
     nav button {
-      background: #191e24;
-      color: #cbd1d8;
-      border: 1px solid #2a3038;
-      padding: 10px 15px;
-      border-radius: 8px;
+      background: #171e27;
+      color: #cbd3dc;
+      border: 1px solid #2a3440;
+      border-radius: 7px;
+      padding: 9px 13px;
       cursor: pointer;
       white-space: nowrap;
     }
 
-    nav button:hover,
+    nav button:hover {
+      background: #222c38;
+    }
+
     nav button.active {
-      background: #2563eb;
-      color: white;
-      border-color: #2563eb;
+      background: #f5f7fa;
+      color: #0b0f14;
+      border-color: #f5f7fa;
     }
 
     main {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: auto;
-      padding: 30px;
+      padding: 28px;
     }
 
     .page {
@@ -74,120 +80,198 @@
       display: block;
     }
 
-    .hero {
-      background: linear-gradient(135deg, #151a21, #101318);
-      border: 1px solid #282e36;
-      border-radius: 16px;
-      padding: 30px;
+    .page-title {
+      margin-bottom: 20px;
+    }
+
+    .page-title h2 {
+      margin: 0 0 5px;
+      font-size: 28px;
+    }
+
+    .page-title p {
+      margin: 0;
+      color: #8f9baa;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
       margin-bottom: 25px;
     }
 
-    .hero h2 {
-      font-size: 32px;
-      margin-bottom: 10px;
+    .stat-card {
+      background: #111720;
+      border: 1px solid #252d38;
+      border-radius: 10px;
+      padding: 18px;
     }
 
-    .hero p {
-      color: #9ca3af;
-      line-height: 1.6;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: #14181d;
-      border: 1px solid #282e36;
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .card h3 {
+    .stat-card .label {
+      color: #8f9baa;
+      font-size: 13px;
       margin-bottom: 8px;
     }
 
-    .stat {
-      font-size: 30px;
+    .stat-card .value {
+      font-size: 26px;
       font-weight: bold;
     }
 
-    .muted {
-      color: #8d96a0;
-    }
-
-    .upload {
-      border: 2px dashed #343b45;
-      border-radius: 14px;
-      padding: 35px;
-      text-align: center;
-      margin-top: 20px;
-      background: #11151a;
-    }
-
-    .upload input {
-      margin-top: 15px;
-    }
-
-    .section-title {
+    .panel {
+      background: #111720;
+      border: 1px solid #252d38;
+      border-radius: 10px;
+      padding: 20px;
       margin-bottom: 20px;
+    }
+
+    .panel h3 {
+      margin-top: 0;
     }
 
     .search-box {
       width: 100%;
-      padding: 13px;
-      margin-bottom: 20px;
-      background: #11151a;
-      border: 1px solid #303640;
+      background: #0b0f14;
+      border: 1px solid #303a47;
       border-radius: 8px;
+      padding: 13px;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: #6e7d90;
     }
 
     .database-status {
-      padding: 15px;
-      border-radius: 10px;
-      background: #11151a;
-      border: 1px solid #282e36;
-      margin-bottom: 20px;
+      color: #8f9baa;
+      margin-bottom: 18px;
+      font-size: 14px;
     }
 
     .player-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
     }
 
     .player-card {
-      background: #14181d;
-      border: 1px solid #282e36;
-      border-radius: 12px;
-      padding: 18px;
+      background: #171e27;
+      border: 1px solid #2a3440;
+      border-radius: 9px;
+      padding: 15px;
+      transition: 0.15s;
     }
 
-    .player-card h3 {
-      margin-bottom: 8px;
+    .player-card:hover {
+      border-color: #526174;
+      transform: translateY(-1px);
+    }
+
+    .player-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .player-name {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .player-club {
+      color: #8f9baa;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .rating {
+      font-size: 24px;
+      font-weight: bold;
+      background: #0b0f14;
+      padding: 5px 9px;
+      border-radius: 7px;
     }
 
     .player-info {
-      color: #9ca3af;
-      line-height: 1.7;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      font-size: 13px;
     }
 
-    @media (max-width: 700px) {
-      main {
-        padding: 15px;
-      }
+    .player-info div {
+      background: #111720;
+      padding: 8px;
+      border-radius: 6px;
+    }
 
-      header {
-        padding: 18px;
-      }
+    .player-info span {
+      color: #7f8b99;
+      display: block;
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
 
-      nav {
-        padding: 12px 18px;
-      }
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8b99;
+    }
+
+    .welcome {
+      background: #111720;
+      border: 1px solid #252d38;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .welcome h2 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+
+    .welcome p {
+      color: #9aa6b4;
+      line-height: 1.6;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .feature {
+      background: #111720;
+      border: 1px solid #252d38;
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .feature h3 {
+      margin-top: 0;
+    }
+
+    .feature p {
+      color: #8f9baa;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .loading {
+      color: #aeb8c4;
+    }
+
+    .error {
+      color: #ff7b7b;
     }
   </style>
 </head>
@@ -196,317 +280,293 @@
 
 <header>
   <h1>⚽ Career Mode Hub</h1>
-  <p>EA FC 27 Career Mode Tracker</p>
+  <p>EA SPORTS FC 27 Career Mode Tracker</p>
 </header>
 
 <nav>
-  <button class="active" onclick="showPage('dashboard', this)">Dashboard</button>
-  <button onclick="showPage('career', this)">My Career</button>
-  <button onclick="showPage('matches', this)">Matches</button>
-  <button onclick="showPage('squad', this)">Squad</button>
-  <button onclick="showPage('players', this)">Players</button>
-  <button onclick="showPage('youth', this)">Youth Academy</button>
-  <button onclick="showPage('transfers', this)">Transfers</button>
-  <button onclick="showPage('competitions', this)">Competitions</button>
-  <button onclick="showPage('league', this)">League Centre</button>
-  <button onclick="showPage('seasons', this)">Past Seasons</button>
-  <button onclick="showPage('trophies', this)">Trophy Cabinet</button>
-  <button onclick="showPage('national', this)">National Team</button>
+  <button onclick="showPage('dashboard')" class="active">Dashboard</button>
+  <button onclick="showPage('career')">My Career</button>
+  <button onclick="showPage('matches')">Matches</button>
+  <button onclick="showPage('squad')">Squad</button>
+  <button onclick="showPage('players')">Players</button>
+  <button onclick="showPage('youth')">Youth Academy</button>
+  <button onclick="showPage('transfers')">Transfers</button>
+  <button onclick="showPage('competitions')">Competitions</button>
+  <button onclick="showPage('league')">League Centre</button>
+  <button onclick="showPage('seasons')">Past Seasons</button>
+  <button onclick="showPage('trophies')">Trophy Cabinet</button>
+  <button onclick="showPage('national')">National Team</button>
 </nav>
 
 <main>
 
   <!-- DASHBOARD -->
-
   <section id="dashboard" class="page active">
 
-    <div class="hero">
-      <h2>Welcome to Career Mode Hub</h2>
-
+    <div class="welcome">
+      <h2>Career Mode Hub</h2>
       <p>
-        Your complete EA FC 27 career database — matches, players,
-        transfers, youth academy, competitions, trophies and more.
+        Your personal FC 27 career database. Track players, squads,
+        matches, transfers, competitions, seasons, trophies and more.
       </p>
     </div>
 
-    <div class="grid">
-
-      <div class="card">
-        <h3>Current Season</h3>
-        <div class="stat">2026/27</div>
-        <p class="muted">Career season</p>
+    <div class="cards">
+      <div class="stat-card">
+        <div class="label">FC 27 Players</div>
+        <div class="value" id="dashboardPlayerCount">Loading...</div>
       </div>
 
-      <div class="card">
-        <h3>Matches</h3>
-        <div class="stat">0</div>
-        <p class="muted">Recorded matches</p>
+      <div class="stat-card">
+        <div class="label">Career Seasons</div>
+        <div class="value">0</div>
       </div>
 
-      <div class="card">
-        <h3>FC 27 Players</h3>
-        <div class="stat" id="dashboardPlayerCount">0</div>
-        <p class="muted">Master database</p>
+      <div class="stat-card">
+        <div class="label">Matches</div>
+        <div class="value">0</div>
       </div>
 
-      <div class="card">
-        <h3>Trophies</h3>
-        <div class="stat">0</div>
-        <p class="muted">Won</p>
+      <div class="stat-card">
+        <div class="label">Trophies</div>
+        <div class="value">0</div>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature">
+        <h3>📊 Player Database</h3>
+        <p>Browse the FC 27 player database with ratings, potential, clubs, positions and attributes.</p>
       </div>
 
+      <div class="feature">
+        <h3>⚽ Match Tracking</h3>
+        <p>Import Match Facts screenshots and automatically record player performances.</p>
+      </div>
+
+      <div class="feature">
+        <h3>🌱 Youth Academy</h3>
+        <p>Upload Youth Academy screenshots and keep your prospects organised.</p>
+      </div>
+
+      <div class="feature">
+        <h3>🏆 Trophy Cabinet</h3>
+        <p>Automatically build your career trophy history.</p>
+      </div>
     </div>
 
   </section>
 
 
   <!-- CAREER -->
-
   <section id="career" class="page">
 
-    <h2 class="section-title">My Career</h2>
+    <div class="page-title">
+      <h2>My Career</h2>
+      <p>Your active FC 27 career save.</p>
+    </div>
 
-    <div class="card">
-
-      <h3>Career Setup</h3>
-
-      <p class="muted">
-        Your FC 27 career will be configured here.
+    <div class="panel">
+      <h3>No Career Started</h3>
+      <p class="database-status">
+        Career creation will be added here. You will be able to choose
+        a club and automatically populate its squad from the FC 27 master database.
       </p>
-
     </div>
 
   </section>
 
 
   <!-- MATCHES -->
-
   <section id="matches" class="page">
 
-    <h2 class="section-title">Match Centre</h2>
+    <div class="page-title">
+      <h2>Matches</h2>
+      <p>Track every match in your career.</p>
+    </div>
 
-    <div class="card">
-
-      <h3>Upload Match Facts</h3>
-
-      <p class="muted">
-        Upload one or multiple EA FC Match Facts screenshots.
-        AI processing will be connected later.
+    <div class="panel">
+      <h3>No Matches Yet</h3>
+      <p class="database-status">
+        Match screenshot importing will be added here.
       </p>
-
-      <div class="upload">
-
-        <p>📸 Drop Match Facts screenshots here</p>
-
-        <input type="file" multiple accept="image/*">
-
-      </div>
-
     </div>
 
   </section>
 
 
   <!-- SQUAD -->
-
   <section id="squad" class="page">
 
-    <h2 class="section-title">Squad</h2>
+    <div class="page-title">
+      <h2>Squad</h2>
+      <p>Manage your current career squad.</p>
+    </div>
 
-    <div class="card">
-
-      <p class="muted">
-        Your career squad will automatically populate from the FC 27 database.
+    <div class="panel">
+      <h3>No Career Squad</h3>
+      <p class="database-status">
+        Start a career to automatically create your squad.
       </p>
-
     </div>
 
   </section>
 
 
   <!-- PLAYERS -->
-
   <section id="players" class="page">
 
-    <h2 class="section-title">FC 27 Players</h2>
-
-    <div class="database-status" id="databaseStatus">
-      Loading FC 27 database...
+    <div class="page-title">
+      <h2>FC 27 Players</h2>
+      <p>Master FC 27 player database.</p>
     </div>
 
-    <input
-      id="playerSearch"
-      class="search-box"
-      type="text"
-      placeholder="Search players..."
-      oninput="searchPlayers()"
-    >
+    <div class="panel">
 
-    <div id="playerResults" class="player-grid"></div>
+      <div id="databaseStatus" class="database-status">
+        Loading FC 27 player database...
+      </div>
+
+      <input
+        id="playerSearch"
+        class="search-box"
+        type="text"
+        placeholder="Search player, club, nationality or position..."
+        oninput="searchPlayers()"
+      >
+
+      <div id="playerResults" class="player-grid">
+        <div class="empty">
+          Loading players...
+        </div>
+      </div>
+
+    </div>
 
   </section>
 
 
   <!-- YOUTH -->
-
   <section id="youth" class="page">
 
-    <h2 class="section-title">Youth Academy</h2>
+    <div class="page-title">
+      <h2>Youth Academy</h2>
+      <p>Manage your youth prospects.</p>
+    </div>
 
-    <div class="card">
-
-      <h3>Batch Import</h3>
-
-      <p class="muted">
-        Upload all Youth Academy screenshots and extract players automatically.
+    <div class="panel">
+      <h3>Youth Academy</h3>
+      <p class="database-status">
+        Youth Academy screenshot importing will be added here.
       </p>
-
-      <div class="upload">
-
-        <p>📸 Upload Youth Academy screenshots</p>
-
-        <input type="file" multiple accept="image/*">
-
-      </div>
-
     </div>
 
   </section>
 
 
   <!-- TRANSFERS -->
-
   <section id="transfers" class="page">
 
-    <h2 class="section-title">Transfers</h2>
+    <div class="page-title">
+      <h2>Transfers</h2>
+      <p>Track transfers and keep squads up to date.</p>
+    </div>
 
-    <div class="card">
-
-      <h3>Transfer Screenshot Import</h3>
-
-      <p class="muted">
-        Upload transfer screenshots to automatically record incoming and outgoing transfers.
+    <div class="panel">
+      <h3>Transfer Centre</h3>
+      <p class="database-status">
+        Transfer screenshot importing will be added here.
       </p>
-
-      <div class="upload">
-
-        <p>📸 Upload transfer screenshots</p>
-
-        <input type="file" multiple accept="image/*">
-
-      </div>
-
     </div>
 
   </section>
 
 
   <!-- COMPETITIONS -->
-
   <section id="competitions" class="page">
 
-    <h2 class="section-title">Competitions</h2>
+    <div class="page-title">
+      <h2>Competitions</h2>
+      <p>FC 27 competition database.</p>
+    </div>
 
-    <div class="grid">
-
-      <div class="card">
-        <h3>League</h3>
-        <p class="muted">Automatic standings</p>
-      </div>
-
-      <div class="card">
-        <h3>Domestic Cups</h3>
-        <p class="muted">Cup progression</p>
-      </div>
-
-      <div class="card">
-        <h3>European Cups</h3>
-        <p class="muted">UCL / UEL / UECL</p>
-      </div>
-
-      <div class="card">
-        <h3>International</h3>
-        <p class="muted">World Cup / Euros</p>
-      </div>
-
+    <div class="panel">
+      <h3>Competition Database</h3>
+      <p class="database-status">
+        Competition data will be added here.
+      </p>
     </div>
 
   </section>
 
 
-  <!-- LEAGUE -->
-
+  <!-- LEAGUE CENTRE -->
   <section id="league" class="page">
 
-    <h2 class="section-title">League Centre</h2>
+    <div class="page-title">
+      <h2>League Centre</h2>
+      <p>View league tables and results.</p>
+    </div>
 
-    <div class="card">
-
-      <h3>League Table Import</h3>
-
-      <p class="muted">
-        Upload a league table screenshot to compare it with the automatically calculated table.
+    <div class="panel">
+      <h3>League Centre</h3>
+      <p class="database-status">
+        Automatic league tables will be added here.
       </p>
-
-      <div class="upload">
-
-        <p>📸 Upload League Table</p>
-
-        <input type="file" accept="image/*">
-
-      </div>
-
     </div>
 
   </section>
 
 
   <!-- SEASONS -->
-
   <section id="seasons" class="page">
 
-    <h2 class="section-title">Past Seasons</h2>
+    <div class="page-title">
+      <h2>Past Seasons</h2>
+      <p>Complete history of your career.</p>
+    </div>
 
-    <div class="card">
-
-      <p class="muted">
-        Completed seasons, statistics, transfers, competitions and results will appear here.
+    <div class="panel">
+      <h3>No Seasons Yet</h3>
+      <p class="database-status">
+        Your seasons will automatically appear here once a career is started.
       </p>
-
     </div>
 
   </section>
 
 
   <!-- TROPHIES -->
-
   <section id="trophies" class="page">
 
-    <h2 class="section-title">🏆 Trophy Cabinet</h2>
+    <div class="page-title">
+      <h2>Trophy Cabinet</h2>
+      <p>Every trophy you've won.</p>
+    </div>
 
-    <div class="card">
-
-      <p class="muted">
-        Your club and international trophies will automatically be recorded.
+    <div class="panel">
+      <h3>No Trophies Yet</h3>
+      <p class="database-status">
+        Trophies will be added automatically when competitions are completed.
       </p>
-
     </div>
 
   </section>
 
 
   <!-- NATIONAL TEAM -->
-
   <section id="national" class="page">
 
-    <h2 class="section-title">National Team</h2>
+    <div class="page-title">
+      <h2>National Team</h2>
+      <p>International career and statistics.</p>
+    </div>
 
-    <div class="card">
-
-      <p class="muted">
-        International squad, fixtures, statistics and tournaments.
+    <div class="panel">
+      <h3>National Team Hub</h3>
+      <p class="database-status">
+        International matches, squads and statistics will be tracked here.
       </p>
-
     </div>
 
   </section>
@@ -515,471 +575,725 @@
 
 
 <script>
-let allPlayers = [];
+
+  // ==========================================
+  // GLOBAL PLAYER DATABASE
+  // ==========================================
+
+  let allPlayers = [];
 
 
-function showPage(pageId, button) {
+  // ==========================================
+  // PAGE NAVIGATION
+  // ==========================================
 
-  document.querySelectorAll('.page').forEach(page => {
-    page.classList.remove('active');
-  });
+  function showPage(pageId) {
 
-  document.getElementById(pageId).classList.add('active');
+    document.querySelectorAll(".page").forEach(page => {
+      page.classList.remove("active");
+    });
 
-  document.querySelectorAll('nav button').forEach(btn => {
-    btn.classList.remove('active');
-  });
+    document.querySelectorAll("nav button").forEach(button => {
+      button.classList.remove("active");
+    });
 
-  button.classList.add('active');
+    const page = document.getElementById(pageId);
 
-  if (pageId === 'players') {
-    loadDatabase();
-  }
-}
-
-
-/* --------------------------------
-   CSV PARSER
--------------------------------- */
-
-function parseCSV(text) {
-
-  const rows = [];
-  let row = [];
-  let value = '';
-  let insideQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (char === '"' && insideQuotes && next === '"') {
-      value += '"';
-      i++;
-      continue;
+    if (page) {
+      page.classList.add("active");
     }
 
-    if (char === '"') {
-      insideQuotes = !insideQuotes;
-      continue;
-    }
+    const buttons = document.querySelectorAll("nav button");
 
-    if (char === ',' && !insideQuotes) {
-      row.push(value);
-      value = '';
-      continue;
-    }
+    buttons.forEach(button => {
 
-    if ((char === '\n' || char === '\r') && !insideQuotes) {
+      const onclick = button.getAttribute("onclick");
 
-      if (char === '\r' && next === '\n') {
-        i++;
+      if (onclick && onclick.includes("'" + pageId + "'")) {
+        button.classList.add("active");
       }
 
-      row.push(value);
-      value = '';
+    });
 
-      if (row.some(cell => cell.trim() !== '')) {
+    if (pageId === "players") {
+      loadDatabase();
+    }
+  }
+
+
+  // ==========================================
+  // CSV PARSER
+  // ==========================================
+
+  function parseCSV(text) {
+
+    const rows = [];
+
+    let row = [];
+    let cell = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+
+      const char = text[i];
+      const next = text[i + 1];
+
+      if (char === '"' && insideQuotes && next === '"') {
+
+        cell += '"';
+        i++;
+
+      } else if (char === '"') {
+
+        insideQuotes = !insideQuotes;
+
+      } else if (char === "," && !insideQuotes) {
+
+        row.push(cell);
+        cell = "";
+
+      } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+
+        if (char === "\r" && next === "\n") {
+          i++;
+        }
+
+        row.push(cell);
+        cell = "";
+
+        if (row.some(value => value.trim() !== "")) {
+          rows.push(row);
+        }
+
+        row = [];
+
+      } else {
+
+        cell += char;
+
+      }
+    }
+
+    if (cell !== "" || row.length > 0) {
+
+      row.push(cell);
+
+      if (row.some(value => value.trim() !== "")) {
         rows.push(row);
       }
 
-      row = [];
-      continue;
     }
 
-    value += char;
+    return rows;
   }
 
-  if (value !== '' || row.length > 0) {
-    row.push(value);
-    rows.push(row);
-  }
 
-  return rows;
-}
+  // ==========================================
+  // NUMBER HELPER
+  // ==========================================
 
+  function numberValue(value) {
 
-/* --------------------------------
-   CONVERT CSV ROW
--------------------------------- */
-
-function convertPlayer(headers, row) {
-
-  const data = {};
-
-  headers.forEach((header, index) => {
-    data[header.trim()] = row[index] ?? '';
-  });
-
-
-  const player = {
-
-    id: data['info.playerid'],
-
-    name:
-      data['info.name.knownas'] ||
-      `${data['info.name.firstname']} ${data['info.name.lastname']}`.trim(),
-
-    firstName: data['info.name.firstname'],
-    lastName: data['info.name.lastname'],
-
-    overall: numberValue(data['info.overallrating']),
-    potential: numberValue(data['info.potential']),
-
-    age: numberValue(data['info.age']),
-
-    position: data['primary_position'],
-
-    otherPositions: data['other_positions'],
-
-    nationality: data['info.nation.name'],
-
-    club: data['info.teams.club_team.name'],
-
-    clubId: data['info.teams.club_team.id'],
-
-    league: data['info.league'],
-
-    leagueId: data['info.teams.club_team.leagueid'],
-
-    jerseyNumber:
-      numberValue(data['info.teams.club_team.jerseynumber']),
-
-    preferredFoot: data['info.preferredfoot'],
-
-    skillMoves: numberValue(data['info.skillmoves']),
-
-    weakFoot: numberValue(data['info.weafoot']),
-
-    height: numberValue(data['info.height']),
-
-    weight: numberValue(data['info.weight']),
-
-    valueUSD: numberValue(data['info.valueUSD']),
-    valueEUR: numberValue(data['info.valueEUR']),
-    valueGBP: numberValue(data['info.valueGBP']),
-
-    wageUSD: numberValue(data['info.wageUSD']),
-    wageEUR: numberValue(data['info.wageEUR']),
-    wageGBP: numberValue(data['info.wageGBP']),
-
-    attackingWorkRate: data['info.attackingworkrate'],
-    defensiveWorkRate: data['info.defensiveworkrate'],
-
-    contractStart: data['info.contract.jointeamdate'],
-    contractEnd: data['info.contract.enddate'],
-
-    loanedOut: data['info.contract.isloanedout'] === '1',
-
-    realFace: data['info.real_face'] === 'Yes',
-
-    headshot: data['info.headshot'],
-
-    playStyles: [
-      data['info.traits.trait1'],
-      data['info.traits.trait2']
-    ].filter(Boolean),
-
-    attributes: {
-
-      acceleration: numberValue(data['attributes.acceleration']),
-      sprintSpeed: numberValue(data['attributes.sprintspeed']),
-      agility: numberValue(data['attributes.agility']),
-      balance: numberValue(data['attributes.balance']),
-      jumping: numberValue(data['attributes.jumping']),
-      stamina: numberValue(data['attributes.stamina']),
-      strength: numberValue(data['attributes.strength']),
-      reactions: numberValue(data['attributes.reactions']),
-      aggression: numberValue(data['attributes.aggression']),
-      composure: numberValue(data['attributes.composure']),
-
-      interceptions: numberValue(data['attributes.interceptions']),
-      positioning: numberValue(data['attributes.positioning']),
-      vision: numberValue(data['attributes.vision']),
-
-      ballControl: numberValue(data['attributes.ballcontrol']),
-      crossing: numberValue(data['attributes.crossing']),
-      dribbling: numberValue(data['attributes.dribbling']),
-      finishing: numberValue(data['attributes.finishing']),
-
-      freeKickAccuracy:
-        numberValue(data['attributes.freekickaccuracy']),
-
-      headingAccuracy:
-        numberValue(data['attributes.headingaccuracy']),
-
-      longPassing:
-        numberValue(data['attributes.longpassing']),
-
-      shortPassing:
-        numberValue(data['attributes.shortpassing']),
-
-      marking: numberValue(data['attributes.marking']),
-      shotPower: numberValue(data['attributes.shotpower']),
-      longShots: numberValue(data['attributes.longshots']),
-
-      standingTackle:
-        numberValue(data['attributes.standingtackle']),
-
-      slidingTackle:
-        numberValue(data['attributes.slidingtackle']),
-
-      volleys: numberValue(data['attributes.volleys']),
-      curve: numberValue(data['attributes.curve']),
-      penalties: numberValue(data['attributes.penalties']),
-
-      gkDiving: numberValue(data['attributes.gkdiving']),
-      gkHandling: numberValue(data['attributes.gkhandling']),
-      gkKicking: numberValue(data['attributes.gkkicking']),
-      gkReflexes: numberValue(data['attributes.gkreflexes']),
-      gkPositioning: numberValue(data['attributes.gkpositioning'])
-    },
-
-    cardAttributes: {
-
-      pace: numberValue(data['card_attrs.pac']),
-      shooting: numberValue(data['card_attrs.sho']),
-      passing: numberValue(data['card_attrs.pas']),
-      dribbling: numberValue(data['card_attrs.dri']),
-      defending: numberValue(data['card_attrs.def']),
-      physical: numberValue(data['card_attrs.phy'])
-    },
-
-    raw: data
-
-  };
-
-  return player;
-}
-
-
-function numberValue(value) {
-
-  if (value === undefined || value === null || value === '') {
-    return null;
-  }
-
-  const number = Number(value);
-
-  return Number.isNaN(number) ? null : number;
-}
-
-
-/* --------------------------------
-   LOAD FC 27 DATABASE
--------------------------------- */
-
-async function loadDatabase() {
-
-  if (allPlayers.length > 0) {
-    displayPlayers(allPlayers);
-    return;
-  }
-
-  try {
-
-    document.getElementById('databaseStatus').textContent =
-      'Loading FC 27 player database...';
-
-    const response = await fetch('data/players.csv');
-
-    if (!response.ok) {
-      throw new Error('players.csv could not be loaded');
+    if (value === undefined || value === null) {
+      return null;
     }
 
-    const csvText = await response.text();
-
-    const rows = parseCSV(csvText);
-
-    if (rows.length < 2) {
-      throw new Error('CSV appears to be empty');
-    }
-
-    const headers = rows[0];
-
-    allPlayers = rows
-      .slice(1)
-      .map(row => convertPlayer(headers, row))
-      .filter(player => player.name);
-
-
-    document.getElementById('dashboardPlayerCount').textContent =
-      allPlayers.length.toLocaleString();
-
-    document.getElementById('databaseStatus').textContent =
-      `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
-
-    displayPlayers(allPlayers);
-
-  } catch (error) {
-
-    console.error(error);
-
-    document.getElementById('databaseStatus').textContent =
-      'Unable to load FC 27 player database.';
-
-  }
-
-}
-
-
-/* --------------------------------
-   PLAYER SEARCH
--------------------------------- */
-
-function searchPlayers() {
-
-  const search =
-    document.getElementById('playerSearch')
-      .value
-      .toLowerCase()
-      .trim();
-
-  if (!search) {
-    displayPlayers(allPlayers);
-    return;
-  }
-
-
-  const results = allPlayers.filter(player => {
-
-    const name =
-      (player.name || '').toLowerCase();
-
-    const club =
-      (player.club || '').toLowerCase();
-
-    const nationality =
-      (player.nationality || '').toLowerCase();
-
-    const position =
-      (player.position || '').toLowerCase();
-
-    const league =
-      (player.league || '').toLowerCase();
-
-    return (
-      name.includes(search) ||
-      club.includes(search) ||
-      nationality.includes(search) ||
-      position.includes(search) ||
-      league.includes(search)
+    const number = parseFloat(
+      String(value).replace(/[^0-9.-]/g, "")
     );
 
-  });
-
-
-  displayPlayers(results);
-
-}
-
-
-/* --------------------------------
-   DISPLAY PLAYERS
--------------------------------- */
-
-function displayPlayers(players) {
-
-  const container =
-    document.getElementById('playerResults');
-
-  container.innerHTML = '';
-
-
-  if (players.length === 0) {
-
-    container.innerHTML = `
-      <div class="card">
-        <h3>No players found</h3>
-        <p class="muted">
-          Try another player, club, nationality or position.
-        </p>
-      </div>
-    `;
-
-    return;
+    return Number.isFinite(number) ? number : null;
   }
 
 
-  players.slice(0, 100).forEach(player => {
+  // ==========================================
+  // CONVERT CSV PLAYER
+  // ==========================================
 
-    const card =
-      document.createElement('div');
+  function convertPlayer(headers, row) {
 
-    card.className = 'player-card';
+    const data = {};
+
+    headers.forEach((header, index) => {
+
+      data[header.trim()] =
+        row[index] !== undefined
+          ? row[index].trim()
+          : "";
+
+    });
 
 
-    card.innerHTML = `
+    const firstName =
+      data["info.name.firstname"] || "";
 
-      <h3>
-        ${escapeHtml(player.name || 'Unknown Player')}
-      </h3>
+    const lastName =
+      data["info.name.lastname"] || "";
 
-      <div class="player-info">
+    const knownAs =
+      data["info.name.knownas"] || "";
 
-        <div>
-          OVR:
-          <strong>${player.overall ?? '-'}</strong>
+    let name =
+      knownAs ||
+      `${firstName} ${lastName}`.trim();
+
+    if (!name) {
+      name = "Unknown Player";
+    }
+
+
+    return {
+
+      id:
+        data["info.playerid"] ||
+        data["playerid"] ||
+        "",
+
+      name: name,
+
+      firstName: firstName,
+
+      lastName: lastName,
+
+      overall:
+        numberValue(data["info.overallrating"]),
+
+      potential:
+        numberValue(data["info.potential"]),
+
+      age:
+        numberValue(data["info.age"]),
+
+      nationality:
+        data["info.nation.name"] || "",
+
+      nationalityId:
+        data["info.nation.id"] || "",
+
+      club:
+        data["info.teams.club_team.name"] || "",
+
+      clubId:
+        data["info.teams.club_team.id"] || "",
+
+      league:
+        data["info.league"] || "",
+
+      leagueId:
+        data["info.teams.club_team.leagueid"] || "",
+
+      position:
+        data["primary_position"] || "",
+
+      otherPositions:
+        data["other_positions"] || "",
+
+      jersey:
+        data["info.teams.club_team.jerseynumber"] || "",
+
+      preferredFoot:
+        data["info.preferredfoot"] || "",
+
+      skillMoves:
+        numberValue(data["info.skillmoves"]),
+
+      weakFoot:
+        numberValue(data["info.weafoot"]),
+
+      height:
+        numberValue(data["info.height"]),
+
+      weight:
+        numberValue(data["info.weight"]),
+
+      valueEUR:
+        numberValue(data["info.valueEUR"]),
+
+      wageEUR:
+        numberValue(data["info.wageEUR"]),
+
+      headshot:
+        data["info.headshot"] || "",
+
+      realFace:
+        data["info.real_face"] || "",
+
+      gender:
+        data["info.gender"] || "",
+
+      attackingWorkRate:
+        data["info.attackingworkrate"] || "",
+
+      defensiveWorkRate:
+        data["info.defensiveworkrate"] || "",
+
+      traits:
+        [
+          data["info.traits.trait1"],
+          data["info.traits.trait2"]
+        ]
+        .filter(Boolean)
+        .join(", "),
+
+      acceleration:
+        numberValue(data["attributes.acceleration"]),
+
+      sprintSpeed:
+        numberValue(data["attributes.sprintspeed"]),
+
+      agility:
+        numberValue(data["attributes.agility"]),
+
+      balance:
+        numberValue(data["attributes.balance"]),
+
+      jumping:
+        numberValue(data["attributes.jumping"]),
+
+      stamina:
+        numberValue(data["attributes.stamina"]),
+
+      strength:
+        numberValue(data["attributes.strength"]),
+
+      reactions:
+        numberValue(data["attributes.reactions"]),
+
+      composure:
+        numberValue(data["attributes.composure"]),
+
+      ballControl:
+        numberValue(data["attributes.ballcontrol"]),
+
+      crossing:
+        numberValue(data["attributes.crossing"]),
+
+      dribbling:
+        numberValue(data["attributes.dribbling"]),
+
+      finishing:
+        numberValue(data["attributes.finishing"]),
+
+      headingAccuracy:
+        numberValue(data["attributes.headingaccuracy"]),
+
+      longPassing:
+        numberValue(data["attributes.longpassing"]),
+
+      shortPassing:
+        numberValue(data["attributes.shortpassing"]),
+
+      shotPower:
+        numberValue(data["attributes.shotpower"]),
+
+      longShots:
+        numberValue(data["attributes.longshots"]),
+
+      standingTackle:
+        numberValue(data["attributes.standingtackle"]),
+
+      slidingTackle:
+        numberValue(data["attributes.slidingtackle"]),
+
+      volleys:
+        numberValue(data["attributes.volleys"]),
+
+      curve:
+        numberValue(data["attributes.curve"]),
+
+      penalties:
+        numberValue(data["attributes.penalties"]),
+
+      gkDiving:
+        numberValue(data["attributes.gkdiving"]),
+
+      gkHandling:
+        numberValue(data["attributes.gkhandling"]),
+
+      gkKicking:
+        numberValue(data["attributes.gkkicking"]),
+
+      gkReflexes:
+        numberValue(data["attributes.gkreflexes"]),
+
+      gkPositioning:
+        numberValue(data["attributes.gkpositioning"]),
+
+      pace:
+        numberValue(data["card_attrs.pac"]),
+
+      shooting:
+        numberValue(data["card_attrs.sho"]),
+
+      passing:
+        numberValue(data["card_attrs.pas"]),
+
+      dribblingCard:
+        numberValue(data["card_attrs.dri"]),
+
+      defending:
+        numberValue(data["card_attrs.def"]),
+
+      physical:
+        numberValue(data["card_attrs.phy"])
+
+    };
+
+  }
+
+
+  // ==========================================
+  // ESCAPE HTML
+  // ==========================================
+
+  function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  // ==========================================
+  // LOAD FC 27 DATABASE
+  // ==========================================
+
+  async function loadDatabase() {
+
+    if (allPlayers.length > 0) {
+      displayPlayers(allPlayers);
+      return;
+    }
+
+
+    const status =
+      document.getElementById("databaseStatus");
+
+    const results =
+      document.getElementById("playerResults");
+
+
+    try {
+
+      status.textContent =
+        "Loading FC 27 player database...";
+
+      results.innerHTML =
+        '<div class="empty">Loading players...</div>';
+
+
+      const response =
+        await fetch("data/players.csv?cache=" + Date.now());
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Could not load players.csv"
+        );
+
+      }
+
+
+      const csvText =
+        await response.text();
+
+
+      const parsed =
+        parseCSV(csvText);
+
+
+      if (!parsed || parsed.length < 2) {
+
+        throw new Error(
+          "The CSV file appears to be empty."
+        );
+
+      }
+
+
+      const headers =
+        parsed[0];
+
+
+      const rows =
+        parsed.slice(1);
+
+
+      allPlayers =
+        rows
+          .map(row => convertPlayer(headers, row))
+          .filter(player => player.name !== "Unknown Player");
+
+
+      status.textContent =
+        `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
+
+
+      const dashboardCount =
+        document.getElementById("dashboardPlayerCount");
+
+
+      if (dashboardCount) {
+
+        dashboardCount.textContent =
+          allPlayers.length.toLocaleString();
+
+      }
+
+
+      displayPlayers(allPlayers);
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      status.innerHTML =
+        '<span class="error">Unable to load FC 27 player database.</span>';
+
+
+      results.innerHTML = `
+        <div class="empty">
+          <h3>Database loading error</h3>
+          <p>
+            Make sure <strong>data/players.csv</strong>
+            exists in your GitHub repository.
+          </p>
+          <p style="font-size:12px;">
+            ${escapeHtml(error.message)}
+          </p>
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  // ==========================================
+  // SEARCH PLAYERS
+  // ==========================================
+
+  function searchPlayers() {
+
+    const input =
+      document.getElementById("playerSearch");
+
+    const query =
+      input.value
+        .trim()
+        .toLowerCase();
+
+
+    if (!query) {
+
+      displayPlayers(allPlayers);
+
+      return;
+
+    }
+
+
+    const filtered =
+      allPlayers.filter(player => {
+
+        return (
+
+          String(player.name)
+            .toLowerCase()
+            .includes(query)
+
+          ||
+
+          String(player.club)
+            .toLowerCase()
+            .includes(query)
+
+          ||
+
+          String(player.nationality)
+            .toLowerCase()
+            .includes(query)
+
+          ||
+
+          String(player.position)
+            .toLowerCase()
+            .includes(query)
+
+          ||
+
+          String(player.league)
+            .toLowerCase()
+            .includes(query)
+
+        );
+
+      });
+
+
+    displayPlayers(filtered);
+
+  }
+
+
+  // ==========================================
+  // DISPLAY PLAYERS
+  // ==========================================
+
+  function displayPlayers(players) {
+
+    const container =
+      document.getElementById("playerResults");
+
+
+    if (!container) {
+      return;
+    }
+
+
+    if (!players.length) {
+
+      container.innerHTML =
+        '<div class="empty"><h3>No players found</h3><p>Try another search.</p></div>';
+
+      return;
+
+    }
+
+
+    // Display maximum 100 at once
+    const visiblePlayers =
+      players.slice(0, 100);
+
+
+    container.innerHTML =
+      visiblePlayers.map(player => {
+
+        const overall =
+          player.overall !== null
+            ? player.overall
+            : "-";
+
+
+        const potential =
+          player.potential !== null
+            ? player.potential
+            : "-";
+
+
+        const age =
+          player.age !== null
+            ? player.age
+            : "-";
+
+
+        return `
+
+          <div class="player-card">
+
+            <div class="player-top">
+
+              <div>
+
+                <div class="player-name">
+                  ${escapeHtml(player.name)}
+                </div>
+
+                <div class="player-club">
+                  ${escapeHtml(player.club || "Free Agent")}
+                </div>
+
+              </div>
+
+              <div class="rating">
+                ${escapeHtml(overall)}
+              </div>
+
+            </div>
+
+
+            <div class="player-info">
+
+              <div>
+                <span>Potential</span>
+                ${escapeHtml(potential)}
+              </div>
+
+              <div>
+                <span>Position</span>
+                ${escapeHtml(player.position || "-")}
+              </div>
+
+              <div>
+                <span>Age</span>
+                ${escapeHtml(age)}
+              </div>
+
+              <div>
+                <span>Nationality</span>
+                ${escapeHtml(player.nationality || "-")}
+              </div>
+
+              <div>
+                <span>League</span>
+                ${escapeHtml(player.league || "-")}
+              </div>
+
+              <div>
+                <span>Foot</span>
+                ${escapeHtml(player.preferredFoot || "-")}
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+
+    if (players.length > 100) {
+
+      container.innerHTML += `
+
+        <div style="
+          grid-column: 1 / -1;
+          text-align: center;
+          color: #7f8b99;
+          padding: 15px;
+        ">
+
+          Showing the first 100 of
+          ${players.length.toLocaleString()}
+          matching players.
+
         </div>
 
-        <div>
-          Potential:
-          ${player.potential ?? '-'}
-        </div>
+      `;
 
-        <div>
-          Position:
-          ${escapeHtml(player.position || '-')}
-        </div>
+    }
 
-        <div>
-          Club:
-          ${escapeHtml(player.club || '-')}
-        </div>
-
-        <div>
-          League:
-          ${escapeHtml(player.league || '-')}
-        </div>
-
-        <div>
-          Nationality:
-          ${escapeHtml(player.nationality || '-')}
-        </div>
-
-        <div>
-          Age:
-          ${player.age ?? '-'}
-        </div>
-
-      </div>
-
-    `;
+  }
 
 
-    container.appendChild(card);
+  // ==========================================
+  // INITIAL LOAD
+  // ==========================================
 
-  });
+  loadDatabase();
 
-}
-
-
-function escapeHtml(value) {
-
-  return String(value)
-
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-
-}
-
-
-loadDatabase();
-  
 </script>
 
 </body>
