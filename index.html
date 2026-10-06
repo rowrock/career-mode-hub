@@ -1,1298 +1,1378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Career Mode Hub</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Mode Hub</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #0b0f14;
-      color: #f5f7fa;
-    }
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0f1117;
+            color: #f5f5f5;
+        }
 
-    header {
-      background: #111720;
-      border-bottom: 1px solid #252d38;
-      padding: 18px 28px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+        header {
+            background: #171a23;
+            border-bottom: 1px solid #2a2e3a;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
 
-    header p {
-      margin: 5px 0 0;
-      color: #8f9baa;
-      font-size: 13px;
-    }
+        nav {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
 
-    nav {
-      display: flex;
-      gap: 8px;
-      padding: 12px 20px;
-      background: #0f141b;
-      border-bottom: 1px solid #252d38;
-      overflow-x: auto;
-    }
+        nav button {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #b9bfcc;
+            padding: 9px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-    nav button {
-      background: #171e27;
-      color: #cbd3dc;
-      border: 1px solid #2a3440;
-      border-radius: 7px;
-      padding: 9px 13px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+        nav button:hover,
+        nav button.active {
+            background: #252a36;
+            color: white;
+            border-color: #353b49;
+        }
 
-    nav button:hover {
-      background: #222c38;
-    }
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
 
-    nav button.active {
-      background: #f5f7fa;
-      color: #0b0f14;
-      border-color: #f5f7fa;
-    }
+        .page {
+            display: none;
+        }
 
-    main {
-      max-width: 1400px;
-      margin: auto;
-      padding: 28px;
-    }
+        .page.active {
+            display: block;
+        }
 
-    .page {
-      display: none;
-    }
+        h2 {
+            margin-top: 0;
+            font-size: 28px;
+        }
 
-    .page.active {
-      display: block;
-    }
+        .subtitle {
+            color: #9da4b3;
+            margin-bottom: 25px;
+        }
 
-    .page-title {
-      margin-bottom: 20px;
-    }
+        .card {
+            background: #171a23;
+            border: 1px solid #292e39;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-    .page-title h2 {
-      margin: 0 0 5px;
-      font-size: 28px;
-    }
+        .placeholder {
+            text-align: center;
+            padding: 70px 20px;
+            color: #8f97a7;
+        }
 
-    .page-title p {
-      margin: 0;
-      color: #8f9baa;
-    }
+        .database-status {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            background: #171a23;
+            border: 1px solid #292e39;
+            color: #aeb5c3;
+        }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
-    }
+        .search-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
 
-    .stat-card {
-      background: #111720;
-      border: 1px solid #252d38;
-      border-radius: 10px;
-      padding: 18px;
-    }
+        .search-area input {
+            width: 100%;
+            background: #11141b;
+            color: white;
+            border: 1px solid #343a48;
+            border-radius: 8px;
+            padding: 13px 15px;
+            font-size: 15px;
+            outline: none;
+        }
 
-    .stat-card .label {
-      color: #8f9baa;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
+        .search-area input:focus {
+            border-color: #667085;
+        }
 
-    .stat-card .value {
-      font-size: 26px;
-      font-weight: bold;
-    }
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 16px;
+        }
 
-    .panel {
-      background: #111720;
-      border: 1px solid #252d38;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
+        .player-card {
+            background: #171a23;
+            border: 1px solid #292e39;
+            border-radius: 12px;
+            padding: 17px;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
 
-    .panel h3 {
-      margin-top: 0;
-    }
+        .player-card:hover {
+            transform: translateY(-2px);
+            border-color: #4a5160;
+        }
 
-    .search-box {
-      width: 100%;
-      background: #0b0f14;
-      border: 1px solid #303a47;
-      border-radius: 8px;
-      padding: 13px;
-      color: white;
-      font-size: 15px;
-      margin-bottom: 15px;
-      outline: none;
-    }
+        .player-top {
+            display: flex;
+            gap: 13px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
 
-    .search-box:focus {
-      border-color: #6e7d90;
-    }
+        .player-photo {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #242936;
+        }
 
-    .database-status {
-      color: #8f9baa;
-      margin-bottom: 18px;
-      font-size: 14px;
-    }
+        .player-name {
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
 
-    .player-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-    }
+        .player-club {
+            color: #9da4b3;
+            font-size: 13px;
+        }
 
-    .player-card {
-      background: #171e27;
-      border: 1px solid #2a3440;
-      border-radius: 9px;
-      padding: 15px;
-      transition: 0.15s;
-    }
+        .overall {
+            margin-left: auto;
+            text-align: center;
+            min-width: 45px;
+        }
 
-    .player-card:hover {
-      border-color: #526174;
-      transform: translateY(-1px);
-    }
+        .overall-number {
+            font-size: 23px;
+            font-weight: bold;
+        }
 
-    .player-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+        .overall-label {
+            font-size: 10px;
+            color: #8f97a7;
+            text-transform: uppercase;
+        }
 
-    .player-name {
-      font-size: 17px;
-      font-weight: bold;
-    }
+        .player-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+            font-size: 13px;
+        }
 
-    .player-club {
-      color: #8f9baa;
-      font-size: 12px;
-      margin-top: 4px;
-    }
+        .info-item {
+            background: #11141b;
+            padding: 9px;
+            border-radius: 7px;
+        }
 
-    .rating {
-      font-size: 24px;
-      font-weight: bold;
-      background: #0b0f14;
-      padding: 5px 9px;
-      border-radius: 7px;
-    }
+        .info-label {
+            display: block;
+            color: #777f90;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
 
-    .player-info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-      font-size: 13px;
-    }
+        .info-value {
+            color: #e7eaf0;
+        }
 
-    .player-info div {
-      background: #111720;
-      padding: 8px;
-      border-radius: 6px;
-    }
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #8f97a7;
+        }
 
-    .player-info span {
-      color: #7f8b99;
-      display: block;
-      font-size: 11px;
-      margin-bottom: 2px;
-    }
+        .loading {
+            color: #aeb5c3;
+        }
 
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: #7f8b99;
-    }
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
 
-    .welcome {
-      background: #111720;
-      border: 1px solid #252d38;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 20px;
-    }
-
-    .welcome h2 {
-      margin-top: 0;
-      font-size: 30px;
-    }
-
-    .welcome p {
-      color: #9aa6b4;
-      line-height: 1.6;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-    }
-
-    .feature {
-      background: #111720;
-      border: 1px solid #252d38;
-      border-radius: 10px;
-      padding: 18px;
-    }
-
-    .feature h3 {
-      margin-top: 0;
-    }
-
-    .feature p {
-      color: #8f9baa;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .loading {
-      color: #aeb8c4;
-    }
-
-    .error {
-      color: #ff7b7b;
-    }
-  </style>
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-  <h1>⚽ Career Mode Hub</h1>
-  <p>EA SPORTS FC 27 Career Mode Tracker</p>
-</header>
+    <h1>⚽ Career Mode Hub</h1>
 
-<nav>
-  <button onclick="showPage('dashboard')" class="active">Dashboard</button>
-  <button onclick="showPage('career')">My Career</button>
-  <button onclick="showPage('matches')">Matches</button>
-  <button onclick="showPage('squad')">Squad</button>
-  <button onclick="showPage('players')">Players</button>
-  <button onclick="showPage('youth')">Youth Academy</button>
-  <button onclick="showPage('transfers')">Transfers</button>
-  <button onclick="showPage('competitions')">Competitions</button>
-  <button onclick="showPage('league')">League Centre</button>
-  <button onclick="showPage('seasons')">Past Seasons</button>
-  <button onclick="showPage('trophies')">Trophy Cabinet</button>
-  <button onclick="showPage('national')">National Team</button>
-</nav>
+    <nav>
+        <button onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</button>
+        <button onclick="showPage('career')" id="nav-career">My Career</button>
+        <button onclick="showPage('matches')" id="nav-matches">Matches</button>
+        <button onclick="showPage('squad')" id="nav-squad">Squad</button>
+        <button onclick="showPage('players')" id="nav-players">Players</button>
+        <button onclick="showPage('youth')" id="nav-youth">Youth Academy</button>
+        <button onclick="showPage('transfers')" id="nav-transfers">Transfers</button>
+        <button onclick="showPage('competitions')" id="nav-competitions">Competitions</button>
+        <button onclick="showPage('league')" id="nav-league">League Centre</button>
+        <button onclick="showPage('seasons')" id="nav-seasons">Past Seasons</button>
+        <button onclick="showPage('trophies')" id="nav-trophies">Trophy Cabinet</button>
+        <button onclick="showPage('national')" id="nav-national">National Team</button>
+    </nav>
+</header>
 
 <main>
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="page active">
+    <!-- DASHBOARD -->
+    <section class="page" id="dashboard">
+        <h2>Dashboard</h2>
+        <p class="subtitle">Your Career Mode command centre.</p>
 
-    <div class="welcome">
-      <h2>Career Mode Hub</h2>
-      <p>
-        Your personal FC 27 career database. Track players, squads,
-        matches, transfers, competitions, seasons, trophies and more.
-      </p>
-    </div>
-
-    <div class="cards">
-      <div class="stat-card">
-        <div class="label">FC 27 Players</div>
-        <div class="value" id="dashboardPlayerCount">Loading...</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="label">Career Seasons</div>
-        <div class="value">0</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="label">Matches</div>
-        <div class="value">0</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="label">Trophies</div>
-        <div class="value">0</div>
-      </div>
-    </div>
-
-    <div class="feature-grid">
-      <div class="feature">
-        <h3>📊 Player Database</h3>
-        <p>Browse the FC 27 player database with ratings, potential, clubs, positions and attributes.</p>
-      </div>
-
-      <div class="feature">
-        <h3>⚽ Match Tracking</h3>
-        <p>Import Match Facts screenshots and automatically record player performances.</p>
-      </div>
-
-      <div class="feature">
-        <h3>🌱 Youth Academy</h3>
-        <p>Upload Youth Academy screenshots and keep your prospects organised.</p>
-      </div>
-
-      <div class="feature">
-        <h3>🏆 Trophy Cabinet</h3>
-        <p>Automatically build your career trophy history.</p>
-      </div>
-    </div>
-
-  </section>
-
-
-  <!-- CAREER -->
-  <section id="career" class="page">
-
-    <div class="page-title">
-      <h2>My Career</h2>
-      <p>Your active FC 27 career save.</p>
-    </div>
-
-    <div class="panel">
-      <h3>No Career Started</h3>
-      <p class="database-status">
-        Career creation will be added here. You will be able to choose
-        a club and automatically populate its squad from the FC 27 master database.
-      </p>
-    </div>
-
-  </section>
-
-
-  <!-- MATCHES -->
-  <section id="matches" class="page">
-
-    <div class="page-title">
-      <h2>Matches</h2>
-      <p>Track every match in your career.</p>
-    </div>
-
-    <div class="panel">
-      <h3>No Matches Yet</h3>
-      <p class="database-status">
-        Match screenshot importing will be added here.
-      </p>
-    </div>
-
-  </section>
-
-
-  <!-- SQUAD -->
-  <section id="squad" class="page">
-
-    <div class="page-title">
-      <h2>Squad</h2>
-      <p>Manage your current career squad.</p>
-    </div>
-
-    <div class="panel">
-      <h3>No Career Squad</h3>
-      <p class="database-status">
-        Start a career to automatically create your squad.
-      </p>
-    </div>
-
-  </section>
-
-
-  <!-- PLAYERS -->
-  <section id="players" class="page">
-
-    <div class="page-title">
-      <h2>FC 27 Players</h2>
-      <p>Master FC 27 player database.</p>
-    </div>
-
-    <div class="panel">
-
-      <div id="databaseStatus" class="database-status">
-        Loading FC 27 player database...
-      </div>
-
-      <input
-        id="playerSearch"
-        class="search-box"
-        type="text"
-        placeholder="Search player, club, nationality or position..."
-        oninput="searchPlayers()"
-      >
-
-      <div id="playerResults" class="player-grid">
-        <div class="empty">
-          Loading players...
+        <div class="card placeholder">
+            Dashboard coming soon.
         </div>
-      </div>
+    </section>
 
-    </div>
+    <!-- MY CAREER -->
+    <section class="page" id="career">
+        <h2>My Career</h2>
+        <p class="subtitle">Manage your career mode save.</p>
 
-  </section>
+        <div class="card placeholder">
+            Career management coming soon.
+        </div>
+    </section>
 
+    <!-- MATCHES -->
+    <section class="page" id="matches">
+        <h2>Matches</h2>
+        <p class="subtitle">Track every match in your career.</p>
 
-  <!-- YOUTH -->
-  <section id="youth" class="page">
+        <div class="card placeholder">
+            Match tracking coming soon.
+        </div>
+    </section>
 
-    <div class="page-title">
-      <h2>Youth Academy</h2>
-      <p>Manage your youth prospects.</p>
-    </div>
+    <!-- SQUAD -->
+    <section class="page" id="squad">
+        <h2>Squad</h2>
+        <p class="subtitle">Manage your current squad.</p>
 
-    <div class="panel">
-      <h3>Youth Academy</h3>
-      <p class="database-status">
-        Youth Academy screenshot importing will be added here.
-      </p>
-    </div>
+        <div class="card placeholder">
+            Squad management coming soon.
+        </div>
+    </section>
 
-  </section>
+    <!-- PLAYERS -->
+    <section class="page" id="players">
 
+        <h2>FC 27 Players</h2>
 
-  <!-- TRANSFERS -->
-  <section id="transfers" class="page">
+        <p class="subtitle">
+            Master FC 27 player database.
+        </p>
 
-    <div class="page-title">
-      <h2>Transfers</h2>
-      <p>Track transfers and keep squads up to date.</p>
-    </div>
+        <div class="database-status" id="databaseStatus">
+            Loading FC 27 player database...
+        </div>
 
-    <div class="panel">
-      <h3>Transfer Centre</h3>
-      <p class="database-status">
-        Transfer screenshot importing will be added here.
-      </p>
-    </div>
+        <div class="search-area">
+            <input
+                type="text"
+                id="playerSearch"
+                placeholder="Search player, club, nationality, position or league..."
+                oninput="searchPlayers()"
+            >
+        </div>
 
-  </section>
+        <div id="playerResults" class="players-grid">
+            <div class="no-results">
+                Loading players...
+            </div>
+        </div>
 
+    </section>
 
-  <!-- COMPETITIONS -->
-  <section id="competitions" class="page">
+    <!-- YOUTH -->
+    <section class="page" id="youth">
+        <h2>Youth Academy</h2>
+        <p class="subtitle">Track your youth academy prospects.</p>
 
-    <div class="page-title">
-      <h2>Competitions</h2>
-      <p>FC 27 competition database.</p>
-    </div>
+        <div class="card placeholder">
+            Youth Academy coming soon.
+        </div>
+    </section>
 
-    <div class="panel">
-      <h3>Competition Database</h3>
-      <p class="database-status">
-        Competition data will be added here.
-      </p>
-    </div>
+    <!-- TRANSFERS -->
+    <section class="page" id="transfers">
+        <h2>Transfers</h2>
+        <p class="subtitle">Track transfers, loans and free agents.</p>
 
-  </section>
+        <div class="card placeholder">
+            Transfer tracking coming soon.
+        </div>
+    </section>
 
+    <!-- COMPETITIONS -->
+    <section class="page" id="competitions">
+        <h2>Competitions</h2>
+        <p class="subtitle">Manage your competitions.</p>
 
-  <!-- LEAGUE CENTRE -->
-  <section id="league" class="page">
+        <div class="card placeholder">
+            Competition management coming soon.
+        </div>
+    </section>
 
-    <div class="page-title">
-      <h2>League Centre</h2>
-      <p>View league tables and results.</p>
-    </div>
+    <!-- LEAGUE -->
+    <section class="page" id="league">
+        <h2>League Centre</h2>
+        <p class="subtitle">League tables and standings.</p>
 
-    <div class="panel">
-      <h3>League Centre</h3>
-      <p class="database-status">
-        Automatic league tables will be added here.
-      </p>
-    </div>
+        <div class="card placeholder">
+            League Centre coming soon.
+        </div>
+    </section>
 
-  </section>
+    <!-- SEASONS -->
+    <section class="page" id="seasons">
+        <h2>Past Seasons</h2>
+        <p class="subtitle">Review previous seasons.</p>
 
+        <div class="card placeholder">
+            Past Seasons coming soon.
+        </div>
+    </section>
 
-  <!-- SEASONS -->
-  <section id="seasons" class="page">
+    <!-- TROPHIES -->
+    <section class="page" id="trophies">
+        <h2>Trophy Cabinet</h2>
+        <p class="subtitle">Your career achievements.</p>
 
-    <div class="page-title">
-      <h2>Past Seasons</h2>
-      <p>Complete history of your career.</p>
-    </div>
+        <div class="card placeholder">
+            Trophy Cabinet coming soon.
+        </div>
+    </section>
 
-    <div class="panel">
-      <h3>No Seasons Yet</h3>
-      <p class="database-status">
-        Your seasons will automatically appear here once a career is started.
-      </p>
-    </div>
+    <!-- NATIONAL TEAM -->
+    <section class="page" id="national">
+        <h2>National Team</h2>
+        <p class="subtitle">Track international football.</p>
 
-  </section>
-
-
-  <!-- TROPHIES -->
-  <section id="trophies" class="page">
-
-    <div class="page-title">
-      <h2>Trophy Cabinet</h2>
-      <p>Every trophy you've won.</p>
-    </div>
-
-    <div class="panel">
-      <h3>No Trophies Yet</h3>
-      <p class="database-status">
-        Trophies will be added automatically when competitions are completed.
-      </p>
-    </div>
-
-  </section>
-
-
-  <!-- NATIONAL TEAM -->
-  <section id="national" class="page">
-
-    <div class="page-title">
-      <h2>National Team</h2>
-      <p>International career and statistics.</p>
-    </div>
-
-    <div class="panel">
-      <h3>National Team Hub</h3>
-      <p class="database-status">
-        International matches, squads and statistics will be tracked here.
-      </p>
-    </div>
-
-  </section>
+        <div class="card placeholder">
+            National Team coming soon.
+        </div>
+    </section>
 
 </main>
 
-
 <script>
 
-  // ==========================================
-  // GLOBAL PLAYER DATABASE
-  // ==========================================
+    let allPlayers = [];
 
-  let allPlayers = [];
+    /* =========================
+       PAGE NAVIGATION
+    ========================= */
 
+    function showPage(pageId) {
 
-  // ==========================================
-  // PAGE NAVIGATION
-  // ==========================================
+        document.querySelectorAll(".page").forEach(page => {
+            page.classList.remove("active");
+        });
 
-  function showPage(pageId) {
+        document.querySelectorAll("nav button").forEach(button => {
+            button.classList.remove("active");
+        });
 
-    document.querySelectorAll(".page").forEach(page => {
-      page.classList.remove("active");
-    });
+        const page = document.getElementById(pageId);
 
-    document.querySelectorAll("nav button").forEach(button => {
-      button.classList.remove("active");
-    });
-
-    const page = document.getElementById(pageId);
-
-    if (page) {
-      page.classList.add("active");
-    }
-
-    const buttons = document.querySelectorAll("nav button");
-
-    buttons.forEach(button => {
-
-      const onclick = button.getAttribute("onclick");
-
-      if (onclick && onclick.includes("'" + pageId + "'")) {
-        button.classList.add("active");
-      }
-
-    });
-
-    if (pageId === "players") {
-      loadDatabase();
-    }
-  }
-
-
-  // ==========================================
-  // CSV PARSER
-  // ==========================================
-
-  function parseCSV(text) {
-
-    const rows = [];
-
-    let row = [];
-    let cell = "";
-    let insideQuotes = false;
-
-    for (let i = 0; i < text.length; i++) {
-
-      const char = text[i];
-      const next = text[i + 1];
-
-      if (char === '"' && insideQuotes && next === '"') {
-
-        cell += '"';
-        i++;
-
-      } else if (char === '"') {
-
-        insideQuotes = !insideQuotes;
-
-      } else if (char === "," && !insideQuotes) {
-
-        row.push(cell);
-        cell = "";
-
-      } else if ((char === "\n" || char === "\r") && !insideQuotes) {
-
-        if (char === "\r" && next === "\n") {
-          i++;
+        if (page) {
+            page.classList.add("active");
         }
 
-        row.push(cell);
-        cell = "";
+        const navButton = document.getElementById("nav-" + pageId);
 
-        if (row.some(value => value.trim() !== "")) {
-          rows.push(row);
+        if (navButton) {
+            navButton.classList.add("active");
         }
 
-        row = [];
-
-      } else {
-
-        cell += char;
-
-      }
-    }
-
-    if (cell !== "" || row.length > 0) {
-
-      row.push(cell);
-
-      if (row.some(value => value.trim() !== "")) {
-        rows.push(row);
-      }
-
-    }
-
-    return rows;
-  }
-
-
-  // ==========================================
-  // NUMBER HELPER
-  // ==========================================
-
-  function numberValue(value) {
-
-    if (value === undefined || value === null) {
-      return null;
-    }
-
-    const number = parseFloat(
-      String(value).replace(/[^0-9.-]/g, "")
-    );
-
-    return Number.isFinite(number) ? number : null;
-  }
-
-
-  // ==========================================
-  // CONVERT CSV PLAYER
-  // ==========================================
-
-  function convertPlayer(headers, row) {
-
-    const data = {};
-
-    headers.forEach((header, index) => {
-
-      data[header.trim()] =
-        row[index] !== undefined
-          ? row[index].trim()
-          : "";
-
-    });
-
-
-    const firstName =
-      data["info.name.firstname"] || "";
-
-    const lastName =
-      data["info.name.lastname"] || "";
-
-    const knownAs =
-      data["info.name.knownas"] || "";
-
-    let name =
-      knownAs ||
-      `${firstName} ${lastName}`.trim();
-
-    if (!name) {
-      name = "Unknown Player";
+        if (pageId === "players") {
+            loadDatabase();
+        }
     }
 
 
-    return {
+    /* =========================
+       CSV PARSER
+    ========================= */
 
-      id:
-        data["info.playerid"] ||
-        data["playerid"] ||
-        "",
+    function parseCSV(text) {
 
-      name: name,
+        const rows = [];
+        let row = [];
+        let value = "";
+        let insideQuotes = false;
 
-      firstName: firstName,
+        for (let i = 0; i < text.length; i++) {
 
-      lastName: lastName,
+            const char = text[i];
+            const next = text[i + 1];
 
-      overall:
-        numberValue(data["info.overallrating"]),
+            if (char === '"' && insideQuotes && next === '"') {
+                value += '"';
+                i++;
+                continue;
+            }
 
-      potential:
-        numberValue(data["info.potential"]),
+            if (char === '"') {
+                insideQuotes = !insideQuotes;
+                continue;
+            }
 
-      age:
-        numberValue(data["info.age"]),
+            if (char === "," && !insideQuotes) {
+                row.push(value);
+                value = "";
+                continue;
+            }
 
-      nationality:
-        data["info.nation.name"] || "",
+            if (char === "\n" && !insideQuotes) {
 
-      nationalityId:
-        data["info.nation.id"] || "",
+                row.push(value);
+                rows.push(row);
 
-      club:
-        data["info.teams.club_team.name"] || "",
+                row = [];
+                value = "";
 
-      clubId:
-        data["info.teams.club_team.id"] || "",
+                continue;
+            }
 
-      league:
-        data["info.league"] || "",
+            if (char !== "\r") {
+                value += char;
+            }
+        }
 
-      leagueId:
-        data["info.teams.club_team.leagueid"] || "",
+        if (value.length > 0 || row.length > 0) {
+            row.push(value);
+            rows.push(row);
+        }
 
-      position:
-        data["primary_position"] || "",
-
-      otherPositions:
-        data["other_positions"] || "",
-
-      jersey:
-        data["info.teams.club_team.jerseynumber"] || "",
-
-      preferredFoot:
-        data["info.preferredfoot"] || "",
-
-      skillMoves:
-        numberValue(data["info.skillmoves"]),
-
-      weakFoot:
-        numberValue(data["info.weafoot"]),
-
-      height:
-        numberValue(data["info.height"]),
-
-      weight:
-        numberValue(data["info.weight"]),
-
-      valueEUR:
-        numberValue(data["info.valueEUR"]),
-
-      wageEUR:
-        numberValue(data["info.wageEUR"]),
-
-      headshot:
-        data["info.headshot"] || "",
-
-      realFace:
-        data["info.real_face"] || "",
-
-      gender:
-        data["info.gender"] || "",
-
-      attackingWorkRate:
-        data["info.attackingworkrate"] || "",
-
-      defensiveWorkRate:
-        data["info.defensiveworkrate"] || "",
-
-      traits:
-        [
-          data["info.traits.trait1"],
-          data["info.traits.trait2"]
-        ]
-        .filter(Boolean)
-        .join(", "),
-
-      acceleration:
-        numberValue(data["attributes.acceleration"]),
-
-      sprintSpeed:
-        numberValue(data["attributes.sprintspeed"]),
-
-      agility:
-        numberValue(data["attributes.agility"]),
-
-      balance:
-        numberValue(data["attributes.balance"]),
-
-      jumping:
-        numberValue(data["attributes.jumping"]),
-
-      stamina:
-        numberValue(data["attributes.stamina"]),
-
-      strength:
-        numberValue(data["attributes.strength"]),
-
-      reactions:
-        numberValue(data["attributes.reactions"]),
-
-      composure:
-        numberValue(data["attributes.composure"]),
-
-      ballControl:
-        numberValue(data["attributes.ballcontrol"]),
-
-      crossing:
-        numberValue(data["attributes.crossing"]),
-
-      dribbling:
-        numberValue(data["attributes.dribbling"]),
-
-      finishing:
-        numberValue(data["attributes.finishing"]),
-
-      headingAccuracy:
-        numberValue(data["attributes.headingaccuracy"]),
-
-      longPassing:
-        numberValue(data["attributes.longpassing"]),
-
-      shortPassing:
-        numberValue(data["attributes.shortpassing"]),
-
-      shotPower:
-        numberValue(data["attributes.shotpower"]),
-
-      longShots:
-        numberValue(data["attributes.longshots"]),
-
-      standingTackle:
-        numberValue(data["attributes.standingtackle"]),
-
-      slidingTackle:
-        numberValue(data["attributes.slidingtackle"]),
-
-      volleys:
-        numberValue(data["attributes.volleys"]),
-
-      curve:
-        numberValue(data["attributes.curve"]),
-
-      penalties:
-        numberValue(data["attributes.penalties"]),
-
-      gkDiving:
-        numberValue(data["attributes.gkdiving"]),
-
-      gkHandling:
-        numberValue(data["attributes.gkhandling"]),
-
-      gkKicking:
-        numberValue(data["attributes.gkkicking"]),
-
-      gkReflexes:
-        numberValue(data["attributes.gkreflexes"]),
-
-      gkPositioning:
-        numberValue(data["attributes.gkpositioning"]),
-
-      pace:
-        numberValue(data["card_attrs.pac"]),
-
-      shooting:
-        numberValue(data["card_attrs.sho"]),
-
-      passing:
-        numberValue(data["card_attrs.pas"]),
-
-      dribblingCard:
-        numberValue(data["card_attrs.dri"]),
-
-      defending:
-        numberValue(data["card_attrs.def"]),
-
-      physical:
-        numberValue(data["card_attrs.phy"])
-
-    };
-
-  }
-
-
-  // ==========================================
-  // ESCAPE HTML
-  // ==========================================
-
-  function escapeHtml(value) {
-
-    if (value === null || value === undefined) {
-      return "";
-    }
-
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-
-  }
-
-
-  // ==========================================
-  // LOAD FC 27 DATABASE
-  // ==========================================
-
-  async function loadDatabase() {
-
-    if (allPlayers.length > 0) {
-      displayPlayers(allPlayers);
-      return;
+        return rows;
     }
 
 
-    const status =
-      document.getElementById("databaseStatus");
+    /* =========================
+       NUMBER HELPER
+    ========================= */
 
-    const results =
-      document.getElementById("playerResults");
+    function numberValue(value) {
+
+        if (
+            value === undefined ||
+            value === null ||
+            value === ""
+        ) {
+            return null;
+        }
+
+        const number = Number(value);
+
+        return Number.isFinite(number)
+            ? number
+            : null;
+    }
 
 
-    try {
+    /* =========================
+       AGE CALCULATOR
+    ========================= */
 
-      status.textContent =
-        "Loading FC 27 player database...";
+    function calculateAge(birthdate) {
 
-      results.innerHTML =
-        '<div class="empty">Loading players...</div>';
+        if (!birthdate) {
+            return null;
+        }
+
+        const birth = new Date(birthdate);
+
+        if (Number.isNaN(birth.getTime())) {
+            return null;
+        }
+
+        const today = new Date();
+
+        let age =
+            today.getFullYear() -
+            birth.getFullYear();
+
+        const monthDifference =
+            today.getMonth() -
+            birth.getMonth();
+
+        if (
+            monthDifference < 0 ||
+            (
+                monthDifference === 0 &&
+                today.getDate() < birth.getDate()
+            )
+        ) {
+            age--;
+        }
+
+        return age;
+    }
 
 
-      const response =
-        await fetch("data/players.csv?cache=" + Date.now());
+    /* =========================
+       CONVERT EA FC PLAYER
+    ========================= */
+
+    function convertPlayer(headers, row) {
+
+        function get(name) {
+
+            const index = headers.indexOf(name);
+
+            if (index === -1) {
+                return "";
+            }
+
+            return row[index] || "";
+        }
 
 
-      if (!response.ok) {
+        const firstName = get("firstName");
+        const lastName = get("lastName");
+        const commonName = get("commonName");
 
-        throw new Error(
-          "Could not load players.csv"
+        const fullName =
+            commonName ||
+            [firstName, lastName]
+                .filter(Boolean)
+                .join(" ") ||
+            "Unknown Player";
+
+
+        const birthdate = get("birthdate");
+
+
+        return {
+
+            id: get("id"),
+
+            name: fullName,
+
+            firstName: firstName,
+            lastName: lastName,
+            commonName: commonName,
+
+            overall: numberValue(
+                get("overallRating")
+            ),
+
+            rank: numberValue(
+                get("rank")
+            ),
+
+            age: calculateAge(birthdate),
+
+            birthdate: birthdate,
+
+            nationality:
+                get("nationality.label"),
+
+            nationalityId:
+                get("nationality.id"),
+
+            nationalityImage:
+                get("nationality.imageUrl"),
+
+            club:
+                get("team.label"),
+
+            clubId:
+                get("team.id"),
+
+            clubImage:
+                get("team.imageUrl"),
+
+            league:
+                get("leagueName"),
+
+            position:
+                get("position.shortLabel") ||
+                get("position.label"),
+
+            positionName:
+                get("position.label"),
+
+            alternatePositions:
+                get("alternatePositions"),
+
+            preferredFoot:
+                get("preferredFoot"),
+
+            skillMoves:
+                numberValue(
+                    get("skillMoves")
+                ),
+
+            weakFoot:
+                numberValue(
+                    get("weakFootAbility")
+                ),
+
+            height:
+                numberValue(
+                    get("height")
+                ),
+
+            weight:
+                numberValue(
+                    get("weight")
+                ),
+
+            avatar:
+                get("avatarUrl"),
+
+            shield:
+                get("shieldUrl"),
+
+
+            /* MAIN STATS */
+
+            pace:
+                numberValue(
+                    get("stats.pac.value")
+                ),
+
+            shooting:
+                numberValue(
+                    get("stats.sho.value")
+                ),
+
+            passing:
+                numberValue(
+                    get("stats.pas.value")
+                ),
+
+            dribbling:
+                numberValue(
+                    get("stats.dri.value")
+                ),
+
+            defending:
+                numberValue(
+                    get("stats.def.value")
+                ),
+
+            physical:
+                numberValue(
+                    get("stats.phy.value")
+                ),
+
+
+            /* ATTACKING */
+
+            finishing:
+                numberValue(
+                    get("stats.finishing.value")
+                ),
+
+            shotPower:
+                numberValue(
+                    get("stats.shotPower.value")
+                ),
+
+            volleys:
+                numberValue(
+                    get("stats.volleys.value")
+                ),
+
+            penalties:
+                numberValue(
+                    get("stats.penalties.value")
+                ),
+
+            headingAccuracy:
+                numberValue(
+                    get("stats.headingAccuracy.value")
+                ),
+
+
+            /* PASSING */
+
+            crossing:
+                numberValue(
+                    get("stats.crossing.value")
+                ),
+
+            vision:
+                numberValue(
+                    get("stats.vision.value")
+                ),
+
+            shortPassing:
+                numberValue(
+                    get("stats.shortPassing.value")
+                ),
+
+            longPassing:
+                numberValue(
+                    get("stats.longPassing.value")
+                ),
+
+
+            /* DRIBBLING */
+
+            ballControl:
+                numberValue(
+                    get("stats.ballControl.value")
+                ),
+
+            dribblingStat:
+                numberValue(
+                    get("stats.dribbling.value")
+                ),
+
+            agility:
+                numberValue(
+                    get("stats.agility.value")
+                ),
+
+            balance:
+                numberValue(
+                    get("stats.balance.value")
+                ),
+
+
+            /* PHYSICAL */
+
+            acceleration:
+                numberValue(
+                    get("stats.acceleration.value")
+                ),
+
+            sprintSpeed:
+                numberValue(
+                    get("stats.sprintSpeed.value")
+                ),
+
+            stamina:
+                numberValue(
+                    get("stats.stamina.value")
+                ),
+
+            strength:
+                numberValue(
+                    get("stats.strength.value")
+                ),
+
+            jumping:
+                numberValue(
+                    get("stats.jumping.value")
+                ),
+
+
+            /* MENTAL */
+
+            reactions:
+                numberValue(
+                    get("stats.reactions.value")
+                ),
+
+            composure:
+                numberValue(
+                    get("stats.composure.value")
+                ),
+
+            aggression:
+                numberValue(
+                    get("stats.aggression.value")
+                ),
+
+            positioning:
+                numberValue(
+                    get("stats.positioning.value")
+                ),
+
+
+            /* GOALKEEPING */
+
+            gkDiving:
+                numberValue(
+                    get("stats.gkDiving.value")
+                ),
+
+            gkHandling:
+                numberValue(
+                    get("stats.gkHandling.value")
+                ),
+
+            gkKicking:
+                numberValue(
+                    get("stats.gkKicking.value")
+                ),
+
+            gkPositioning:
+                numberValue(
+                    get("stats.gkPositioning.value")
+                ),
+
+            gkReflexes:
+                numberValue(
+                    get("stats.gkReflexes.value")
+                )
+        };
+    }
+
+
+    /* =========================
+       LOAD DATABASE
+    ========================= */
+
+    async function loadDatabase() {
+
+        const status =
+            document.getElementById(
+                "databaseStatus"
+            );
+
+        const results =
+            document.getElementById(
+                "playerResults"
+            );
+
+
+        if (allPlayers.length > 0) {
+
+            status.textContent =
+                "FC 27 database loaded — " +
+                allPlayers.length +
+                " players";
+
+            return;
+        }
+
+
+        status.textContent =
+            "Loading FC 27 player database...";
+
+
+        results.innerHTML = `
+            <div class="no-results">
+                Loading FC 27 players...
+            </div>
+        `;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "data/players.csv?cache=" +
+                    Date.now()
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Could not load players.csv"
+                );
+            }
+
+
+            const csv =
+                await response.text();
+
+
+            const rows =
+                parseCSV(csv);
+
+
+            if (!rows.length) {
+
+                throw new Error(
+                    "CSV is empty"
+                );
+            }
+
+
+            const headers =
+                rows[0].map(
+                    header => header.trim()
+                );
+
+
+            allPlayers = [];
+
+
+            for (
+                let i = 1;
+                i < rows.length;
+                i++
+            ) {
+
+                const row = rows[i];
+
+
+                if (
+                    !row ||
+                    row.length === 0
+                ) {
+                    continue;
+                }
+
+
+                const player =
+                    convertPlayer(
+                        headers,
+                        row
+                    );
+
+
+                if (
+                    player.name &&
+                    player.name !==
+                    "Unknown Player"
+                ) {
+
+                    allPlayers.push(
+                        player
+                    );
+                }
+            }
+
+
+            status.textContent =
+                "FC 27 database loaded — " +
+                allPlayers.length +
+                " players";
+
+
+            displayPlayers(
+                allPlayers
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Player database error:",
+                error
+            );
+
+
+            status.textContent =
+                "Error loading FC 27 database";
+
+
+            results.innerHTML = `
+                <div class="no-results">
+                    <strong>
+                        Could not load player database.
+                    </strong>
+                    <br><br>
+                    ${escapeHTML(error.message)}
+                </div>
+            `;
+        }
+    }
+
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    function searchPlayers() {
+
+        const input =
+            document.getElementById(
+                "playerSearch"
+            );
+
+
+        const query =
+            input.value
+                .trim()
+                .toLowerCase();
+
+
+        if (!query) {
+
+            displayPlayers(
+                allPlayers
+            );
+
+            return;
+        }
+
+
+        const filtered =
+            allPlayers.filter(
+                player => {
+
+                    return (
+
+                        (player.name || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        (player.club || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        (player.nationality || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        (player.position || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        (player.positionName || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        (player.league || "")
+                            .toLowerCase()
+                            .includes(query)
+
+                    );
+                }
+            );
+
+
+        displayPlayers(
+            filtered
         );
-
-      }
-
-
-      const csvText =
-        await response.text();
-
-
-      const parsed =
-        parseCSV(csvText);
-
-
-      if (!parsed || parsed.length < 2) {
-
-        throw new Error(
-          "The CSV file appears to be empty."
-        );
-
-      }
-
-
-      const headers =
-        parsed[0];
-
-
-      const rows =
-        parsed.slice(1);
-
-
-      allPlayers =
-        rows
-          .map(row => convertPlayer(headers, row))
-          .filter(player => player.name !== "Unknown Player");
-
-
-      status.textContent =
-        `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
-
-
-      const dashboardCount =
-        document.getElementById("dashboardPlayerCount");
-
-
-      if (dashboardCount) {
-
-        dashboardCount.textContent =
-          allPlayers.length.toLocaleString();
-
-      }
-
-
-      displayPlayers(allPlayers);
-
-    } catch (error) {
-
-      console.error(error);
-
-
-      status.innerHTML =
-        '<span class="error">Unable to load FC 27 player database.</span>';
-
-
-      results.innerHTML = `
-        <div class="empty">
-          <h3>Database loading error</h3>
-          <p>
-            Make sure <strong>data/players.csv</strong>
-            exists in your GitHub repository.
-          </p>
-          <p style="font-size:12px;">
-            ${escapeHtml(error.message)}
-          </p>
-        </div>
-      `;
-
-    }
-
-  }
-
-
-  // ==========================================
-  // SEARCH PLAYERS
-  // ==========================================
-
-  function searchPlayers() {
-
-    const input =
-      document.getElementById("playerSearch");
-
-    const query =
-      input.value
-        .trim()
-        .toLowerCase();
-
-
-    if (!query) {
-
-      displayPlayers(allPlayers);
-
-      return;
-
     }
 
 
-    const filtered =
-      allPlayers.filter(player => {
+    /* =========================
+       DISPLAY PLAYERS
+    ========================= */
 
-        return (
+    function displayPlayers(players) {
 
-          String(player.name)
-            .toLowerCase()
-            .includes(query)
-
-          ||
-
-          String(player.club)
-            .toLowerCase()
-            .includes(query)
-
-          ||
-
-          String(player.nationality)
-            .toLowerCase()
-            .includes(query)
-
-          ||
-
-          String(player.position)
-            .toLowerCase()
-            .includes(query)
-
-          ||
-
-          String(player.league)
-            .toLowerCase()
-            .includes(query)
-
-        );
-
-      });
+        const container =
+            document.getElementById(
+                "playerResults"
+            );
 
 
-    displayPlayers(filtered);
+        if (!players.length) {
 
-  }
+            container.innerHTML = `
+                <div class="no-results">
+                    No players found.
+                    <br><br>
+                    Try another search.
+                </div>
+            `;
+
+            return;
+        }
 
 
-  // ==========================================
-  // DISPLAY PLAYERS
-  // ==========================================
+        /*
+         * Don't render all 16,228 players
+         * at once.
+         *
+         * Show the first 100 results.
+         */
 
-  function displayPlayers(players) {
-
-    const container =
-      document.getElementById("playerResults");
+        const visiblePlayers =
+            players.slice(0, 100);
 
 
-    if (!container) {
-      return;
+        container.innerHTML =
+            visiblePlayers
+                .map(
+                    player =>
+                        createPlayerCard(
+                            player
+                        )
+                )
+                .join("");
+
+
+        if (players.length > 100) {
+
+            container.innerHTML += `
+                <div class="no-results"
+                     style="grid-column:1/-1;">
+                    Showing first 100 results
+                    out of ${players.length}.
+                    <br>
+                    Use the search box to narrow
+                    your results.
+                </div>
+            `;
+        }
     }
 
 
-    if (!players.length) {
+    /* =========================
+       PLAYER CARD
+    ========================= */
 
-      container.innerHTML =
-        '<div class="empty"><h3>No players found</h3><p>Try another search.</p></div>';
+    function createPlayerCard(player) {
 
-      return;
+        const image =
+            player.avatar
+                ? `
+                    <img
+                        class="player-photo"
+                        src="${escapeAttribute(player.avatar)}"
+                        alt=""
+                        onerror="this.style.display='none'"
+                    >
+                  `
+                : `
+                    <div
+                        class="player-photo">
+                    </div>
+                  `;
 
-    }
-
-
-    // Display maximum 100 at once
-    const visiblePlayers =
-      players.slice(0, 100);
-
-
-    container.innerHTML =
-      visiblePlayers.map(player => {
 
         const overall =
-          player.overall !== null
-            ? player.overall
-            : "-";
-
-
-        const potential =
-          player.potential !== null
-            ? player.potential
-            : "-";
+            player.overall !== null
+                ? player.overall
+                : "—";
 
 
         const age =
-          player.age !== null
-            ? player.age
-            : "-";
+            player.age !== null
+                ? player.age
+                : "—";
+
+
+        const position =
+            player.position ||
+            "—";
+
+
+        const club =
+            player.club ||
+            "Free Agent";
+
+
+        const nationality =
+            player.nationality ||
+            "—";
+
+
+        const league =
+            player.league ||
+            "—";
+
+
+        const foot =
+            player.preferredFoot ||
+            "—";
 
 
         return `
+            <div class="player-card">
 
-          <div class="player-card">
+                <div class="player-top">
 
-            <div class="player-top">
+                    ${image}
 
-              <div>
+                    <div style="flex:1; min-width:0;">
 
-                <div class="player-name">
-                  ${escapeHtml(player.name)}
+                        <div class="player-name">
+                            ${escapeHTML(player.name)}
+                        </div>
+
+                        <div class="player-club">
+                            ${escapeHTML(club)}
+                        </div>
+
+                    </div>
+
+                    <div class="overall">
+
+                        <div class="overall-number">
+                            ${overall}
+                        </div>
+
+                        <div class="overall-label">
+                            OVR
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="player-club">
-                  ${escapeHtml(player.club || "Free Agent")}
+
+                <div class="player-info">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Position
+                        </span>
+
+                        <span class="info-value">
+                            ${escapeHTML(position)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Age
+                        </span>
+
+                        <span class="info-value">
+                            ${age}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Nationality
+                        </span>
+
+                        <span class="info-value">
+                            ${escapeHTML(nationality)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            League
+                        </span>
+
+                        <span class="info-value">
+                            ${escapeHTML(league)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Foot
+                        </span>
+
+                        <span class="info-value">
+                            ${escapeHTML(foot)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Rank
+                        </span>
+
+                        <span class="info-value">
+                            ${
+                                player.rank !== null
+                                    ? player.rank
+                                    : "—"
+                            }
+                        </span>
+
+                    </div>
+
                 </div>
 
-              </div>
-
-              <div class="rating">
-                ${escapeHtml(overall)}
-              </div>
-
             </div>
-
-
-            <div class="player-info">
-
-              <div>
-                <span>Potential</span>
-                ${escapeHtml(potential)}
-              </div>
-
-              <div>
-                <span>Position</span>
-                ${escapeHtml(player.position || "-")}
-              </div>
-
-              <div>
-                <span>Age</span>
-                ${escapeHtml(age)}
-              </div>
-
-              <div>
-                <span>Nationality</span>
-                ${escapeHtml(player.nationality || "-")}
-              </div>
-
-              <div>
-                <span>League</span>
-                ${escapeHtml(player.league || "-")}
-              </div>
-
-              <div>
-                <span>Foot</span>
-                ${escapeHtml(player.preferredFoot || "-")}
-              </div>
-
-            </div>
-
-          </div>
-
         `;
-
-      })
-      .join("");
-
-
-    if (players.length > 100) {
-
-      container.innerHTML += `
-
-        <div style="
-          grid-column: 1 / -1;
-          text-align: center;
-          color: #7f8b99;
-          padding: 15px;
-        ">
-
-          Showing the first 100 of
-          ${players.length.toLocaleString()}
-          matching players.
-
-        </div>
-
-      `;
-
     }
 
-  }
+
+    /* =========================
+       SECURITY / HTML ESCAPING
+    ========================= */
+
+    function escapeHTML(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
 
-  // ==========================================
-  // INITIAL LOAD
-  // ==========================================
+    function escapeAttribute(value) {
 
-  loadDatabase();
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+
+    /* =========================
+       START SITE
+    ========================= */
+
+    showPage("dashboard");
 
 </script>
 
