@@ -515,179 +515,471 @@
 
 
 <script>
+let allPlayers = [];
 
-  let allPlayers = [];
+
+function showPage(pageId, button) {
+
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+
+  document.getElementById(pageId).classList.add('active');
+
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  button.classList.add('active');
+
+  if (pageId === 'players') {
+    loadDatabase();
+  }
+}
 
 
-  function showPage(pageId, button) {
+/* --------------------------------
+   CSV PARSER
+-------------------------------- */
 
-    document.querySelectorAll('.page').forEach(page => {
-      page.classList.remove('active');
-    });
+function parseCSV(text) {
 
-    document.getElementById(pageId).classList.add('active');
+  const rows = [];
+  let row = [];
+  let value = '';
+  let insideQuotes = false;
 
-    document.querySelectorAll('nav button').forEach(btn => {
-      btn.classList.remove('active');
-    });
+  for (let i = 0; i < text.length; i++) {
 
-    button.classList.add('active');
+    const char = text[i];
+    const next = text[i + 1];
 
-    if (pageId === 'players') {
-      loadDatabase();
+    if (char === '"' && insideQuotes && next === '"') {
+      value += '"';
+      i++;
+      continue;
     }
 
-  }
+    if (char === '"') {
+      insideQuotes = !insideQuotes;
+      continue;
+    }
 
+    if (char === ',' && !insideQuotes) {
+      row.push(value);
+      value = '';
+      continue;
+    }
 
-  async function loadDatabase() {
+    if ((char === '\n' || char === '\r') && !insideQuotes) {
 
-    try {
-
-      const response = await fetch('data/database.json');
-
-      if (!response.ok) {
-        throw new Error('Database could not be loaded');
+      if (char === '\r' && next === '\n') {
+        i++;
       }
 
-      const database = await response.json();
+      row.push(value);
+      value = '';
 
-      allPlayers = database.players || [];
+      if (row.some(cell => cell.trim() !== '')) {
+        rows.push(row);
+      }
 
-      document.getElementById('dashboardPlayerCount').textContent =
-        allPlayers.length.toLocaleString();
-
-      document.getElementById('databaseStatus').textContent =
-        `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
-
-      displayPlayers(allPlayers);
-
-    } catch (error) {
-
-      document.getElementById('databaseStatus').textContent =
-        'FC 27 database is currently empty — dataset will be imported next.';
-
-      console.error(error);
-
+      row = [];
+      continue;
     }
+
+    value += char;
+  }
+
+  if (value !== '' || row.length > 0) {
+    row.push(value);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+
+/* --------------------------------
+   CONVERT CSV ROW
+-------------------------------- */
+
+function convertPlayer(headers, row) {
+
+  const data = {};
+
+  headers.forEach((header, index) => {
+    data[header.trim()] = row[index] ?? '';
+  });
+
+
+  const player = {
+
+    id: data['info.playerid'],
+
+    name:
+      data['info.name.knownas'] ||
+      `${data['info.name.firstname']} ${data['info.name.lastname']}`.trim(),
+
+    firstName: data['info.name.firstname'],
+    lastName: data['info.name.lastname'],
+
+    overall: numberValue(data['info.overallrating']),
+    potential: numberValue(data['info.potential']),
+
+    age: numberValue(data['info.age']),
+
+    position: data['primary_position'],
+
+    otherPositions: data['other_positions'],
+
+    nationality: data['info.nation.name'],
+
+    club: data['info.teams.club_team.name'],
+
+    clubId: data['info.teams.club_team.id'],
+
+    league: data['info.league'],
+
+    leagueId: data['info.teams.club_team.leagueid'],
+
+    jerseyNumber:
+      numberValue(data['info.teams.club_team.jerseynumber']),
+
+    preferredFoot: data['info.preferredfoot'],
+
+    skillMoves: numberValue(data['info.skillmoves']),
+
+    weakFoot: numberValue(data['info.weafoot']),
+
+    height: numberValue(data['info.height']),
+
+    weight: numberValue(data['info.weight']),
+
+    valueUSD: numberValue(data['info.valueUSD']),
+    valueEUR: numberValue(data['info.valueEUR']),
+    valueGBP: numberValue(data['info.valueGBP']),
+
+    wageUSD: numberValue(data['info.wageUSD']),
+    wageEUR: numberValue(data['info.wageEUR']),
+    wageGBP: numberValue(data['info.wageGBP']),
+
+    attackingWorkRate: data['info.attackingworkrate'],
+    defensiveWorkRate: data['info.defensiveworkrate'],
+
+    contractStart: data['info.contract.jointeamdate'],
+    contractEnd: data['info.contract.enddate'],
+
+    loanedOut: data['info.contract.isloanedout'] === '1',
+
+    realFace: data['info.real_face'] === 'Yes',
+
+    headshot: data['info.headshot'],
+
+    playStyles: [
+      data['info.traits.trait1'],
+      data['info.traits.trait2']
+    ].filter(Boolean),
+
+    attributes: {
+
+      acceleration: numberValue(data['attributes.acceleration']),
+      sprintSpeed: numberValue(data['attributes.sprintspeed']),
+      agility: numberValue(data['attributes.agility']),
+      balance: numberValue(data['attributes.balance']),
+      jumping: numberValue(data['attributes.jumping']),
+      stamina: numberValue(data['attributes.stamina']),
+      strength: numberValue(data['attributes.strength']),
+      reactions: numberValue(data['attributes.reactions']),
+      aggression: numberValue(data['attributes.aggression']),
+      composure: numberValue(data['attributes.composure']),
+
+      interceptions: numberValue(data['attributes.interceptions']),
+      positioning: numberValue(data['attributes.positioning']),
+      vision: numberValue(data['attributes.vision']),
+
+      ballControl: numberValue(data['attributes.ballcontrol']),
+      crossing: numberValue(data['attributes.crossing']),
+      dribbling: numberValue(data['attributes.dribbling']),
+      finishing: numberValue(data['attributes.finishing']),
+
+      freeKickAccuracy:
+        numberValue(data['attributes.freekickaccuracy']),
+
+      headingAccuracy:
+        numberValue(data['attributes.headingaccuracy']),
+
+      longPassing:
+        numberValue(data['attributes.longpassing']),
+
+      shortPassing:
+        numberValue(data['attributes.shortpassing']),
+
+      marking: numberValue(data['attributes.marking']),
+      shotPower: numberValue(data['attributes.shotpower']),
+      longShots: numberValue(data['attributes.longshots']),
+
+      standingTackle:
+        numberValue(data['attributes.standingtackle']),
+
+      slidingTackle:
+        numberValue(data['attributes.slidingtackle']),
+
+      volleys: numberValue(data['attributes.volleys']),
+      curve: numberValue(data['attributes.curve']),
+      penalties: numberValue(data['attributes.penalties']),
+
+      gkDiving: numberValue(data['attributes.gkdiving']),
+      gkHandling: numberValue(data['attributes.gkhandling']),
+      gkKicking: numberValue(data['attributes.gkkicking']),
+      gkReflexes: numberValue(data['attributes.gkreflexes']),
+      gkPositioning: numberValue(data['attributes.gkpositioning'])
+    },
+
+    cardAttributes: {
+
+      pace: numberValue(data['card_attrs.pac']),
+      shooting: numberValue(data['card_attrs.sho']),
+      passing: numberValue(data['card_attrs.pas']),
+      dribbling: numberValue(data['card_attrs.dri']),
+      defending: numberValue(data['card_attrs.def']),
+      physical: numberValue(data['card_attrs.phy'])
+    },
+
+    raw: data
+
+  };
+
+  return player;
+}
+
+
+function numberValue(value) {
+
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  const number = Number(value);
+
+  return Number.isNaN(number) ? null : number;
+}
+
+
+/* --------------------------------
+   LOAD FC 27 DATABASE
+-------------------------------- */
+
+async function loadDatabase() {
+
+  if (allPlayers.length > 0) {
+    displayPlayers(allPlayers);
+    return;
+  }
+
+  try {
+
+    document.getElementById('databaseStatus').textContent =
+      'Loading FC 27 player database...';
+
+    const response = await fetch('data/players.csv');
+
+    if (!response.ok) {
+      throw new Error('players.csv could not be loaded');
+    }
+
+    const csvText = await response.text();
+
+    const rows = parseCSV(csvText);
+
+    if (rows.length < 2) {
+      throw new Error('CSV appears to be empty');
+    }
+
+    const headers = rows[0];
+
+    allPlayers = rows
+      .slice(1)
+      .map(row => convertPlayer(headers, row))
+      .filter(player => player.name);
+
+
+    document.getElementById('dashboardPlayerCount').textContent =
+      allPlayers.length.toLocaleString();
+
+    document.getElementById('databaseStatus').textContent =
+      `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
+
+    displayPlayers(allPlayers);
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById('databaseStatus').textContent =
+      'Unable to load FC 27 player database.';
 
   }
 
+}
 
-  function searchPlayers() {
 
-    const search =
-      document.getElementById('playerSearch').value.toLowerCase().trim();
+/* --------------------------------
+   PLAYER SEARCH
+-------------------------------- */
 
-    if (!search) {
+function searchPlayers() {
 
-      displayPlayers(allPlayers);
+  const search =
+    document.getElementById('playerSearch')
+      .value
+      .toLowerCase()
+      .trim();
 
-      return;
-
-    }
-
-    const results = allPlayers.filter(player => {
-
-      const name = (player.name || '').toLowerCase();
-
-      const club = (player.club || '').toLowerCase();
-
-      const nation = (player.nationality || '').toLowerCase();
-
-      return (
-        name.includes(search) ||
-        club.includes(search) ||
-        nation.includes(search)
-      );
-
-    });
-
-    displayPlayers(results);
-
+  if (!search) {
+    displayPlayers(allPlayers);
+    return;
   }
 
 
-  function displayPlayers(players) {
+  const results = allPlayers.filter(player => {
 
-    const container =
-      document.getElementById('playerResults');
+    const name =
+      (player.name || '').toLowerCase();
 
-    container.innerHTML = '';
+    const club =
+      (player.club || '').toLowerCase();
 
-    if (players.length === 0) {
+    const nationality =
+      (player.nationality || '').toLowerCase();
 
-      container.innerHTML = `
-        <div class="card">
-          <h3>No players found</h3>
-          <p class="muted">
-            The FC 27 player dataset will be imported soon.
-          </p>
+    const position =
+      (player.position || '').toLowerCase();
+
+    const league =
+      (player.league || '').toLowerCase();
+
+    return (
+      name.includes(search) ||
+      club.includes(search) ||
+      nationality.includes(search) ||
+      position.includes(search) ||
+      league.includes(search)
+    );
+
+  });
+
+
+  displayPlayers(results);
+
+}
+
+
+/* --------------------------------
+   DISPLAY PLAYERS
+-------------------------------- */
+
+function displayPlayers(players) {
+
+  const container =
+    document.getElementById('playerResults');
+
+  container.innerHTML = '';
+
+
+  if (players.length === 0) {
+
+    container.innerHTML = `
+      <div class="card">
+        <h3>No players found</h3>
+        <p class="muted">
+          Try another player, club, nationality or position.
+        </p>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  players.slice(0, 100).forEach(player => {
+
+    const card =
+      document.createElement('div');
+
+    card.className = 'player-card';
+
+
+    card.innerHTML = `
+
+      <h3>
+        ${escapeHtml(player.name || 'Unknown Player')}
+      </h3>
+
+      <div class="player-info">
+
+        <div>
+          OVR:
+          <strong>${player.overall ?? '-'}</strong>
         </div>
-      `;
 
-      return;
-
-    }
-
-
-    players.slice(0, 100).forEach(player => {
-
-      const card = document.createElement('div');
-
-      card.className = 'player-card';
-
-      card.innerHTML = `
-
-        <h3>${escapeHtml(player.name || 'Unknown Player')}</h3>
-
-        <div class="player-info">
-
-          <div>
-            OVR: <strong>${player.overall ?? '-'}</strong>
-          </div>
-
-          <div>
-            Potential: ${player.potential ?? '-'}
-          </div>
-
-          <div>
-            Position: ${escapeHtml(player.position || '-')}
-          </div>
-
-          <div>
-            Club: ${escapeHtml(player.club || '-')}
-          </div>
-
-          <div>
-            Nationality: ${escapeHtml(player.nationality || '-')}
-          </div>
-
+        <div>
+          Potential:
+          ${player.potential ?? '-'}
         </div>
 
-      `;
+        <div>
+          Position:
+          ${escapeHtml(player.position || '-')}
+        </div>
 
-      container.appendChild(card);
+        <div>
+          Club:
+          ${escapeHtml(player.club || '-')}
+        </div>
 
-    });
+        <div>
+          League:
+          ${escapeHtml(player.league || '-')}
+        </div>
 
-  }
+        <div>
+          Nationality:
+          ${escapeHtml(player.nationality || '-')}
+        </div>
+
+        <div>
+          Age:
+          ${player.age ?? '-'}
+        </div>
+
+      </div>
+
+    `;
 
 
-  function escapeHtml(value) {
+    container.appendChild(card);
 
-    return String(value)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
+  });
 
-  }
+}
 
 
-  loadDatabase();
+function escapeHtml(value) {
 
+  return String(value)
+
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+
+}
+
+
+loadDatabase();
+  
 </script>
 
 </body>
