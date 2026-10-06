@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Career Mode Hub</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -134,6 +135,47 @@
       margin-bottom: 20px;
     }
 
+    .search-box {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 20px;
+      background: #11151a;
+      border: 1px solid #303640;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+    }
+
+    .database-status {
+      padding: 15px;
+      border-radius: 10px;
+      background: #11151a;
+      border: 1px solid #282e36;
+      margin-bottom: 20px;
+    }
+
+    .player-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 15px;
+    }
+
+    .player-card {
+      background: #14181d;
+      border: 1px solid #282e36;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .player-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .player-info {
+      color: #9ca3af;
+      line-height: 1.7;
+    }
+
     @media (max-width: 700px) {
       main {
         padding: 15px;
@@ -174,9 +216,13 @@
 
 <main>
 
+  <!-- DASHBOARD -->
+
   <section id="dashboard" class="page active">
+
     <div class="hero">
       <h2>Welcome to Career Mode Hub</h2>
+
       <p>
         Your complete EA FC 27 career database — matches, players,
         transfers, youth academy, competitions, trophies and more.
@@ -184,6 +230,7 @@
     </div>
 
     <div class="grid">
+
       <div class="card">
         <h3>Current Season</h3>
         <div class="stat">2026/27</div>
@@ -197,9 +244,9 @@
       </div>
 
       <div class="card">
-        <h3>Players</h3>
-        <div class="stat">0</div>
-        <p class="muted">Career players</p>
+        <h3>FC 27 Players</h3>
+        <div class="stat" id="dashboardPlayerCount">0</div>
+        <p class="muted">Master database</p>
       </div>
 
       <div class="card">
@@ -207,141 +254,273 @@
         <div class="stat">0</div>
         <p class="muted">Won</p>
       </div>
+
     </div>
+
   </section>
+
+
+  <!-- CAREER -->
 
   <section id="career" class="page">
+
     <h2 class="section-title">My Career</h2>
+
     <div class="card">
+
       <h3>Career Setup</h3>
-      <p class="muted">Your FC 27 career will be configured here.</p>
+
+      <p class="muted">
+        Your FC 27 career will be configured here.
+      </p>
+
     </div>
+
   </section>
 
+
+  <!-- MATCHES -->
+
   <section id="matches" class="page">
+
     <h2 class="section-title">Match Centre</h2>
 
     <div class="card">
+
       <h3>Upload Match Facts</h3>
+
       <p class="muted">
         Upload one or multiple EA FC Match Facts screenshots.
         AI processing will be connected later.
       </p>
 
       <div class="upload">
+
         <p>📸 Drop Match Facts screenshots here</p>
+
         <input type="file" multiple accept="image/*">
+
       </div>
+
     </div>
+
   </section>
 
+
+  <!-- SQUAD -->
+
   <section id="squad" class="page">
+
     <h2 class="section-title">Squad</h2>
+
     <div class="card">
+
       <p class="muted">
         Your career squad will automatically populate from the FC 27 database.
       </p>
+
     </div>
+
   </section>
+
+
+  <!-- PLAYERS -->
 
   <section id="players" class="page">
-    <h2 class="section-title">Players</h2>
-    <div class="card">
-      <p class="muted">
-        Search every player in the FC 27 database.
-      </p>
+
+    <h2 class="section-title">FC 27 Players</h2>
+
+    <div class="database-status" id="databaseStatus">
+      Loading FC 27 database...
     </div>
+
+    <input
+      id="playerSearch"
+      class="search-box"
+      type="text"
+      placeholder="Search players..."
+      oninput="searchPlayers()"
+    >
+
+    <div id="playerResults" class="player-grid"></div>
+
   </section>
 
+
+  <!-- YOUTH -->
+
   <section id="youth" class="page">
+
     <h2 class="section-title">Youth Academy</h2>
 
     <div class="card">
+
       <h3>Batch Import</h3>
+
       <p class="muted">
         Upload all Youth Academy screenshots and extract players automatically.
       </p>
 
       <div class="upload">
+
         <p>📸 Upload Youth Academy screenshots</p>
+
         <input type="file" multiple accept="image/*">
+
       </div>
+
     </div>
+
   </section>
 
+
+  <!-- TRANSFERS -->
+
   <section id="transfers" class="page">
+
     <h2 class="section-title">Transfers</h2>
 
     <div class="card">
+
       <h3>Transfer Screenshot Import</h3>
+
       <p class="muted">
         Upload transfer screenshots to automatically record incoming and outgoing transfers.
       </p>
 
       <div class="upload">
+
         <p>📸 Upload transfer screenshots</p>
+
         <input type="file" multiple accept="image/*">
+
       </div>
+
     </div>
+
   </section>
+
+
+  <!-- COMPETITIONS -->
 
   <section id="competitions" class="page">
+
     <h2 class="section-title">Competitions</h2>
+
     <div class="grid">
-      <div class="card"><h3>League</h3><p class="muted">Automatic standings</p></div>
-      <div class="card"><h3>Domestic Cups</h3><p class="muted">Cup progression</p></div>
-      <div class="card"><h3>European Cups</h3><p class="muted">UCL / UEL / UECL</p></div>
-      <div class="card"><h3>International</h3><p class="muted">World Cup / Euros</p></div>
+
+      <div class="card">
+        <h3>League</h3>
+        <p class="muted">Automatic standings</p>
+      </div>
+
+      <div class="card">
+        <h3>Domestic Cups</h3>
+        <p class="muted">Cup progression</p>
+      </div>
+
+      <div class="card">
+        <h3>European Cups</h3>
+        <p class="muted">UCL / UEL / UECL</p>
+      </div>
+
+      <div class="card">
+        <h3>International</h3>
+        <p class="muted">World Cup / Euros</p>
+      </div>
+
     </div>
+
   </section>
 
+
+  <!-- LEAGUE -->
+
   <section id="league" class="page">
+
     <h2 class="section-title">League Centre</h2>
 
     <div class="card">
+
       <h3>League Table Import</h3>
+
       <p class="muted">
         Upload a league table screenshot to compare it with the automatically calculated table.
       </p>
 
       <div class="upload">
+
         <p>📸 Upload League Table</p>
+
         <input type="file" accept="image/*">
+
       </div>
+
     </div>
+
   </section>
 
+
+  <!-- SEASONS -->
+
   <section id="seasons" class="page">
+
     <h2 class="section-title">Past Seasons</h2>
+
     <div class="card">
+
       <p class="muted">
         Completed seasons, statistics, transfers, competitions and results will appear here.
       </p>
+
     </div>
+
   </section>
 
+
+  <!-- TROPHIES -->
+
   <section id="trophies" class="page">
+
     <h2 class="section-title">🏆 Trophy Cabinet</h2>
+
     <div class="card">
+
       <p class="muted">
         Your club and international trophies will automatically be recorded.
       </p>
+
     </div>
+
   </section>
 
+
+  <!-- NATIONAL TEAM -->
+
   <section id="national" class="page">
+
     <h2 class="section-title">National Team</h2>
+
     <div class="card">
+
       <p class="muted">
         International squad, fixtures, statistics and tournaments.
       </p>
+
     </div>
+
   </section>
 
 </main>
 
+
 <script>
+
+  let allPlayers = [];
+
+
   function showPage(pageId, button) {
+
     document.querySelectorAll('.page').forEach(page => {
       page.classList.remove('active');
     });
@@ -353,7 +532,162 @@
     });
 
     button.classList.add('active');
+
+    if (pageId === 'players') {
+      loadDatabase();
+    }
+
   }
+
+
+  async function loadDatabase() {
+
+    try {
+
+      const response = await fetch('data/database.json');
+
+      if (!response.ok) {
+        throw new Error('Database could not be loaded');
+      }
+
+      const database = await response.json();
+
+      allPlayers = database.players || [];
+
+      document.getElementById('dashboardPlayerCount').textContent =
+        allPlayers.length.toLocaleString();
+
+      document.getElementById('databaseStatus').textContent =
+        `FC 27 database loaded — ${allPlayers.length.toLocaleString()} players`;
+
+      displayPlayers(allPlayers);
+
+    } catch (error) {
+
+      document.getElementById('databaseStatus').textContent =
+        'FC 27 database is currently empty — dataset will be imported next.';
+
+      console.error(error);
+
+    }
+
+  }
+
+
+  function searchPlayers() {
+
+    const search =
+      document.getElementById('playerSearch').value.toLowerCase().trim();
+
+    if (!search) {
+
+      displayPlayers(allPlayers);
+
+      return;
+
+    }
+
+    const results = allPlayers.filter(player => {
+
+      const name = (player.name || '').toLowerCase();
+
+      const club = (player.club || '').toLowerCase();
+
+      const nation = (player.nationality || '').toLowerCase();
+
+      return (
+        name.includes(search) ||
+        club.includes(search) ||
+        nation.includes(search)
+      );
+
+    });
+
+    displayPlayers(results);
+
+  }
+
+
+  function displayPlayers(players) {
+
+    const container =
+      document.getElementById('playerResults');
+
+    container.innerHTML = '';
+
+    if (players.length === 0) {
+
+      container.innerHTML = `
+        <div class="card">
+          <h3>No players found</h3>
+          <p class="muted">
+            The FC 27 player dataset will be imported soon.
+          </p>
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    players.slice(0, 100).forEach(player => {
+
+      const card = document.createElement('div');
+
+      card.className = 'player-card';
+
+      card.innerHTML = `
+
+        <h3>${escapeHtml(player.name || 'Unknown Player')}</h3>
+
+        <div class="player-info">
+
+          <div>
+            OVR: <strong>${player.overall ?? '-'}</strong>
+          </div>
+
+          <div>
+            Potential: ${player.potential ?? '-'}
+          </div>
+
+          <div>
+            Position: ${escapeHtml(player.position || '-')}
+          </div>
+
+          <div>
+            Club: ${escapeHtml(player.club || '-')}
+          </div>
+
+          <div>
+            Nationality: ${escapeHtml(player.nationality || '-')}
+          </div>
+
+        </div>
+
+      `;
+
+      container.appendChild(card);
+
+    });
+
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+  loadDatabase();
+
 </script>
 
 </body>
