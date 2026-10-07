@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Career Mode Hub</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -27,10 +29,6 @@ button {
     cursor: pointer;
 }
 
-.app {
-    min-height: 100vh;
-}
-
 /* =========================
    SIDEBAR
 ========================= */
@@ -45,6 +43,7 @@ button {
     border-right: 1px solid #252c35;
     padding: 24px 14px;
     z-index: 10;
+    overflow-y: auto;
 }
 
 .logo {
@@ -122,15 +121,8 @@ button {
 }
 
 /* =========================
-   DASHBOARD
+   BUTTONS
 ========================= */
-
-.careers-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 22px;
-}
 
 .primary-btn {
     background: #3288e8;
@@ -159,6 +151,26 @@ button {
     background: #222a34;
 }
 
+.delete-btn {
+    background: transparent;
+    border: 1px solid #493038;
+    color: #d97886;
+    padding: 9px 13px;
+    border-radius: 7px;
+}
+
+.delete-btn:hover {
+    background: #24161a;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.careers-header {
+    margin-bottom: 22px;
+}
+
 .careers-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -178,12 +190,6 @@ button {
     transform: translateY(-2px);
 }
 
-.career-card-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-}
-
 .career-name {
     font-size: 19px;
     font-weight: 800;
@@ -201,8 +207,8 @@ button {
 }
 
 .career-season {
-    margin-top: 18px;
-    padding-top: 15px;
+    margin-top: 15px;
+    padding-top: 13px;
     border-top: 1px solid #252c35;
     display: flex;
     justify-content: space-between;
@@ -221,20 +227,8 @@ button {
     margin-top: 17px;
 }
 
-.career-actions button {
+.career-actions .primary-btn {
     flex: 1;
-}
-
-.delete-btn {
-    background: transparent;
-    border: 1px solid #493038;
-    color: #d97886;
-    padding: 9px;
-    border-radius: 7px;
-}
-
-.delete-btn:hover {
-    background: #24161a;
 }
 
 .empty-state {
@@ -252,7 +246,7 @@ button {
 }
 
 /* =========================
-   CAREER HEADER
+   CAREER BANNER
 ========================= */
 
 .career-banner {
@@ -299,7 +293,7 @@ button {
 }
 
 /* =========================
-   CARDS
+   PANELS
 ========================= */
 
 .panel {
@@ -320,6 +314,10 @@ button {
     font-size: 13px;
     margin-bottom: 20px;
 }
+
+/* =========================
+   STATS
+========================= */
 
 .stats-grid {
     display: grid;
@@ -437,7 +435,7 @@ button {
 }
 
 /* =========================
-   SEARCHABLE DROPDOWN
+   SEARCH DROPDOWNS
 ========================= */
 
 .search-select {
@@ -469,18 +467,8 @@ button {
     font-size: 13px;
 }
 
-.search-option:last-child {
-    border-bottom: 0;
-}
-
 .search-option:hover {
     background: #222a34;
-}
-
-.search-option small {
-    display: block;
-    color: #737d89;
-    margin-top: 3px;
 }
 
 .no-results {
@@ -490,25 +478,248 @@ button {
 }
 
 /* =========================
+   MATCHES
+========================= */
+
+.match-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.match-stat {
+    background: #171d25;
+    border: 1px solid #252c35;
+    border-radius: 9px;
+    padding: 15px;
+}
+
+.match-stat-label {
+    color: #7f8996;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.match-stat-number {
+    font-size: 23px;
+    font-weight: 800;
+    margin-top: 6px;
+}
+
+.match-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.match-row {
+    background: #171d25;
+    border: 1px solid #252c35;
+    border-radius: 9px;
+    padding: 16px;
+}
+
+.match-row-main {
+    display: grid;
+    grid-template-columns: 90px 1fr 100px 90px;
+    align-items: center;
+    gap: 15px;
+}
+
+.match-date {
+    color: #7f8996;
+    font-size: 12px;
+}
+
+.match-competition {
+    color: #7f8996;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.match-opponent {
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.match-home-away {
+    color: #8d97a3;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.match-score {
+    text-align: center;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.match-result {
+    text-align: center;
+    font-weight: 800;
+}
+
+.result-win {
+    color: #69d38b;
+}
+
+.result-draw {
+    color: #e0bd68;
+}
+
+.result-loss {
+    color: #e27684;
+}
+
+.match-details {
+    border-top: 1px solid #252c35;
+    margin-top: 14px;
+    padding-top: 12px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: #8d97a3;
+    font-size: 12px;
+}
+
+.match-delete {
+    margin-left: auto;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+}
+
+.modal {
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #11161d;
+    border: 1px solid #303844;
+    border-radius: 13px;
+    padding: 25px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-title {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.close-btn {
+    background: transparent;
+    border: 0;
+    color: #7f8996;
+    font-size: 23px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 17px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #cdd3db;
+    margin-bottom: 7px;
+}
+
+.score-inputs {
+    display: grid;
+    grid-template-columns: 1fr 45px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.score-inputs span {
+    text-align: center;
+    color: #7f8996;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+/* =========================
+   PLAYERS
+========================= */
+
+.player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.player-card {
+    background: #171d25;
+    border: 1px solid #252c35;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.player-name {
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.player-club {
+    color: #7f8996;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* =========================
    RESPONSIVE
 ========================= */
 
-@media (max-width: 900px) {
-    .sidebar {
-        width: 190px;
-    }
-
-    .main {
-        margin-left: 190px;
-        padding: 25px;
-    }
+@media (max-width: 1000px) {
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2,1fr);
     }
+
+    .match-summary-grid {
+        grid-template-columns: repeat(3,1fr);
+    }
+
 }
 
-@media (max-width: 650px) {
+@media (max-width: 750px) {
+
     .sidebar {
         position: static;
         width: 100%;
@@ -522,38 +733,55 @@ button {
         padding: 20px;
     }
 
-    .careers-grid {
-        grid-template-columns: 1fr;
+    .match-row-main {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .type-buttons {
-        grid-template-columns: 1fr;
-    }
-
-    .career-banner-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
 }
+
+@media (max-width: 600px) {
+
+    .type-buttons,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full {
+        grid-column: auto;
+    }
+
+    .stats-grid,
+    .match-summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
         <div class="logo">
             Career Mode <span>Hub</span>
         </div>
 
-        <div class="nav-title" id="careerNavTitle">
+        <div class="nav-title">
             Career
         </div>
 
-        <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+        <button
+            class="nav-btn active"
+            data-page="dashboard"
+            onclick="showPage('dashboard')"
+        >
             Dashboard
         </button>
 
@@ -609,6 +837,7 @@ button {
 
 
     <!-- MAIN -->
+
     <main class="main">
 
         <div id="pageContent"></div>
@@ -618,92 +847,115 @@ button {
 </div>
 
 
+<!-- MODAL CONTAINER -->
+
+<div id="modalContainer"></div>
+
+
 <script>
 
 /* =========================================================
-   GLOBAL DATA
+   GLOBAL VARIABLES
 ========================================================= */
 
 let allPlayers = [];
 
 let fc27Leagues = [];
+
 let fc27ClubsByLeague = {};
 
 let careers = [];
+
 let currentCareerId = null;
 
 let setupClubType = "original";
 
 let selectedLeague = "";
+
 let selectedClub = "";
+
 let selectedCountry = "";
+
 let selectedContinent = "";
 
 
 /* =========================================================
-   COUNTRY DATA
+   COUNTRIES
 ========================================================= */
 
 const countriesByContinent = {
 
     Europe: [
-        "Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina",
-        "Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","England",
-        "Estonia","Faroe Islands","Finland","France","Georgia","Germany",
-        "Greece","Hungary","Iceland","Ireland","Israel","Italy","Kosovo",
-        "Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova",
-        "Montenegro","Netherlands","North Macedonia","Northern Ireland","Norway",
-        "Poland","Portugal","Republic of Ireland","Romania","Russia","San Marino",
-        "Scotland","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland",
-        "Turkey","Ukraine","Wales"
+        "Albania","Andorra","Austria","Belarus",
+        "Belgium","Bosnia and Herzegovina","Bulgaria",
+        "Croatia","Cyprus","Czech Republic","Denmark",
+        "England","Estonia","Faroe Islands","Finland",
+        "France","Georgia","Germany","Greece","Hungary",
+        "Iceland","Ireland","Israel","Italy","Kosovo",
+        "Latvia","Liechtenstein","Lithuania","Luxembourg",
+        "Malta","Moldova","Montenegro","Netherlands",
+        "North Macedonia","Northern Ireland","Norway",
+        "Poland","Portugal","Republic of Ireland",
+        "Romania","Russia","San Marino","Scotland",
+        "Serbia","Slovakia","Slovenia","Spain",
+        "Sweden","Switzerland","Turkey","Ukraine","Wales"
     ],
 
     Asia: [
-        "China PR","India","Indonesia","Iran","Iraq","Japan","Korea Republic",
-        "Malaysia","Saudi Arabia","Thailand","United Arab Emirates"
+        "China PR","India","Indonesia","Iran","Iraq",
+        "Japan","Korea Republic","Malaysia",
+        "Saudi Arabia","Thailand","United Arab Emirates"
     ],
 
     Africa: [
-        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast","Mali","Morocco",
-        "Nigeria","Senegal","South Africa","Tunisia"
+        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast",
+        "Mali","Morocco","Nigeria","Senegal","South Africa",
+        "Tunisia"
     ],
 
     NorthAmerica: [
-        "Canada","Costa Rica","Honduras","Jamaica","Mexico","Panama",
-        "United States"
+        "Canada","Costa Rica","Honduras","Jamaica",
+        "Mexico","Panama","United States"
     ],
 
     SouthAmerica: [
-        "Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador",
-        "Paraguay","Peru","Uruguay","Venezuela"
+        "Argentina","Bolivia","Brazil","Chile","Colombia",
+        "Ecuador","Paraguay","Peru","Uruguay","Venezuela"
     ],
 
     Oceania: [
         "Australia","New Zealand"
     ]
+
 };
 
 
 /* =========================================================
-   LOCAL STORAGE
+   STORAGE
 ========================================================= */
 
 function loadCareers() {
 
     try {
 
-        const saved = localStorage.getItem("careerModeHubCareers");
+        const saved =
+            localStorage.getItem(
+                "careerModeHubCareers"
+            );
 
         if (saved) {
-            careers = JSON.parse(saved);
+
+            careers =
+                JSON.parse(saved);
+
         }
 
     } catch (error) {
 
-        console.error("Could not load careers:", error);
         careers = [];
 
     }
+
 }
 
 
@@ -713,32 +965,34 @@ function saveCareers() {
         "careerModeHubCareers",
         JSON.stringify(careers)
     );
+
 }
 
 
 /* =========================================================
-   PAGE SYSTEM
+   GET CURRENT CAREER
+========================================================= */
+
+function getCurrentCareer() {
+
+    return careers.find(
+        career =>
+            career.id === currentCareerId
+    );
+
+}
+
+
+/* =========================================================
+   NAVIGATION
 ========================================================= */
 
 function showPage(page) {
 
-    if (page !== "dashboard" && !currentCareerId) {
-        showPage("dashboard");
-        return;
-    }
-
-    document.querySelectorAll(".nav-btn").forEach(button => {
-
-        button.classList.remove("active");
-
-        if (button.dataset.page === page) {
-            button.classList.add("active");
-        }
-
-    });
-
-
-    if (page === "dashboard") {
+    if (
+        page !== "dashboard" &&
+        !currentCareerId
+    ) {
 
         renderDashboard();
         return;
@@ -746,156 +1000,115 @@ function showPage(page) {
     }
 
 
-    if (page === "mycareer") {
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+            if (
+                button.dataset.page === page
+            ) {
+
+                button.classList.add("active");
+
+            }
+
+        });
+
+
+    if (page === "dashboard") {
+
+        renderDashboard();
+
+    }
+
+    else if (page === "mycareer") {
 
         renderCareerHome();
-        return;
 
     }
 
+    else if (page === "matches") {
 
-    if (page === "matches") {
-
-        renderPlaceholder(
-            "Matches",
-            "This is where your career mode matches will be tracked."
-        );
-
-        return;
+        renderMatches();
 
     }
 
-
-    if (page === "squad") {
-
-        renderPlaceholder(
-            "Squad",
-            "Your current squad will appear here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "players") {
+    else if (page === "players") {
 
         renderPlayers();
 
-        return;
-
     }
 
-
-    if (page === "youth") {
-
-        renderPlaceholder(
-            "Youth Academy",
-            "Youth academy players and development will appear here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "transfers") {
+    else {
 
         renderPlaceholder(
-            "Transfers",
-            "Transfers, arrivals and departures will appear here."
+            pageTitle(page),
+            "This section will be built next."
         );
-
-        return;
-
-    }
-
-
-    if (page === "competitions") {
-
-        renderPlaceholder(
-            "Competitions",
-            "Your competitions and progress will appear here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "league") {
-
-        renderPlaceholder(
-            "League Centre",
-            "League table, fixtures and promotion/relegation will appear here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "past") {
-
-        renderPlaceholder(
-            "Past Seasons",
-            "Previous seasons will be stored here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "trophies") {
-
-        renderPlaceholder(
-            "Trophy Cabinet",
-            "Your trophies and honours will appear here."
-        );
-
-        return;
-
-    }
-
-
-    if (page === "national") {
-
-        renderPlaceholder(
-            "National Team",
-            "Your national team career will appear here."
-        );
-
-        return;
 
     }
 
 }
 
 
+function pageTitle(page) {
+
+    const titles = {
+
+        squad: "Squad",
+
+        youth: "Youth Academy",
+
+        transfers: "Transfers",
+
+        competitions: "Competitions",
+
+        league: "League Centre",
+
+        past: "Past Seasons",
+
+        trophies: "Trophy Cabinet",
+
+        national: "National Team"
+
+    };
+
+    return titles[page] || page;
+
+}
+
+
 /* =========================================================
-   SIDEBAR STATE
+   NAVIGATION STATE
 ========================================================= */
 
 function updateNavigation() {
 
-    const buttons = document.querySelectorAll(
-        "#careerNavigation .nav-btn"
-    );
+    document
+        .querySelectorAll(
+            "#careerNavigation .nav-btn"
+        )
+        .forEach(button => {
 
-    buttons.forEach(button => {
+            if (currentCareerId) {
 
-        if (currentCareerId) {
+                button.classList.remove(
+                    "disabled"
+                );
 
-            button.classList.remove("disabled");
+            }
 
-        } else {
+            else {
 
-            button.classList.add("disabled");
+                button.classList.add(
+                    "disabled"
+                );
 
-        }
+            }
 
-    });
+        });
 
 }
 
@@ -910,7 +1123,9 @@ function renderDashboard() {
 
     updateNavigation();
 
-    document.getElementById("pageContent").innerHTML = `
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
 
         <div class="topbar">
 
@@ -926,7 +1141,10 @@ function renderDashboard() {
 
             </div>
 
-            <button class="primary-btn" onclick="startNewCareer()">
+            <button
+                class="primary-btn"
+                onclick="startNewCareer()"
+            >
                 + New Career
             </button>
 
@@ -935,14 +1153,12 @@ function renderDashboard() {
 
         <div class="careers-header">
 
-            <div>
-                <div class="panel-title">
-                    Your Careers
-                </div>
+            <div class="panel-title">
+                Your Careers
+            </div>
 
-                <div class="panel-subtitle">
-                    Run multiple career modes at the same time.
-                </div>
+            <div class="panel-subtitle">
+                Run multiple career modes at the same time.
             </div>
 
         </div>
@@ -957,7 +1173,9 @@ function renderDashboard() {
 
             <div class="empty-state">
 
-                <h2>No careers yet</h2>
+                <h2>
+                    No careers yet
+                </h2>
 
                 <p>
                     Create your first Career Mode save to get started.
@@ -980,7 +1198,9 @@ function renderDashboard() {
 
             <div class="careers-grid">
 
-                ${careers.map(career => createCareerCard(career)).join("")}
+                ${careers
+                    .map(createCareerCard)
+                    .join("")}
 
             </div>
 
@@ -994,32 +1214,20 @@ function renderDashboard() {
 
 function createCareerCard(career) {
 
-    const nationalTeam = career.nationalTeam
-        ? career.nationalTeam
-        : "No National Team";
-
     return `
 
         <div class="career-card">
 
-            <div class="career-card-top">
+            <div class="career-name">
+                ${escapeHTML(career.managerName)}
+            </div>
 
-                <div>
+            <div class="career-club">
+                ${escapeHTML(career.clubName)}
+            </div>
 
-                    <div class="career-name">
-                        ${escapeHTML(career.managerName)}
-                    </div>
-
-                    <div class="career-club">
-                        ${escapeHTML(career.clubName)}
-                    </div>
-
-                    <div class="career-league">
-                        ${escapeHTML(career.league)}
-                    </div>
-
-                </div>
-
+            <div class="career-league">
+                ${escapeHTML(career.league)}
             </div>
 
 
@@ -1039,11 +1247,30 @@ function createCareerCard(career) {
             <div class="career-season">
 
                 <span>
+                    Matches
+                </span>
+
+                <span class="season-value">
+                    ${career.matches.length}
+                </span>
+
+            </div>
+
+
+            <div class="career-season">
+
+                <span>
                     National Team
                 </span>
 
                 <span class="season-value">
-                    ${escapeHTML(nationalTeam)}
+                    ${
+                        career.nationalTeam
+                        ? escapeHTML(
+                            career.nationalTeam
+                        )
+                        : "None"
+                    }
                 </span>
 
             </div>
@@ -1083,8 +1310,11 @@ function startNewCareer() {
     setupClubType = "original";
 
     selectedLeague = "";
+
     selectedClub = "";
+
     selectedCountry = "";
+
     selectedContinent = "";
 
     renderCareerSetup();
@@ -1100,7 +1330,9 @@ function renderCareerSetup() {
 
     currentCareerId = null;
 
-    document.getElementById("pageContent").innerHTML = `
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
 
         <div class="topbar">
 
@@ -1124,8 +1356,6 @@ function renderCareerSetup() {
             <div class="setup-panel">
 
 
-                <!-- MANAGER -->
-
                 <div class="setup-section">
 
                     <label class="setup-label">
@@ -1140,8 +1370,6 @@ function renderCareerSetup() {
 
                 </div>
 
-
-                <!-- CLUB TYPE -->
 
                 <div class="setup-section">
 
@@ -1189,8 +1417,6 @@ function renderCareerSetup() {
                 </div>
 
 
-                <!-- LEAGUE -->
-
                 <div class="setup-section">
 
                     <label class="setup-label">
@@ -1215,14 +1441,8 @@ function renderCareerSetup() {
 
                     </div>
 
-                    <div class="setup-help">
-                        Select a league from the FC 27 player database.
-                    </div>
-
                 </div>
 
-
-                <!-- CLUB -->
 
                 <div
                     id="clubSection"
@@ -1240,9 +1460,9 @@ function renderCareerSetup() {
                             class="search-input"
                             placeholder="Select a league first..."
                             autocomplete="off"
+                            disabled
                             oninput="searchClub(this.value)"
                             onclick="openClubResults()"
-                            disabled
                         >
 
                         <div
@@ -1255,12 +1475,10 @@ function renderCareerSetup() {
                 </div>
 
 
-                <!-- CUSTOM CLUB -->
-
                 <div
                     id="customClubSection"
                     class="setup-section"
-                    style="display:none;"
+                    style="display:none"
                 >
 
                     <label class="setup-label">
@@ -1276,8 +1494,6 @@ function renderCareerSetup() {
                 </div>
 
 
-                <!-- SEASON -->
-
                 <div class="setup-section">
 
                     <label class="setup-label">
@@ -1290,14 +1506,8 @@ function renderCareerSetup() {
                         disabled
                     >
 
-                    <div class="setup-help">
-                        Every new career starts in the 2026/27 season.
-                    </div>
-
                 </div>
 
-
-                <!-- NATIONAL TEAM -->
 
                 <div class="setup-section">
 
@@ -1324,12 +1534,10 @@ function renderCareerSetup() {
                 </div>
 
 
-                <!-- CONTINENT -->
-
                 <div
                     id="continentSection"
                     class="setup-section"
-                    style="display:none;"
+                    style="display:none"
                 >
 
                     <label class="setup-label">
@@ -1375,12 +1583,10 @@ function renderCareerSetup() {
                 </div>
 
 
-                <!-- COUNTRY -->
-
                 <div
                     id="countrySection"
                     class="setup-section"
-                    style="display:none;"
+                    style="display:none"
                 >
 
                     <label class="setup-label">
@@ -1393,10 +1599,10 @@ function renderCareerSetup() {
                             id="countrySearch"
                             class="search-input"
                             placeholder="Select a continent first..."
+                            disabled
                             autocomplete="off"
                             oninput="searchCountry(this.value)"
                             onclick="openCountryResults()"
-                            disabled
                         >
 
                         <div
@@ -1445,34 +1651,60 @@ function selectClubType(type) {
 
     setupClubType = type;
 
-    const originalButton =
-        document.getElementById("originalClubButton");
+    const original =
+        document.getElementById(
+            "originalClubButton"
+        );
 
-    const createButton =
-        document.getElementById("createClubButton");
+    const create =
+        document.getElementById(
+            "createClubButton"
+        );
 
     const clubSection =
-        document.getElementById("clubSection");
+        document.getElementById(
+            "clubSection"
+        );
 
-    const customClubSection =
-        document.getElementById("customClubSection");
+    const customSection =
+        document.getElementById(
+            "customClubSection"
+        );
 
 
     if (type === "original") {
 
-        originalButton.classList.add("selected");
-        createButton.classList.remove("selected");
+        original.classList.add(
+            "selected"
+        );
 
-        clubSection.style.display = "block";
-        customClubSection.style.display = "none";
+        create.classList.remove(
+            "selected"
+        );
 
-    } else {
+        clubSection.style.display =
+            "block";
 
-        originalButton.classList.remove("selected");
-        createButton.classList.add("selected");
+        customSection.style.display =
+            "none";
 
-        clubSection.style.display = "none";
-        customClubSection.style.display = "block";
+    }
+
+    else {
+
+        original.classList.remove(
+            "selected"
+        );
+
+        create.classList.add(
+            "selected"
+        );
+
+        clubSection.style.display =
+            "none";
+
+        customSection.style.display =
+            "block";
 
     }
 
@@ -1486,7 +1718,9 @@ function selectClubType(type) {
 function openLeagueResults() {
 
     searchLeague(
-        document.getElementById("leagueSearch").value
+        document.getElementById(
+            "leagueSearch"
+        ).value
     );
 
 }
@@ -1495,41 +1729,58 @@ function openLeagueResults() {
 function searchLeague(query) {
 
     const results =
-        document.getElementById("leagueResults");
+        document.getElementById(
+            "leagueResults"
+        );
 
     if (!results) return;
 
-    const q = query.trim().toLowerCase();
 
-    const matches = fc27Leagues
-        .filter(league =>
-            league.toLowerCase().includes(q)
-        )
-        .slice(0, 80);
+    const q =
+        query
+            .trim()
+            .toLowerCase();
 
 
-    if (matches.length === 0) {
+    const matches =
+        fc27Leagues
+            .filter(
+                league =>
+                    league
+                        .toLowerCase()
+                        .includes(q)
+            )
+            .slice(0,80);
 
-        results.innerHTML = `
+
+    results.innerHTML =
+        matches.length
+
+        ?
+
+        matches
+            .map(
+                league => `
+
+                    <div
+                        class="search-option"
+                        onclick="chooseLeague('${escapeJS(league)}')"
+                    >
+                        ${escapeHTML(league)}
+                    </div>
+
+                `
+            )
+            .join("")
+
+        :
+
+        `
             <div class="no-results">
                 No FC 27 leagues found.
             </div>
         `;
 
-    } else {
-
-        results.innerHTML = matches.map(league => `
-
-            <div
-                class="search-option"
-                onclick="chooseLeague('${escapeJS(league)}')"
-            >
-                ${escapeHTML(league)}
-            </div>
-
-        `).join("");
-
-    }
 
     results.classList.add("open");
 
@@ -1540,26 +1791,32 @@ function chooseLeague(league) {
 
     selectedLeague = league;
 
-    document.getElementById("leagueSearch").value = league;
-
-    document
-        .getElementById("leagueResults")
-        .classList.remove("open");
-
-
     selectedClub = "";
 
+    document.getElementById(
+        "leagueSearch"
+    ).value = league;
+
+
+    document.getElementById(
+        "leagueResults"
+    ).classList.remove("open");
+
+
     const clubInput =
-        document.getElementById("clubSearch");
+        document.getElementById(
+            "clubSearch"
+        );
+
 
     if (clubInput) {
 
         clubInput.disabled = false;
 
+        clubInput.value = "";
+
         clubInput.placeholder =
             "Search clubs in this league...";
-
-        clubInput.value = "";
 
     }
 
@@ -1575,7 +1832,9 @@ function openClubResults() {
     if (!selectedLeague) return;
 
     searchClub(
-        document.getElementById("clubSearch").value
+        document.getElementById(
+            "clubSearch"
+        ).value
     );
 
 }
@@ -1585,45 +1844,64 @@ function searchClub(query) {
 
     if (!selectedLeague) return;
 
-    const results =
-        document.getElementById("clubResults");
 
-    if (!results) return;
+    const results =
+        document.getElementById(
+            "clubResults"
+        );
+
 
     const clubs =
-        fc27ClubsByLeague[selectedLeague] || [];
-
-    const q = query.trim().toLowerCase();
-
-    const matches = clubs
-        .filter(club =>
-            club.toLowerCase().includes(q)
-        )
-        .slice(0, 100);
+        fc27ClubsByLeague[
+            selectedLeague
+        ] || [];
 
 
-    if (matches.length === 0) {
+    const q =
+        query
+            .trim()
+            .toLowerCase();
 
-        results.innerHTML = `
+
+    const matches =
+        clubs
+            .filter(
+                club =>
+                    club
+                        .toLowerCase()
+                        .includes(q)
+            )
+            .slice(0,100);
+
+
+    results.innerHTML =
+        matches.length
+
+        ?
+
+        matches
+            .map(
+                club => `
+
+                    <div
+                        class="search-option"
+                        onclick="chooseClub('${escapeJS(club)}')"
+                    >
+                        ${escapeHTML(club)}
+                    </div>
+
+                `
+            )
+            .join("")
+
+        :
+
+        `
             <div class="no-results">
-                No clubs found in this league.
+                No clubs found.
             </div>
         `;
 
-    } else {
-
-        results.innerHTML = matches.map(club => `
-
-            <div
-                class="search-option"
-                onclick="chooseClub('${escapeJS(club)}')"
-            >
-                ${escapeHTML(club)}
-            </div>
-
-        `).join("");
-
-    }
 
     results.classList.add("open");
 
@@ -1634,11 +1912,14 @@ function chooseClub(club) {
 
     selectedClub = club;
 
-    document.getElementById("clubSearch").value = club;
+    document.getElementById(
+        "clubSearch"
+    ).value = club;
 
-    document
-        .getElementById("clubResults")
-        .classList.remove("open");
+
+    document.getElementById(
+        "clubResults"
+    ).classList.remove("open");
 
 }
 
@@ -1649,23 +1930,34 @@ function chooseClub(club) {
 
 function toggleNationalTeam(value) {
 
-    const continentSection =
-        document.getElementById("continentSection");
+    const continent =
+        document.getElementById(
+            "continentSection"
+        );
 
-    const countrySection =
-        document.getElementById("countrySection");
+    const country =
+        document.getElementById(
+            "countrySection"
+        );
 
 
     if (value === "add") {
 
-        continentSection.style.display = "block";
+        continent.style.display =
+            "block";
 
-    } else {
+    }
 
-        continentSection.style.display = "none";
-        countrySection.style.display = "none";
+    else {
+
+        continent.style.display =
+            "none";
+
+        country.style.display =
+            "none";
 
         selectedContinent = "";
+
         selectedCountry = "";
 
     }
@@ -1673,35 +1965,43 @@ function toggleNationalTeam(value) {
 }
 
 
-function selectContinent(continent) {
+function selectContinent(value) {
 
-    selectedContinent = continent;
+    selectedContinent = value;
 
     selectedCountry = "";
 
-    const countryInput =
-        document.getElementById("countrySearch");
 
     const countrySection =
-        document.getElementById("countrySection");
+        document.getElementById(
+            "countrySection"
+        );
+
+    const countryInput =
+        document.getElementById(
+            "countrySearch"
+        );
 
 
-    if (!continent) {
+    if (!value) {
 
-        countrySection.style.display = "none";
+        countrySection.style.display =
+            "none";
+
         return;
 
     }
 
 
-    countrySection.style.display = "block";
+    countrySection.style.display =
+        "block";
 
     countryInput.disabled = false;
 
+    countryInput.value = "";
+
     countryInput.placeholder =
         "Search country...";
-
-    countryInput.value = "";
 
 }
 
@@ -1711,7 +2011,9 @@ function openCountryResults() {
     if (!selectedContinent) return;
 
     searchCountry(
-        document.getElementById("countrySearch").value
+        document.getElementById(
+            "countrySearch"
+        ).value
     );
 
 }
@@ -1721,44 +2023,65 @@ function searchCountry(query) {
 
     if (!selectedContinent) return;
 
+
     const results =
-        document.getElementById("countryResults");
-
-    const countries =
-        countriesByContinent[selectedContinent] || [];
-
-    const q = query.trim().toLowerCase();
-
-    const matches = countries
-        .filter(country =>
-            country.toLowerCase().includes(q)
+        document.getElementById(
+            "countryResults"
         );
 
 
-    if (matches.length === 0) {
+    const countries =
+        countriesByContinent[
+            selectedContinent
+        ] || [];
 
-        results.innerHTML = `
-            <div class="no-results">
-                No countries found.
-            </div>
-        `;
 
-    } else {
+    const q =
+        query
+            .trim()
+            .toLowerCase();
 
-        results.innerHTML = matches.map(country => `
 
-            <div
-                class="search-option"
-                onclick="chooseCountry('${escapeJS(country)}')"
-            >
-                ${escapeHTML(country)}
-            </div>
+    const matches =
+        countries.filter(
+            country =>
+                country
+                    .toLowerCase()
+                    .includes(q)
+        );
 
-        `).join("");
 
-    }
+    results.innerHTML =
+        matches
+            .map(
+                country => `
+
+                    <div
+                        class="search-option"
+                        onclick="chooseCountry('${escapeJS(country)}')"
+                    >
+                        ${escapeHTML(country)}
+                    </div>
+
+                `
+            )
+            .join("");
+
 
     results.classList.add("open");
+
+}
+
+
+function openCountryResults() {
+
+    if (!selectedContinent) return;
+
+    searchCountry(
+        document.getElementById(
+            "countrySearch"
+        ).value
+    );
 
 }
 
@@ -1767,12 +2090,14 @@ function chooseCountry(country) {
 
     selectedCountry = country;
 
-    document.getElementById("countrySearch").value =
-        country;
+    document.getElementById(
+        "countrySearch"
+    ).value = country;
 
-    document
-        .getElementById("countryResults")
-        .classList.remove("open");
+
+    document.getElementById(
+        "countryResults"
+    ).classList.remove("open");
 
 }
 
@@ -1783,13 +2108,18 @@ function chooseCountry(country) {
 
 function createCareer() {
 
-    const managerName =
-        document.getElementById("managerName").value.trim();
+    const manager =
+        document.getElementById(
+            "managerName"
+        ).value.trim();
 
 
-    if (!managerName) {
+    if (!manager) {
 
-        alert("Please enter a manager name.");
+        alert(
+            "Please enter a manager name."
+        );
+
         return;
 
     }
@@ -1797,38 +2127,48 @@ function createCareer() {
 
     if (!selectedLeague) {
 
-        alert("Please select a league.");
+        alert(
+            "Please select a league."
+        );
+
         return;
 
     }
 
 
-    let clubName = "";
+    let club = "";
 
 
     if (setupClubType === "original") {
 
         if (!selectedClub) {
 
-            alert("Please select a club.");
+            alert(
+                "Please select a club."
+            );
+
             return;
 
         }
 
-        clubName = selectedClub;
+        club = selectedClub;
 
-    } else {
+    }
 
-        clubName =
-            document
-                .getElementById("customClubName")
-                .value
-                .trim();
+    else {
+
+        club =
+            document.getElementById(
+                "customClubName"
+            ).value.trim();
 
 
-        if (!clubName) {
+        if (!club) {
 
-            alert("Please enter your custom club name.");
+            alert(
+                "Please enter your custom club name."
+            );
+
             return;
 
         }
@@ -1837,7 +2177,9 @@ function createCareer() {
 
 
     const nationalChoice =
-        document.getElementById("nationalTeamChoice").value;
+        document.getElementById(
+            "nationalTeamChoice"
+        ).value;
 
 
     if (
@@ -1845,46 +2187,48 @@ function createCareer() {
         !selectedCountry
     ) {
 
-        alert("Please select a national team.");
+        alert(
+            "Please select a national team."
+        );
+
         return;
 
     }
 
 
-    const newCareer = {
+    const career = {
 
         id:
             Date.now().toString() +
-            Math.random().toString(36).substring(2),
+            Math.random()
+                .toString(36)
+                .substring(2),
 
-        managerName: managerName,
+        managerName: manager,
 
-        clubType: setupClubType,
+        clubType:
+            setupClubType,
 
-        clubName: clubName,
+        clubName: club,
 
-        league: selectedLeague,
+        league:
+            selectedLeague,
 
-        currentSeason: "2026/27",
+        currentSeason:
+            "2026/27",
 
-        seasonNumber: 1,
+        seasonNumber:
+            1,
 
         nationalTeam:
             nationalChoice === "add"
-                ? selectedCountry
-                : null,
+            ? selectedCountry
+            : null,
 
         continent:
             nationalChoice === "add"
-                ? selectedContinent
-                : null,
-
-        createdAt: new Date().toISOString(),
-
-        /*
-         * These fields are ready for future features.
-         * Promotion/relegation will update the league.
-         */
+            ? selectedContinent
+            : null,
 
         leagueHistory: [
             {
@@ -1908,11 +2252,11 @@ function createCareer() {
     };
 
 
-    careers.push(newCareer);
+    careers.push(career);
 
     saveCareers();
 
-    enterCareer(newCareer.id);
+    enterCareer(career.id);
 
 }
 
@@ -1924,7 +2268,9 @@ function createCareer() {
 function enterCareer(id) {
 
     const career =
-        careers.find(c => c.id === id);
+        careers.find(
+            c => c.id === id
+        );
 
 
     if (!career) return;
@@ -1934,32 +2280,7 @@ function enterCareer(id) {
 
     updateNavigation();
 
-    showCareerBanner();
-
     renderCareerHome();
-
-}
-
-
-/* =========================================================
-   CURRENT CAREER
-========================================================= */
-
-function getCurrentCareer() {
-
-    return careers.find(
-        career => career.id === currentCareerId
-    );
-
-}
-
-
-function showCareerBanner() {
-
-    const existing =
-        document.getElementById("careerBanner");
-
-    if (existing) return;
 
 }
 
@@ -1970,53 +2291,23 @@ function showCareerBanner() {
 
 function renderCareerHome() {
 
-    const career = getCurrentCareer();
+    const career =
+        getCurrentCareer();
+
 
     if (!career) {
 
-        showPage("dashboard");
+        renderDashboard();
         return;
 
     }
 
 
-    document.getElementById("pageContent").innerHTML = `
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
 
-        <div class="career-banner">
-
-            <div class="career-banner-row">
-
-                <div>
-
-                    <div class="current-career-label">
-                        Current Career
-                    </div>
-
-                    <div class="current-career-name">
-                        ${escapeHTML(career.clubName)}
-                    </div>
-
-                    <div class="current-career-info">
-                        ${escapeHTML(career.managerName)}
-                        &nbsp; • &nbsp;
-                        ${escapeHTML(career.league)}
-                        &nbsp; • &nbsp;
-                        ${escapeHTML(career.currentSeason)}
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="back-dashboard"
-                    onclick="showPage('dashboard')"
-                >
-                    ← All Careers
-                </button>
-
-            </div>
-
-        </div>
+        ${careerBanner(career)}
 
 
         <div class="topbar">
@@ -2029,7 +2320,8 @@ function renderCareerHome() {
 
                 <div class="page-subtitle">
                     ${escapeHTML(career.clubName)}
-                    • ${escapeHTML(career.currentSeason)}
+                    •
+                    ${escapeHTML(career.currentSeason)}
                 </div>
 
             </div>
@@ -2058,10 +2350,8 @@ function renderCareerHome() {
                     League
                 </div>
 
-                <div
-                    class="stat-value"
-                    style="font-size:18px;"
-                >
+                <div class="stat-value"
+                     style="font-size:17px">
                     ${escapeHTML(career.league)}
                 </div>
 
@@ -2106,42 +2396,47 @@ function renderCareerHome() {
             </div>
 
             <div class="panel-subtitle">
-                Your career information will appear here as the
-                different Career Mode features are built.
+                Your career information.
             </div>
 
-            <p style="color:#8d97a3; line-height:1.7;">
+            <p style="color:#8d97a3;line-height:1.8">
 
-                <strong style="color:white;">
+                <strong style="color:white">
                     Manager:
                 </strong>
                 ${escapeHTML(career.managerName)}
+
                 <br>
 
-                <strong style="color:white;">
+                <strong style="color:white">
                     Club:
                 </strong>
                 ${escapeHTML(career.clubName)}
+
                 <br>
 
-                <strong style="color:white;">
+                <strong style="color:white">
                     League:
                 </strong>
                 ${escapeHTML(career.league)}
+
                 <br>
 
-                <strong style="color:white;">
-                    Current Year:
+                <strong style="color:white">
+                    Season:
                 </strong>
                 ${escapeHTML(career.currentSeason)}
+
                 <br>
 
-                <strong style="color:white;">
+                <strong style="color:white">
                     National Team:
                 </strong>
                 ${
                     career.nationalTeam
-                    ? escapeHTML(career.nationalTeam)
+                    ? escapeHTML(
+                        career.nationalTeam
+                    )
                     : "None"
                 }
 
@@ -2155,66 +2450,12 @@ function renderCareerHome() {
 
 
 /* =========================================================
-   DELETE CAREER
+   CAREER BANNER
 ========================================================= */
 
-function deleteCareer(id, event) {
+function careerBanner(career) {
 
-    if (event) {
-        event.stopPropagation();
-    }
-
-
-    const career =
-        careers.find(c => c.id === id);
-
-
-    if (!career) return;
-
-
-    const confirmed =
-        confirm(
-            `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
-        );
-
-
-    if (!confirmed) return;
-
-
-    careers =
-        careers.filter(c => c.id !== id);
-
-
-    saveCareers();
-
-
-    if (currentCareerId === id) {
-        currentCareerId = null;
-    }
-
-
-    renderDashboard();
-
-}
-
-
-/* =========================================================
-   FUTURE PLACEHOLDER PAGES
-========================================================= */
-
-function renderPlaceholder(title, description) {
-
-    const career = getCurrentCareer();
-
-    if (!career) {
-
-        showPage("dashboard");
-        return;
-
-    }
-
-
-    document.getElementById("pageContent").innerHTML = `
+    return `
 
         <div class="career-banner">
 
@@ -2223,15 +2464,31 @@ function renderPlaceholder(title, description) {
                 <div>
 
                     <div class="current-career-label">
-                        ${escapeHTML(career.clubName)}
+                        Current Career
                     </div>
 
                     <div class="current-career-name">
-                        ${escapeHTML(career.currentSeason)}
+                        ${escapeHTML(career.clubName)}
                     </div>
 
                     <div class="current-career-info">
-                        ${escapeHTML(career.league)}
+
+                        ${escapeHTML(
+                            career.managerName
+                        )}
+
+                        &nbsp; • &nbsp;
+
+                        ${escapeHTML(
+                            career.league
+                        )}
+
+                        &nbsp; • &nbsp;
+
+                        ${escapeHTML(
+                            career.currentSeason
+                        )}
+
                     </div>
 
                 </div>
@@ -2248,17 +2505,160 @@ function renderPlaceholder(title, description) {
 
         </div>
 
+    `;
+
+}
+
+
+/* =========================================================
+   MATCHES PAGE
+========================================================= */
+
+function renderMatches() {
+
+    const career =
+        getCurrentCareer();
+
+
+    if (!career) {
+
+        renderDashboard();
+        return;
+
+    }
+
+
+    const matches =
+        [...career.matches]
+            .sort(
+                (a,b) =>
+                    new Date(b.date) -
+                    new Date(a.date)
+            );
+
+
+    const wins =
+        matches.filter(
+            match =>
+                match.result === "W"
+        ).length;
+
+
+    const draws =
+        matches.filter(
+            match =>
+                match.result === "D"
+        ).length;
+
+
+    const losses =
+        matches.filter(
+            match =>
+                match.result === "L"
+        ).length;
+
+
+    const cleanSheets =
+        matches.filter(
+            match =>
+                match.cleanSheet
+        ).length;
+
+
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
+
+        ${careerBanner(career)}
+
 
         <div class="topbar">
 
             <div>
 
                 <div class="page-title">
-                    ${escapeHTML(title)}
+                    Matches
                 </div>
 
                 <div class="page-subtitle">
-                    ${escapeHTML(description)}
+                    Track every match in this career.
+                </div>
+
+            </div>
+
+
+            <button
+                class="primary-btn"
+                onclick="openMatchModal()"
+            >
+                + Add Match
+            </button>
+
+        </div>
+
+
+        <div class="match-summary-grid">
+
+            <div class="match-stat">
+
+                <div class="match-stat-label">
+                    Played
+                </div>
+
+                <div class="match-stat-number">
+                    ${matches.length}
+                </div>
+
+            </div>
+
+
+            <div class="match-stat">
+
+                <div class="match-stat-label">
+                    Wins
+                </div>
+
+                <div class="match-stat-number">
+                    ${wins}
+                </div>
+
+            </div>
+
+
+            <div class="match-stat">
+
+                <div class="match-stat-label">
+                    Draws
+                </div>
+
+                <div class="match-stat-number">
+                    ${draws}
+                </div>
+
+            </div>
+
+
+            <div class="match-stat">
+
+                <div class="match-stat-label">
+                    Losses
+                </div>
+
+                <div class="match-stat-number">
+                    ${losses}
+                </div>
+
+            </div>
+
+
+            <div class="match-stat">
+
+                <div class="match-stat-label">
+                    Clean Sheets
+                </div>
+
+                <div class="match-stat-number">
+                    ${cleanSheets}
                 </div>
 
             </div>
@@ -2269,17 +2669,66 @@ function renderPlaceholder(title, description) {
         <div class="panel">
 
             <div class="panel-title">
-                Coming next
+                Match History
             </div>
 
             <div class="panel-subtitle">
-                This section is connected to your current career save.
+                ${matches.length}
+                ${matches.length === 1 ? "match" : "matches"}
+                recorded in ${escapeHTML(career.currentSeason)}.
             </div>
 
-            <p style="color:#7f8996; line-height:1.7;">
-                The data for this page will be stored separately
-                for each career mode.
-            </p>
+
+            ${
+                matches.length === 0
+
+                ?
+
+                `
+
+                <div class="empty-state">
+
+                    <h2>
+                        No matches yet
+                    </h2>
+
+                    <p>
+                        Add your first match to start building your career history.
+                    </p>
+
+                    <button
+                        class="primary-btn"
+                        onclick="openMatchModal()"
+                    >
+                        + Add Match
+                    </button>
+
+                </div>
+
+                `
+
+                :
+
+                `
+
+                <div class="match-list">
+
+                    ${
+                        matches
+                            .map(
+                                match =>
+                                    createMatchRow(
+                                        match
+                                    )
+                            )
+                            .join("")
+                    }
+
+                </div>
+
+                `
+
+            }
 
         </div>
 
@@ -2289,54 +2738,642 @@ function renderPlaceholder(title, description) {
 
 
 /* =========================================================
-   PLAYER DATABASE
+   MATCH ROW
 ========================================================= */
 
-function renderPlayers() {
+function createMatchRow(match) {
 
-    const career = getCurrentCareer();
+    const resultClass =
+        match.result === "W"
+        ? "result-win"
+        : match.result === "D"
+        ? "result-draw"
+        : "result-loss";
 
-    if (!career) {
-        showPage("dashboard");
-        return;
-    }
+
+    const resultText =
+        match.result === "W"
+        ? "WIN"
+        : match.result === "D"
+        ? "DRAW"
+        : "LOSS";
 
 
-    document.getElementById("pageContent").innerHTML = `
+    const date =
+        formatDate(match.date);
 
-        <div class="career-banner">
 
-            <div class="career-banner-row">
+    const venue =
+        match.homeAway === "Home"
+        ? "Home"
+        : "Away";
+
+
+    return `
+
+        <div class="match-row">
+
+            <div class="match-row-main">
 
                 <div>
 
-                    <div class="current-career-label">
-                        ${escapeHTML(career.clubName)}
+                    <div class="match-date">
+                        ${escapeHTML(date)}
                     </div>
 
-                    <div class="current-career-name">
-                        Players
-                    </div>
-
-                    <div class="current-career-info">
-                        ${escapeHTML(career.currentSeason)}
-                        • ${escapeHTML(career.league)}
+                    <div class="match-competition">
+                        ${escapeHTML(
+                            match.competition
+                        )}
                     </div>
 
                 </div>
 
 
+                <div>
+
+                    <div class="match-opponent">
+                        ${escapeHTML(
+                            match.opponent
+                        )}
+                    </div>
+
+                    <div class="match-home-away">
+                        ${venue}
+                    </div>
+
+                </div>
+
+
+                <div class="match-score">
+
+                    ${
+                        match.homeAway === "Home"
+                        ?
+
+                        `${match.goalsFor}
+                         -
+                         ${match.goalsAgainst}`
+
+                        :
+
+                        `${match.goalsAgainst}
+                         -
+                         ${match.goalsFor}`
+
+                    }
+
+                </div>
+
+
+                <div class="match-result ${resultClass}">
+                    ${resultText}
+                </div>
+
+            </div>
+
+
+            <div class="match-details">
+
+                ${
+                    match.rating
+                    ?
+                    `<span>
+                        GK Rating:
+                        <strong style="color:white">
+                            ${escapeHTML(match.rating)}
+                        </strong>
+                    </span>`
+                    : ""
+                }
+
+
+                ${
+                    match.saves !== ""
+                    ?
+                    `<span>
+                        Saves:
+                        <strong style="color:white">
+                            ${escapeHTML(match.saves)}
+                        </strong>
+                    </span>`
+                    : ""
+                }
+
+
+                <span>
+                    Goals Conceded:
+                    <strong style="color:white">
+                        ${match.goalsAgainst}
+                    </strong>
+                </span>
+
+
+                ${
+                    match.cleanSheet
+                    ?
+                    `<span style="color:#69d38b">
+                        ✓ Clean Sheet
+                    </span>`
+                    : ""
+                }
+
+
                 <button
-                    class="back-dashboard"
-                    onclick="showPage('dashboard')"
+                    class="delete-btn match-delete"
+                    onclick="deleteMatch('${match.id}')"
                 >
-                    ← All Careers
+                    Delete
                 </button>
 
             </div>
 
         </div>
 
+    `;
+
+}
+
+
+/* =========================================================
+   ADD MATCH MODAL
+========================================================= */
+
+function openMatchModal() {
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    document.getElementById(
+        "modalContainer"
+    ).innerHTML = `
+
+        <div
+            class="modal-overlay"
+            onclick="closeModalOutside(event)"
+        >
+
+            <div
+                class="modal"
+                onclick="event.stopPropagation()"
+            >
+
+                <div class="modal-header">
+
+                    <div class="modal-title">
+                        Add Match
+                    </div>
+
+                    <button
+                        class="close-btn"
+                        onclick="closeModal()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Date
+                        </label>
+
+                        <input
+                            id="matchDate"
+                            class="form-input"
+                            type="date"
+                            value="${today}"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Competition
+                        </label>
+
+                        <select
+                            id="matchCompetition"
+                            class="form-select"
+                        >
+
+                            <option>
+                                League
+                            </option>
+
+                            <option>
+                                Domestic Cup
+                            </option>
+
+                            <option>
+                                Continental Competition
+                            </option>
+
+                            <option>
+                                Super Cup
+                            </option>
+
+                            <option>
+                                Friendly
+                            </option>
+
+                            <option>
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Home / Away
+                        </label>
+
+                        <select
+                            id="matchHomeAway"
+                            class="form-select"
+                        >
+
+                            <option value="Home">
+                                Home
+                            </option>
+
+                            <option value="Away">
+                                Away
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Opponent
+                        </label>
+
+                        <input
+                            id="matchOpponent"
+                            class="form-input"
+                            placeholder="e.g. Manchester United"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label>
+                            Score
+                        </label>
+
+
+                        <div class="score-inputs">
+
+                            <input
+                                id="goalsFor"
+                                class="form-input"
+                                type="number"
+                                min="0"
+                                value="0"
+                                placeholder="Your goals"
+                            >
+
+                            <span>
+                                -
+                            </span>
+
+                            <input
+                                id="goalsAgainst"
+                                class="form-input"
+                                type="number"
+                                min="0"
+                                value="0"
+                                placeholder="Their goals"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            GK Rating
+                        </label>
+
+                        <input
+                            id="matchRating"
+                            class="form-input"
+                            type="number"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                            placeholder="e.g. 7.4"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Saves
+                        </label>
+
+                        <input
+                            id="matchSaves"
+                            class="form-input"
+                            type="number"
+                            min="0"
+                            placeholder="e.g. 5"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        class="secondary-btn"
+                        onclick="closeModal()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveMatch()"
+                    >
+                        Save Match
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+function closeModal() {
+
+    document.getElementById(
+        "modalContainer"
+    ).innerHTML = "";
+
+}
+
+
+function closeModalOutside(event) {
+
+    if (
+        event.target.classList.contains(
+            "modal-overlay"
+        )
+    ) {
+
+        closeModal();
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE MATCH
+========================================================= */
+
+function saveMatch() {
+
+    const career =
+        getCurrentCareer();
+
+
+    if (!career) return;
+
+
+    const opponent =
+        document.getElementById(
+            "matchOpponent"
+        ).value.trim();
+
+
+    if (!opponent) {
+
+        alert(
+            "Please enter the opponent."
+        );
+
+        return;
+
+    }
+
+
+    const date =
+        document.getElementById(
+            "matchDate"
+        ).value;
+
+
+    const competition =
+        document.getElementById(
+            "matchCompetition"
+        ).value;
+
+
+    const homeAway =
+        document.getElementById(
+            "matchHomeAway"
+        ).value;
+
+
+    const goalsFor =
+        Number(
+            document.getElementById(
+                "goalsFor"
+            ).value
+        );
+
+
+    const goalsAgainst =
+        Number(
+            document.getElementById(
+                "goalsAgainst"
+            ).value
+        );
+
+
+    const rating =
+        document.getElementById(
+            "matchRating"
+        ).value;
+
+
+    const saves =
+        document.getElementById(
+            "matchSaves"
+        ).value;
+
+
+    let result;
+
+
+    if (goalsFor > goalsAgainst) {
+
+        result = "W";
+
+    }
+
+    else if (goalsFor === goalsAgainst) {
+
+        result = "D";
+
+    }
+
+    else {
+
+        result = "L";
+
+    }
+
+
+    const match = {
+
+        id:
+            Date.now().toString() +
+            Math.random()
+                .toString(36)
+                .substring(2),
+
+        season:
+            career.currentSeason,
+
+        date:
+            date,
+
+        competition:
+            competition,
+
+        homeAway:
+            homeAway,
+
+        opponent:
+            opponent,
+
+        goalsFor:
+            goalsFor,
+
+        goalsAgainst:
+            goalsAgainst,
+
+        result:
+            result,
+
+        rating:
+            rating,
+
+        saves:
+            saves,
+
+        cleanSheet:
+            goalsAgainst === 0
+
+    };
+
+
+    career.matches.push(match);
+
+    saveCareers();
+
+    closeModal();
+
+    renderMatches();
+
+}
+
+
+/* =========================================================
+   DELETE MATCH
+========================================================= */
+
+function deleteMatch(id) {
+
+    const career =
+        getCurrentCareer();
+
+
+    if (!career) return;
+
+
+    const confirmed =
+        confirm(
+            "Delete this match?"
+        );
+
+
+    if (!confirmed) return;
+
+
+    career.matches =
+        career.matches.filter(
+            match =>
+                match.id !== id
+        );
+
+
+    saveCareers();
+
+    renderMatches();
+
+}
+
+
+/* =========================================================
+   PLAYERS
+========================================================= */
+
+function renderPlayers() {
+
+    const career =
+        getCurrentCareer();
+
+
+    if (!career) {
+
+        renderDashboard();
+        return;
+
+    }
+
+
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
+
+        ${careerBanner(career)}
 
         <div class="topbar">
 
@@ -2364,15 +3401,10 @@ function renderPlayers() {
                 oninput="searchPlayers(this.value)"
             >
 
+
             <div
                 id="playersList"
-                style="
-                    display:grid;
-                    grid-template-columns:
-                    repeat(auto-fill,minmax(250px,1fr));
-                    gap:12px;
-                    margin-top:18px;
-                "
+                class="player-grid"
             ></div>
 
         </div>
@@ -2380,7 +3412,9 @@ function renderPlayers() {
     `;
 
 
-    displayPlayers(allPlayers.slice(0, 100));
+    displayPlayers(
+        allPlayers.slice(0,100)
+    );
 
 }
 
@@ -2398,13 +3432,18 @@ function searchPlayers(query) {
             .filter(player => {
 
                 const name =
-                    `${player.firstName || ""} ${player.lastName || ""} ${player.commonName || ""}`
-                        .toLowerCase();
+                    `
+                    ${player.firstName || ""}
+                    ${player.lastName || ""}
+                    ${player.commonName || ""}
+                    `
+                    .toLowerCase();
+
 
                 return name.includes(q);
 
             })
-            .slice(0, 100);
+            .slice(0,100);
 
 
     displayPlayers(results);
@@ -2415,7 +3454,10 @@ function searchPlayers(query) {
 function displayPlayers(players) {
 
     const container =
-        document.getElementById("playersList");
+        document.getElementById(
+            "playersList"
+        );
+
 
     if (!container) return;
 
@@ -2423,7 +3465,7 @@ function displayPlayers(players) {
     if (players.length === 0) {
 
         container.innerHTML = `
-            <div style="color:#7f8996;">
+            <div style="color:#7f8996">
                 No players found.
             </div>
         `;
@@ -2435,68 +3477,183 @@ function displayPlayers(players) {
 
     container.innerHTML =
         players
-            .map(player => createPlayerCard(player))
+            .map(
+                player => `
+
+                    <div class="player-card">
+
+                        <div class="player-name">
+
+                            ${escapeHTML(
+                                player.commonName ||
+                                `${player.firstName || ""}
+                                 ${player.lastName || ""}`.trim()
+                            )}
+
+                        </div>
+
+                        <div class="player-club">
+
+                            ${escapeHTML(
+                                player.club ||
+                                "Free Agent"
+                            )}
+
+                        </div>
+
+                        <div
+                            style="
+                                display:flex;
+                                gap:15px;
+                                margin-top:12px;
+                                color:#8d97a3;
+                                font-size:12px
+                            "
+                        >
+
+                            <span>
+                                <strong style="color:white">
+                                    ${escapeHTML(
+                                        player.overallRating ||
+                                        "—"
+                                    )}
+                                </strong>
+                                OVR
+                            </span>
+
+                            <span>
+                                ${escapeHTML(
+                                    player.position ||
+                                    "—"
+                                )}
+                            </span>
+
+                            <span>
+                                ${escapeHTML(
+                                    player.nationality ||
+                                    "—"
+                                )}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
             .join("");
 
 }
 
 
-function createPlayerCard(player) {
+/* =========================================================
+   PLACEHOLDER PAGES
+========================================================= */
 
-    const name =
-        player.commonName ||
-        `${player.firstName || ""} ${player.lastName || ""}`.trim();
+function renderPlaceholder(title, description) {
 
-
-    const position =
-        player.position || "—";
-
-
-    const rating =
-        player.overallRating || "—";
+    const career =
+        getCurrentCareer();
 
 
-    return `
+    if (!career) {
 
-        <div
-            style="
-                background:#171d25;
-                border:1px solid #252c35;
-                border-radius:10px;
-                padding:15px;
-            "
-        >
+        renderDashboard();
+        return;
 
-            <div style="font-weight:800;font-size:16px;">
-                ${escapeHTML(name)}
-            </div>
+    }
 
-            <div style="color:#7f8996;font-size:13px;margin-top:5px;">
-                ${escapeHTML(player.club || "Free Agent")}
-            </div>
 
-            <div style="display:flex;gap:15px;margin-top:12px;font-size:12px;">
+    document.getElementById(
+        "pageContent"
+    ).innerHTML = `
 
-                <span>
-                    <strong style="color:white;">
-                        ${escapeHTML(String(rating))}
-                    </strong>
-                    OVR
-                </span>
+        ${careerBanner(career)}
 
-                <span>
-                    ${escapeHTML(position)}
-                </span>
 
-                <span>
-                    ${escapeHTML(player.nationality || "—")}
-                </span>
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    ${escapeHTML(title)}
+                </div>
+
+                <div class="page-subtitle">
+                    ${escapeHTML(description)}
+                </div>
 
             </div>
 
         </div>
 
+
+        <div class="panel">
+
+            <div class="panel-title">
+                Coming next
+            </div>
+
+            <div class="panel-subtitle">
+                This section is connected to this career save.
+            </div>
+
+            <p style="color:#7f8996;line-height:1.7">
+
+                Everything on this page will belong specifically
+                to <strong style="color:white">
+                ${escapeHTML(career.clubName)}
+                </strong>.
+
+            </p>
+
+        </div>
+
     `;
+
+}
+
+
+/* =========================================================
+   DELETE CAREER
+========================================================= */
+
+function deleteCareer(id,event) {
+
+    if (event) {
+
+        event.stopPropagation();
+
+    }
+
+
+    const career =
+        careers.find(
+            c => c.id === id
+        );
+
+
+    if (!career) return;
+
+
+    const confirmed =
+        confirm(
+            `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
+        );
+
+
+    if (!confirmed) return;
+
+
+    careers =
+        careers.filter(
+            c => c.id !== id
+        );
+
+
+    saveCareers();
+
+    renderDashboard();
 
 }
 
@@ -2510,20 +3667,35 @@ function parseCSV(text) {
     const rows = [];
 
     let row = [];
+
     let value = "";
+
     let insideQuotes = false;
 
 
-    for (let i = 0; i < text.length; i++) {
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
 
-        const char = text[i];
-        const next = text[i + 1];
+        const char =
+            text[i];
+
+        const next =
+            text[i + 1];
 
 
-        if (char === '"' && insideQuotes && next === '"') {
+        if (
+            char === '"' &&
+            insideQuotes &&
+            next === '"'
+        ) {
 
             value += '"';
+
             i++;
+
             continue;
 
         }
@@ -2531,36 +3703,60 @@ function parseCSV(text) {
 
         if (char === '"') {
 
-            insideQuotes = !insideQuotes;
-            continue;
+            insideQuotes =
+                !insideQuotes;
 
-        }
-
-
-        if (char === "," && !insideQuotes) {
-
-            row.push(value);
-            value = "";
             continue;
 
         }
 
 
         if (
-            (char === "\n" || char === "\r") &&
+            char === "," &&
             !insideQuotes
         ) {
 
-            if (char === "\r" && next === "\n") {
+            row.push(value);
+
+            value = "";
+
+            continue;
+
+        }
+
+
+        if (
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
+            !insideQuotes
+        ) {
+
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
+
                 i++;
+
             }
 
+
             row.push(value);
+
             value = "";
 
 
-            if (row.some(cell => cell.trim() !== "")) {
+            if (
+                row.some(
+                    cell =>
+                        cell.trim() !== ""
+                )
+            ) {
+
                 rows.push(row);
+
             }
 
 
@@ -2576,25 +3772,38 @@ function parseCSV(text) {
     }
 
 
-    if (value !== "" || row.length > 0) {
+    if (
+        value !== "" ||
+        row.length > 0
+    ) {
 
         row.push(value);
 
-        if (row.some(cell => cell.trim() !== "")) {
+        if (
+            row.some(
+                cell =>
+                    cell.trim() !== ""
+            )
+        ) {
+
             rows.push(row);
+
         }
 
     }
 
 
     if (rows.length === 0) {
+
         return [];
+
     }
 
 
     const headers =
-        rows[0].map(header =>
-            header.trim()
+        rows[0].map(
+            header =>
+                header.trim()
         );
 
 
@@ -2604,14 +3813,18 @@ function parseCSV(text) {
 
             const object = {};
 
-            headers.forEach((header, index) => {
 
-                object[header] =
-                    row[index] !== undefined
+            headers.forEach(
+                (header,index) => {
+
+                    object[header] =
+                        row[index] !== undefined
                         ? row[index].trim()
                         : "";
 
-            });
+                }
+            );
+
 
             return object;
 
@@ -2621,12 +3834,17 @@ function parseCSV(text) {
 
 
 /* =========================================================
-   PLAYER CONVERSION
+   PLAYER VALUE
 ========================================================= */
 
-function getPlayerValue(row, possibleNames) {
+function getPlayerValue(
+    row,
+    possibleNames
+) {
 
-    for (const name of possibleNames) {
+    for (
+        const name of possibleNames
+    ) {
 
         if (
             row[name] !== undefined &&
@@ -2644,15 +3862,25 @@ function getPlayerValue(row, possibleNames) {
 }
 
 
-function calculateAge(birthdate) {
+function calculateAge(
+    birthdate
+) {
 
     if (!birthdate) return "";
+
 
     const date =
         new Date(birthdate);
 
-    if (isNaN(date.getTime())) {
+
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
         return "";
+
     }
 
 
@@ -2674,7 +3902,8 @@ function calculateAge(birthdate) {
         month < 0 ||
         (
             month === 0 &&
-            now.getDate() < date.getDate()
+            now.getDate() <
+            date.getDate()
         )
     ) {
 
@@ -2693,83 +3922,118 @@ function convertPlayer(row) {
     return {
 
         id:
-            getPlayerValue(row, ["id"]),
+            getPlayerValue(
+                row,
+                ["id"]
+            ),
 
         rank:
-            getPlayerValue(row, ["rank"]),
+            getPlayerValue(
+                row,
+                ["rank"]
+            ),
 
         overallRating:
-            getPlayerValue(row, [
-                "overallRating",
-                "overall",
-                "rating"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "overallRating",
+                    "overall",
+                    "rating"
+                ]
+            ),
 
         firstName:
-            getPlayerValue(row, [
-                "firstName",
-                "first_name"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "firstName",
+                    "first_name"
+                ]
+            ),
 
         lastName:
-            getPlayerValue(row, [
-                "lastName",
-                "last_name"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "lastName",
+                    "last_name"
+                ]
+            ),
 
         commonName:
-            getPlayerValue(row, [
-                "commonName",
-                "common_name"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "commonName",
+                    "common_name"
+                ]
+            ),
 
         birthdate:
-            getPlayerValue(row, [
-                "birthdate"
-            ]),
+            getPlayerValue(
+                row,
+                ["birthdate"]
+            ),
 
         age:
             calculateAge(
-                getPlayerValue(row, ["birthdate"])
+                getPlayerValue(
+                    row,
+                    ["birthdate"]
+                )
             ),
 
         league:
-            getPlayerValue(row, [
-                "leagueName",
-                "league"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "leagueName",
+                    "league"
+                ]
+            ),
 
         club:
-            getPlayerValue(row, [
-                "team",
-                "club"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "team",
+                    "club"
+                ]
+            ),
 
         nationality:
-            getPlayerValue(row, [
-                "nationality"
-            ]),
+            getPlayerValue(
+                row,
+                ["nationality"]
+            ),
 
         position:
-            getPlayerValue(row, [
-                "positionShort",
-                "position"
-            ]),
+            getPlayerValue(
+                row,
+                [
+                    "positionShort",
+                    "position"
+                ]
+            ),
 
         preferredFoot:
-            getPlayerValue(row, [
-                "preferredFoot"
-            ]),
+            getPlayerValue(
+                row,
+                ["preferredFoot"]
+            ),
 
         avatarUrl:
-            getPlayerValue(row, [
-                "avatarUrl"
-            ]),
+            getPlayerValue(
+                row,
+                ["avatarUrl"]
+            ),
 
         shieldUrl:
-            getPlayerValue(row, [
-                "shieldUrl"
-            ])
+            getPlayerValue(
+                row,
+                ["shieldUrl"]
+            )
 
     };
 
@@ -2777,7 +4041,7 @@ function convertPlayer(row) {
 
 
 /* =========================================================
-   BUILD FC27 LEAGUE / CLUB DATABASE
+   BUILD LEAGUES AND CLUBS
 ========================================================= */
 
 function buildFC27LeagueDatabase() {
@@ -2789,66 +4053,83 @@ function buildFC27LeagueDatabase() {
     const clubsByLeague = {};
 
 
-    allPlayers.forEach(player => {
+    allPlayers.forEach(
+        player => {
 
-        const league =
-            player.league;
+            const league =
+                player.league;
 
-
-        const club =
-            player.club;
-
-
-        if (!league) return;
+            const club =
+                player.club;
 
 
-        leagueSet.add(league);
+            if (!league) return;
 
 
-        if (!clubsByLeague[league]) {
+            leagueSet.add(
+                league
+            );
 
-            clubsByLeague[league] = new Set();
+
+            if (
+                !clubsByLeague[league]
+            ) {
+
+                clubsByLeague[league] =
+                    new Set();
+
+            }
+
+
+            if (club) {
+
+                clubsByLeague[
+                    league
+                ].add(club);
+
+            }
 
         }
-
-
-        if (club) {
-
-            clubsByLeague[league].add(club);
-
-        }
-
-    });
+    );
 
 
     fc27Leagues =
-        Array.from(leagueSet)
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
+        Array.from(
+            leagueSet
+        ).sort(
+            (a,b) =>
+                a.localeCompare(b)
+        );
 
 
     fc27ClubsByLeague = {};
 
 
-    Object.keys(clubsByLeague).forEach(league => {
+    Object.keys(
+        clubsByLeague
+    ).forEach(
+        league => {
 
-        fc27ClubsByLeague[league] =
-            Array.from(
-                clubsByLeague[league]
-            ).sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
+            fc27ClubsByLeague[
+                league
+            ] =
+                Array.from(
+                    clubsByLeague[
+                        league
+                    ]
+                ).sort(
+                    (a,b) =>
+                        a.localeCompare(b)
+                );
 
-    });
+        }
+    );
 
 }
 
 
 /* =========================================================
-   LOAD PLAYER DATABASE
+   LOAD DATABASE
 ========================================================= */
 
 async function loadDatabase() {
@@ -2880,14 +4161,16 @@ async function loadDatabase() {
 
 
         allPlayers =
-            rows.map(convertPlayer);
+            rows.map(
+                convertPlayer
+            );
 
 
         buildFC27LeagueDatabase();
 
 
         console.log(
-            "Loaded players:",
+            "Players loaded:",
             allPlayers.length
         );
 
@@ -2898,10 +4181,12 @@ async function loadDatabase() {
         );
 
 
-    } catch (error) {
+    }
+
+    catch(error) {
 
         console.error(
-            "Player database error:",
+            "Database error:",
             error
         );
 
@@ -2911,24 +4196,8 @@ async function loadDatabase() {
 
 
 /* =========================================================
-   SEASON / PROMOTION / RELEGATION READY
+   SEASON / PROMOTION / RELEGATION
 ========================================================= */
-
-/*
-   This function will be used later when the user
-   finishes a season.
-
-   Example:
-
-   updateCareerLeague(
-       career.id,
-       "EFL Championship",
-       "2027/28"
-   );
-
-   This changes the current league AND current year
-   while keeping the previous league in history.
-*/
 
 function updateCareerLeague(
     careerId,
@@ -2938,7 +4207,8 @@ function updateCareerLeague(
 
     const career =
         careers.find(
-            c => c.id === careerId
+            c =>
+                c.id === careerId
         );
 
 
@@ -2947,9 +4217,11 @@ function updateCareerLeague(
 
     career.leagueHistory.push({
 
-        season: newSeason,
+        season:
+            newSeason,
 
-        league: newLeague
+        league:
+            newLeague
 
     });
 
@@ -2969,7 +4241,10 @@ function updateCareerLeague(
     saveCareers();
 
 
-    if (currentCareerId === careerId) {
+    if (
+        currentCareerId ===
+        careerId
+    ) {
 
         renderCareerHome();
 
@@ -2979,55 +4254,138 @@ function updateCareerLeague(
 
 
 /* =========================================================
-   HTML ESCAPING
+   DATE
+========================================================= */
+
+function formatDate(dateString) {
+
+    if (!dateString) return "—";
+
+
+    const date =
+        new Date(
+            dateString +
+            "T00:00:00"
+        );
+
+
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return dateString;
+
+    }
+
+
+    return date.toLocaleDateString(
+        "en-AU",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE
 ========================================================= */
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
 
 }
 
 
 function escapeJS(value) {
 
-    return String(value ?? "")
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r");
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /\\/g,
+        "\\\\"
+    )
+    .replace(
+        /'/g,
+        "\\'"
+    )
+    .replace(
+        /\n/g,
+        "\\n"
+    )
+    .replace(
+        /\r/g,
+        "\\r"
+    );
 
 }
 
 
 /* =========================================================
-   CLOSE DROPDOWNS
+   CLOSE SEARCH DROPDOWNS
 ========================================================= */
 
-document.addEventListener("click", function(event) {
+document.addEventListener(
+    "click",
+    function(event) {
 
-    if (!event.target.closest(".search-select")) {
+        if (
+            !event.target.closest(
+                ".search-select"
+            )
+        ) {
 
-        document
-            .querySelectorAll(".search-results")
-            .forEach(results => {
+            document
+                .querySelectorAll(
+                    ".search-results"
+                )
+                .forEach(
+                    results => {
 
-                results.classList.remove("open");
+                        results.classList.remove(
+                            "open"
+                        );
 
-            });
+                    }
+                );
+
+        }
 
     }
-
-});
+);
 
 
 /* =========================================================
-   START APP
+   START
 ========================================================= */
 
 loadCareers();
