@@ -13,229 +13,446 @@
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #111827;
-    color: #f9fafb;
+    background: #0b0f14;
+    color: #f5f7fa;
 }
 
-header {
-    background: #0b1220;
-    border-bottom: 1px solid #263244;
-    padding: 18px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 20;
+button,
+input,
+select {
+    font-family: inherit;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-nav {
-    display: flex;
-    gap: 7px;
-    flex-wrap: wrap;
-}
-
-nav button {
-    background: transparent;
-    border: none;
-    color: #9ca3af;
-    padding: 9px 11px;
-    border-radius: 8px;
+button {
     cursor: pointer;
+}
+
+.app {
+    min-height: 100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 230px;
+    background: #11161d;
+    border-right: 1px solid #252c35;
+    padding: 24px 14px;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+    padding: 8px 12px 25px;
+}
+
+.logo span {
+    color: #4da3ff;
+}
+
+.nav-title {
+    color: #707986;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0 12px 8px;
+    letter-spacing: 1px;
+}
+
+.nav-btn {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    color: #9ca5b1;
+    text-align: left;
+    padding: 11px 12px;
+    border-radius: 8px;
+    margin-bottom: 3px;
     font-size: 14px;
 }
 
-nav button:hover,
-nav button.active {
-    background: #1f2937;
+.nav-btn:hover {
+    background: #1a2028;
     color: white;
 }
 
-main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 35px 25px 60px;
+.nav-btn.active {
+    background: #1d2835;
+    color: white;
+    font-weight: 700;
 }
 
-.page {
-    display: none;
+.nav-btn.disabled {
+    opacity: 0.55;
 }
 
-.page.active {
-    display: block;
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    margin-left: 230px;
+    min-height: 100vh;
+    padding: 32px 38px;
 }
 
-h2 {
-    margin-top: 0;
-    font-size: 30px;
-}
-
-h3 {
-    margin-top: 0;
-}
-
-.subtitle {
-    color: #9ca3af;
-    margin-top: -15px;
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 30px;
 }
 
-.card {
-    background: #182235;
-    border: 1px solid #29364c;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 20px;
+.page-title {
+    font-size: 28px;
+    font-weight: 800;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 18px;
-}
-
-.field {
-    margin-bottom: 4px;
-}
-
-label {
-    display: block;
-    color: #cbd5e1;
+.page-subtitle {
+    color: #7f8996;
+    margin-top: 5px;
     font-size: 14px;
-    margin-bottom: 8px;
 }
 
-input,
-select {
-    width: 100%;
-    background: #0f172a;
-    color: white;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 15px;
-    outline: none;
-}
+/* =========================
+   DASHBOARD
+========================= */
 
-input:focus,
-select:focus {
-    border-color: #64748b;
-}
-
-.button-row {
+.careers-header {
     display: flex;
-    gap: 10px;
-    margin-top: 22px;
-    flex-wrap: wrap;
-}
-
-.primary-btn,
-.secondary-btn,
-.danger-btn {
-    border: none;
-    border-radius: 8px;
-    padding: 12px 18px;
-    font-size: 14px;
-    cursor: pointer;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
 }
 
 .primary-btn {
-    background: #2563eb;
+    background: #3288e8;
     color: white;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .primary-btn:hover {
-    background: #1d4ed8;
+    background: #2576d0;
 }
 
 .secondary-btn {
-    background: #334155;
-    color: white;
+    background: #1a2028;
+    color: #e7ebf0;
+    border: 1px solid #303844;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 600;
 }
 
 .secondary-btn:hover {
-    background: #475569;
+    background: #222a34;
 }
 
-.danger-btn {
-    background: #7f1d1d;
-    color: white;
+.careers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 18px;
 }
 
-.danger-btn:hover {
-    background: #991b1b;
-}
-
-.option-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.option-button {
-    flex: 1;
-    min-height: 70px;
-    background: #0f172a;
-    color: #cbd5e1;
-    border: 2px solid #334155;
+.career-card {
+    background: #11161d;
+    border: 1px solid #252c35;
     border-radius: 12px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
+    padding: 20px;
+    transition: 0.15s;
 }
 
-.option-button:hover {
-    border-color: #64748b;
+.career-card:hover {
+    border-color: #3b4653;
+    transform: translateY(-2px);
 }
 
-.option-button.selected {
-    border-color: #2563eb;
-    background: #172554;
+.career-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.career-name {
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.career-club {
+    color: #d8dde4;
+    margin-top: 5px;
+}
+
+.career-league {
+    color: #7f8996;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.career-season {
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #252c35;
+    display: flex;
+    justify-content: space-between;
+    color: #8d97a3;
+    font-size: 13px;
+}
+
+.season-value {
     color: white;
+    font-weight: 700;
 }
 
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 12px;
+.career-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 17px;
 }
 
-.hidden {
-    display: none !important;
+.career-actions button {
+    flex: 1;
 }
 
-/* Searchable dropdown */
+.delete-btn {
+    background: transparent;
+    border: 1px solid #493038;
+    color: #d97886;
+    padding: 9px;
+    border-radius: 7px;
+}
+
+.delete-btn:hover {
+    background: #24161a;
+}
+
+.empty-state {
+    background: #11161d;
+    border: 1px dashed #303844;
+    border-radius: 12px;
+    padding: 55px 20px;
+    text-align: center;
+    color: #7f8996;
+}
+
+.empty-state h2 {
+    color: white;
+    margin-top: 0;
+}
+
+/* =========================
+   CAREER HEADER
+========================= */
+
+.career-banner {
+    background: #11161d;
+    border: 1px solid #252c35;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+}
+
+.career-banner-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.current-career-label {
+    color: #737d89;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.current-career-name {
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 4px;
+}
+
+.current-career-info {
+    color: #8d97a3;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.back-dashboard {
+    background: #1a2028;
+    border: 1px solid #303844;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 7px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.panel {
+    background: #11161d;
+    border: 1px solid #252c35;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.panel-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.panel-subtitle {
+    color: #7f8996;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.stat-box {
+    background: #171d25;
+    border: 1px solid #252c35;
+    border-radius: 9px;
+    padding: 18px;
+}
+
+.stat-label {
+    color: #7f8996;
+    font-size: 12px;
+}
+
+.stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+/* =========================
+   SETUP
+========================= */
+
+.setup-wrapper {
+    max-width: 760px;
+}
+
+.setup-panel {
+    background: #11161d;
+    border: 1px solid #252c35;
+    border-radius: 12px;
+    padding: 28px;
+}
+
+.setup-section {
+    margin-bottom: 28px;
+}
+
+.setup-section:last-child {
+    margin-bottom: 0;
+}
+
+.setup-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 9px;
+}
+
+.setup-help {
+    color: #727c88;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.type-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.type-btn {
+    background: #171d25;
+    border: 1px solid #303844;
+    color: #cdd3db;
+    border-radius: 9px;
+    padding: 17px;
+    text-align: left;
+}
+
+.type-btn strong {
+    display: block;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.type-btn span {
+    color: #7f8996;
+    font-size: 12px;
+}
+
+.type-btn.selected {
+    border-color: #3288e8;
+    background: #152337;
+}
+
+.form-input,
+.search-input,
+.form-select {
+    width: 100%;
+    background: #171d25;
+    border: 1px solid #303844;
+    color: white;
+    padding: 12px 13px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.form-input:focus,
+.search-input:focus,
+.form-select:focus {
+    border-color: #3288e8;
+}
+
+.setup-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* =========================
+   SEARCHABLE DROPDOWN
+========================= */
 
 .search-select {
     position: relative;
 }
 
-.search-select input {
-    padding-right: 38px;
-}
-
-.dropdown-arrow {
-    position: absolute;
-    right: 13px;
-    top: 13px;
-    color: #94a3b8;
-    pointer-events: none;
-}
-
 .search-results {
     position: absolute;
-    top: calc(100% + 5px);
     left: 0;
     right: 0;
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 9px;
-    max-height: 260px;
+    top: calc(100% + 4px);
+    background: #171d25;
+    border: 1px solid #303844;
+    border-radius: 8px;
+    max-height: 250px;
     overflow-y: auto;
     z-index: 50;
     display: none;
@@ -245,160 +462,77 @@ select:focus {
     display: block;
 }
 
-.search-result {
+.search-option {
     padding: 11px 13px;
     cursor: pointer;
-    border-bottom: 1px solid #1e293b;
-}
-
-.search-result:last-child {
-    border-bottom: none;
-}
-
-.search-result:hover {
-    background: #1e293b;
-}
-
-.search-result.no-results {
-    color: #64748b;
-    cursor: default;
-}
-
-/* Dashboard */
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.stat-card {
-    background: #111827;
-    border: 1px solid #29364c;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    color: #9ca3af;
+    border-bottom: 1px solid #242b34;
     font-size: 13px;
 }
 
-.career-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+.search-option:last-child {
+    border-bottom: 0;
 }
 
-.club-name {
-    font-size: 28px;
-    font-weight: bold;
+.search-option:hover {
+    background: #222a34;
 }
 
-.career-info {
-    color: #9ca3af;
-    margin-top: 6px;
+.search-option small {
+    display: block;
+    color: #737d89;
+    margin-top: 3px;
 }
 
-.empty-message {
-    text-align: center;
-    padding: 50px 20px;
-    color: #9ca3af;
-}
-
-/* Players */
-
-.database-status {
-    color: #9ca3af;
-    margin-bottom: 20px;
-}
-
-.search-box {
-    margin-bottom: 20px;
-}
-
-.player-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 15px;
-}
-
-.player-card {
-    background: #182235;
-    border: 1px solid #29364c;
-    border-radius: 14px;
-    overflow: hidden;
-}
-
-.player-image {
-    width: 100%;
-    height: 190px;
-    object-fit: contain;
-    background: #111827;
-}
-
-.player-info {
-    padding: 15px;
-}
-
-.player-name {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.player-meta {
-    color: #9ca3af;
+.no-results {
+    padding: 14px;
+    color: #737d89;
     font-size: 13px;
-    line-height: 1.7;
 }
 
-.rating {
-    font-size: 25px;
-    font-weight: bold;
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
-.info-box {
-    background: #0f172a;
-    border: 1px solid #29364c;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-    color: #cbd5e1;
-}
-
-@media (max-width: 800px) {
-
-    header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
+@media (max-width: 900px) {
+    .sidebar {
+        width: 190px;
     }
 
-    nav {
+    .main {
+        margin-left: 190px;
+        padding: 25px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .sidebar {
+        position: static;
         width: 100%;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid #252c35;
     }
 
-    nav button {
-        padding: 8px 9px;
+    .main {
+        margin-left: 0;
+        padding: 20px;
     }
 
-    main {
-        padding: 25px 15px 50px;
+    .careers-grid {
+        grid-template-columns: 1fr;
     }
 
-    .option-buttons {
+    .type-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .career-banner-row {
         flex-direction: column;
+        align-items: flex-start;
     }
 }
 </style>
@@ -406,233 +540,82 @@ select:focus {
 
 <body>
 
-<header>
+<div class="app">
 
-    <h1>⚽ Career Mode Hub</h1>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-    <nav>
-        <button onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</button>
-        <button onclick="showPage('career')" id="nav-career">My Career</button>
-        <button onclick="showPage('matches')" id="nav-matches">Matches</button>
-        <button onclick="showPage('squad')" id="nav-squad">Squad</button>
-        <button onclick="showPage('players')" id="nav-players">Players</button>
-        <button onclick="showPage('youth')" id="nav-youth">Youth Academy</button>
-        <button onclick="showPage('transfers')" id="nav-transfers">Transfers</button>
-        <button onclick="showPage('competitions')" id="nav-competitions">Competitions</button>
-        <button onclick="showPage('league')" id="nav-league">League Centre</button>
-        <button onclick="showPage('seasons')" id="nav-seasons">Past Seasons</button>
-        <button onclick="showPage('trophies')" id="nav-trophies">Trophy Cabinet</button>
-        <button onclick="showPage('national')" id="nav-national">National Team</button>
-    </nav>
+        <div class="logo">
+            Career Mode <span>Hub</span>
+        </div>
 
-</header>
+        <div class="nav-title" id="careerNavTitle">
+            Career
+        </div>
 
+        <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+            Dashboard
+        </button>
 
-<main>
+        <div id="careerNavigation">
 
+            <button class="nav-btn disabled" data-page="mycareer" onclick="showPage('mycareer')">
+                My Career
+            </button>
 
-<!-- DASHBOARD -->
+            <button class="nav-btn disabled" data-page="matches" onclick="showPage('matches')">
+                Matches
+            </button>
 
-<section id="dashboard" class="page">
+            <button class="nav-btn disabled" data-page="squad" onclick="showPage('squad')">
+                Squad
+            </button>
 
-    <h2>Dashboard</h2>
+            <button class="nav-btn disabled" data-page="players" onclick="showPage('players')">
+                Players
+            </button>
 
-    <p class="subtitle">
-        Your Career Mode overview.
-    </p>
+            <button class="nav-btn disabled" data-page="youth" onclick="showPage('youth')">
+                Youth Academy
+            </button>
 
-    <div id="dashboardContent"></div>
+            <button class="nav-btn disabled" data-page="transfers" onclick="showPage('transfers')">
+                Transfers
+            </button>
 
-</section>
+            <button class="nav-btn disabled" data-page="competitions" onclick="showPage('competitions')">
+                Competitions
+            </button>
 
+            <button class="nav-btn disabled" data-page="league" onclick="showPage('league')">
+                League Centre
+            </button>
 
-<!-- MY CAREER -->
+            <button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
+                Past Seasons
+            </button>
 
-<section id="career" class="page">
+            <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
+                Trophy Cabinet
+            </button>
 
-    <h2>My Career</h2>
+            <button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
+                National Team
+            </button>
 
-    <p class="subtitle">
-        Create and manage your Career Mode save.
-    </p>
+        </div>
 
-    <div id="careerSetup"></div>
+    </aside>
 
-</section>
 
+    <!-- MAIN -->
+    <main class="main">
 
-<!-- MATCHES -->
+        <div id="pageContent"></div>
 
-<section id="matches" class="page">
+    </main>
 
-    <h2>Matches</h2>
-
-    <p class="subtitle">
-        Track every match in your career.
-    </p>
-
-    <div class="card empty-message">
-        Match tracking will be built next.
-    </div>
-
-</section>
-
-
-<!-- SQUAD -->
-
-<section id="squad" class="page">
-
-    <h2>Squad</h2>
-
-    <p class="subtitle">
-        Manage your Career Mode squad.
-    </p>
-
-    <div class="card empty-message">
-        Squad management will be built after Match tracking.
-    </div>
-
-</section>
-
-
-<!-- PLAYERS -->
-
-<section id="players" class="page">
-
-    <h2>FC 27 Players</h2>
-
-    <p class="subtitle">
-        Search the complete FC 27 men's player database.
-    </p>
-
-    <div id="databaseStatus" class="database-status">
-        Loading player database...
-    </div>
-
-    <div class="search-box">
-
-        <input
-            type="text"
-            id="playerSearch"
-            placeholder="Search player, club, nationality or position..."
-            oninput="searchPlayers()"
-        >
-
-    </div>
-
-    <div id="playerResults" class="player-grid"></div>
-
-</section>
-
-
-<!-- OTHER PAGES -->
-
-<section id="youth" class="page">
-
-    <h2>Youth Academy</h2>
-
-    <p class="subtitle">
-        Track your youth academy players.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="transfers" class="page">
-
-    <h2>Transfers</h2>
-
-    <p class="subtitle">
-        Track transfers in and out of your club.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="competitions" class="page">
-
-    <h2>Competitions</h2>
-
-    <p class="subtitle">
-        Track your competitions and results.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="league" class="page">
-
-    <h2>League Centre</h2>
-
-    <p class="subtitle">
-        Track league tables and standings.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="seasons" class="page">
-
-    <h2>Past Seasons</h2>
-
-    <p class="subtitle">
-        Your previous Career Mode seasons.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="trophies" class="page">
-
-    <h2>Trophy Cabinet</h2>
-
-    <p class="subtitle">
-        Every trophy you've won.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-<section id="national" class="page">
-
-    <h2>National Team</h2>
-
-    <p class="subtitle">
-        Track your international career.
-    </p>
-
-    <div class="card empty-message">
-        Coming soon.
-    </div>
-
-</section>
-
-
-</main>
+</div>
 
 
 <script>
@@ -642,1179 +625,278 @@ select:focus {
 ========================================================= */
 
 let allPlayers = [];
-let databaseLoaded = false;
 
 let fc27Leagues = [];
 let fc27ClubsByLeague = {};
 
+let careers = [];
+let currentCareerId = null;
+
+let setupClubType = "original";
+
 let selectedLeague = "";
 let selectedClub = "";
-let selectedContinent = "";
 let selectedCountry = "";
-
-let career = JSON.parse(
-    localStorage.getItem("careerModeHubCareer")
-) || null;
+let selectedContinent = "";
 
 
 /* =========================================================
-   CONTINENT / COUNTRY DATA
+   COUNTRY DATA
 ========================================================= */
 
 const countriesByContinent = {
 
-    "Africa": [
-        "Algeria",
-        "Angola",
-        "Burkina Faso",
-        "Cameroon",
-        "Cape Verde",
-        "Côte d'Ivoire",
-        "DR Congo",
-        "Egypt",
-        "Ghana",
-        "Guinea",
-        "Guinea-Bissau",
-        "Ivory Coast",
-        "Mali",
-        "Morocco",
-        "Mozambique",
-        "Nigeria",
-        "Senegal",
-        "South Africa",
-        "Togo",
-        "Tunisia",
-        "Zambia",
-        "Zimbabwe"
+    Europe: [
+        "Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina",
+        "Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","England",
+        "Estonia","Faroe Islands","Finland","France","Georgia","Germany",
+        "Greece","Hungary","Iceland","Ireland","Israel","Italy","Kosovo",
+        "Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova",
+        "Montenegro","Netherlands","North Macedonia","Northern Ireland","Norway",
+        "Poland","Portugal","Republic of Ireland","Romania","Russia","San Marino",
+        "Scotland","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland",
+        "Turkey","Ukraine","Wales"
     ],
 
-    "Asia": [
-        "Australia",
-        "China",
-        "India",
-        "Indonesia",
-        "Iran",
-        "Iraq",
-        "Israel",
-        "Japan",
-        "Jordan",
-        "Korea Republic",
-        "Malaysia",
-        "Qatar",
-        "Saudi Arabia",
-        "Thailand",
-        "United Arab Emirates"
+    Asia: [
+        "China PR","India","Indonesia","Iran","Iraq","Japan","Korea Republic",
+        "Malaysia","Saudi Arabia","Thailand","United Arab Emirates"
     ],
 
-    "Europe": [
-        "Albania",
-        "Austria",
-        "Belgium",
-        "Bosnia and Herzegovina",
-        "Bulgaria",
-        "Croatia",
-        "Cyprus",
-        "Czech Republic",
-        "Denmark",
-        "England",
-        "Finland",
-        "France",
-        "Georgia",
-        "Germany",
-        "Greece",
-        "Hungary",
-        "Iceland",
-        "Ireland",
-        "Italy",
-        "Netherlands",
-        "Northern Ireland",
-        "Norway",
-        "Poland",
-        "Portugal",
-        "Romania",
-        "Scotland",
-        "Serbia",
-        "Slovakia",
-        "Slovenia",
-        "Spain",
-        "Sweden",
-        "Switzerland",
-        "Turkey",
-        "Ukraine",
-        "Wales"
+    Africa: [
+        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast","Mali","Morocco",
+        "Nigeria","Senegal","South Africa","Tunisia"
     ],
 
-    "North America": [
-        "Canada",
-        "Costa Rica",
-        "Honduras",
-        "Jamaica",
-        "Mexico",
-        "Panama",
+    NorthAmerica: [
+        "Canada","Costa Rica","Honduras","Jamaica","Mexico","Panama",
         "United States"
     ],
 
-    "South America": [
-        "Argentina",
-        "Bolivia",
-        "Brazil",
-        "Chile",
-        "Colombia",
-        "Ecuador",
-        "Paraguay",
-        "Peru",
-        "Uruguay",
-        "Venezuela"
+    SouthAmerica: [
+        "Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador",
+        "Paraguay","Peru","Uruguay","Venezuela"
     ],
 
-    "Oceania": [
-        "Australia",
-        "Fiji",
-        "New Zealand"
+    Oceania: [
+        "Australia","New Zealand"
     ]
 };
 
 
 /* =========================================================
-   PAGE NAVIGATION
+   LOCAL STORAGE
 ========================================================= */
 
-function showPage(pageId) {
+function loadCareers() {
 
-    document.querySelectorAll(".page").forEach(page => {
-        page.classList.remove("active");
-    });
+    try {
 
-    document.querySelectorAll("nav button").forEach(button => {
+        const saved = localStorage.getItem("careerModeHubCareers");
+
+        if (saved) {
+            careers = JSON.parse(saved);
+        }
+
+    } catch (error) {
+
+        console.error("Could not load careers:", error);
+        careers = [];
+
+    }
+}
+
+
+function saveCareers() {
+
+    localStorage.setItem(
+        "careerModeHubCareers",
+        JSON.stringify(careers)
+    );
+}
+
+
+/* =========================================================
+   PAGE SYSTEM
+========================================================= */
+
+function showPage(page) {
+
+    if (page !== "dashboard" && !currentCareerId) {
+        showPage("dashboard");
+        return;
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(button => {
+
         button.classList.remove("active");
+
+        if (button.dataset.page === page) {
+            button.classList.add("active");
+        }
+
     });
 
-    const page = document.getElementById(pageId);
 
-    if (page) {
-        page.classList.add("active");
-    }
+    if (page === "dashboard") {
 
-    const navButton =
-        document.getElementById("nav-" + pageId);
-
-    if (navButton) {
-        navButton.classList.add("active");
-    }
-
-    if (pageId === "career") {
-        renderCareer();
-    }
-
-    if (pageId === "dashboard") {
         renderDashboard();
-    }
-
-    if (pageId === "players") {
-        loadDatabase();
-    }
-}
-
-
-/* =========================================================
-   CAREER PAGE
-========================================================= */
-
-function renderCareer() {
-
-    const container =
-        document.getElementById("careerSetup");
-
-    if (!career) {
-
-        renderCareerCreation(container);
-
-    } else {
-
-        renderExistingCareer(container);
+        return;
 
     }
-}
 
 
-/* =========================================================
-   CAREER CREATION
-========================================================= */
+    if (page === "mycareer") {
 
-function renderCareerCreation(container) {
-
-    container.innerHTML = `
-
-        <div class="card">
-
-            <h3>1. Manager</h3>
-
-            <div class="field">
-
-                <label>Manager Name</label>
-
-                <input
-                    id="managerName"
-                    placeholder="Enter manager name"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>2. Club Type</h3>
-
-            <div class="option-buttons">
-
-                <button
-                    class="option-button selected"
-                    id="originalClubButton"
-                    onclick="selectClubType('original')"
-                >
-                    🏟️ Original Club
-                </button>
-
-                <button
-                    class="option-button"
-                    id="createClubButton"
-                    onclick="selectClubType('create')"
-                >
-                    ✨ Create a Club
-                </button>
-
-            </div>
-
-            <input
-                type="hidden"
-                id="clubType"
-                value="original"
-            >
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>3. League</h3>
-
-            <p class="subtitle">
-                Choose a league from the FC 27 men's player database.
-            </p>
-
-            <div
-                class="search-select"
-                id="leagueSelector"
-            ></div>
-
-        </div>
-
-
-        <div
-            class="card"
-            id="originalClubSection"
-        >
-
-            <h3>4. Club</h3>
-
-            <p class="subtitle">
-                Choose an original FC 27 club from your selected league.
-            </p>
-
-            <div
-                class="search-select"
-                id="clubSelector"
-            ></div>
-
-        </div>
-
-
-        <div
-            class="card hidden"
-            id="createClubSection"
-        >
-
-            <h3>4. Create Your Club</h3>
-
-            <div class="field">
-
-                <label>Club Name</label>
-
-                <input
-                    id="createdClubName"
-                    placeholder="Enter your club name"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>5. National Team</h3>
-
-            <p class="subtitle">
-                Choose a national team or select no national team.
-            </p>
-
-            <div class="option-buttons">
-
-                <button
-                    class="option-button selected"
-                    id="noNationalButton"
-                    onclick="selectNationalType('none')"
-                >
-                    🚫 No National Team
-                </button>
-
-                <button
-                    class="option-button"
-                    id="nationalButton"
-                    onclick="selectNationalType('national')"
-                >
-                    🌍 Add National Team
-                </button>
-
-            </div>
-
-            <input
-                type="hidden"
-                id="nationalType"
-                value="none"
-            >
-
-            <div
-                id="nationalSelection"
-                class="hidden"
-                style="margin-top:20px;"
-            >
-
-                <div class="grid">
-
-                    <div>
-
-                        <label>Continent</label>
-
-                        <select
-                            id="continentSelect"
-                            onchange="continentChanged()"
-                        >
-
-                            <option value="">
-                                Choose continent
-                            </option>
-
-                            ${Object.keys(countriesByContinent)
-                                .map(continent =>
-                                    `<option value="${escapeAttribute(continent)}">
-                                        ${escapeHTML(continent)}
-                                    </option>`
-                                )
-                                .join("")}
-
-                        </select>
-
-                    </div>
-
-
-                    <div>
-
-                        <label>Country</label>
-
-                        <div
-                            class="search-select"
-                            id="countrySelector"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>6. Start Your Career</h3>
-
-            <div class="info-box">
-
-                <strong>Starting season:</strong> 2026/27
-
-                <br><br>
-
-                Your career will begin in the 2026/27 season.
-                Difficulty and match length are not stored because
-                they are not needed for the tracker.
-
-            </div>
-
-            <button
-                class="primary-btn"
-                onclick="createCareer()"
-            >
-                Create Career
-            </button>
-
-        </div>
-    `;
-
-    initialiseCareerSelectors();
-}
-
-
-/* =========================================================
-   CLUB TYPE
-========================================================= */
-
-function selectClubType(type) {
-
-    document.getElementById("clubType").value = type;
-
-    const originalButton =
-        document.getElementById("originalClubButton");
-
-    const createButton =
-        document.getElementById("createClubButton");
-
-    const originalSection =
-        document.getElementById("originalClubSection");
-
-    const createSection =
-        document.getElementById("createClubSection");
-
-
-    if (type === "original") {
-
-        originalButton.classList.add("selected");
-        createButton.classList.remove("selected");
-
-        originalSection.classList.remove("hidden");
-        createSection.classList.add("hidden");
-
-    } else {
-
-        createButton.classList.add("selected");
-        originalButton.classList.remove("selected");
-
-        createSection.classList.remove("hidden");
-        originalSection.classList.add("hidden");
+        renderCareerHome();
+        return;
 
     }
-}
 
 
-/* =========================================================
-   NATIONAL TEAM TYPE
-========================================================= */
+    if (page === "matches") {
 
-function selectNationalType(type) {
+        renderPlaceholder(
+            "Matches",
+            "This is where your career mode matches will be tracked."
+        );
 
-    document.getElementById("nationalType").value = type;
-
-    const noneButton =
-        document.getElementById("noNationalButton");
-
-    const nationalButton =
-        document.getElementById("nationalButton");
-
-    const selection =
-        document.getElementById("nationalSelection");
-
-
-    if (type === "none") {
-
-        noneButton.classList.add("selected");
-        nationalButton.classList.remove("selected");
-
-        selection.classList.add("hidden");
-
-        selectedContinent = "";
-        selectedCountry = "";
-
-    } else {
-
-        nationalButton.classList.add("selected");
-        noneButton.classList.remove("selected");
-
-        selection.classList.remove("hidden");
+        return;
 
     }
+
+
+    if (page === "squad") {
+
+        renderPlaceholder(
+            "Squad",
+            "Your current squad will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "players") {
+
+        renderPlayers();
+
+        return;
+
+    }
+
+
+    if (page === "youth") {
+
+        renderPlaceholder(
+            "Youth Academy",
+            "Youth academy players and development will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "transfers") {
+
+        renderPlaceholder(
+            "Transfers",
+            "Transfers, arrivals and departures will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "competitions") {
+
+        renderPlaceholder(
+            "Competitions",
+            "Your competitions and progress will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "league") {
+
+        renderPlaceholder(
+            "League Centre",
+            "League table, fixtures and promotion/relegation will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "past") {
+
+        renderPlaceholder(
+            "Past Seasons",
+            "Previous seasons will be stored here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "trophies") {
+
+        renderPlaceholder(
+            "Trophy Cabinet",
+            "Your trophies and honours will appear here."
+        );
+
+        return;
+
+    }
+
+
+    if (page === "national") {
+
+        renderPlaceholder(
+            "National Team",
+            "Your national team career will appear here."
+        );
+
+        return;
+
+    }
+
 }
 
 
 /* =========================================================
-   INITIALISE CAREER SELECTORS
+   SIDEBAR STATE
 ========================================================= */
 
-function initialiseCareerSelectors() {
+function updateNavigation() {
 
-    renderSearchSelect(
-        "leagueSelector",
-        "Search or choose FC 27 league...",
-        fc27Leagues,
-        selectedLeague,
-        league => {
-
-            selectedLeague = league;
-
-            selectedClub = "";
-
-            renderClubSelector();
-
-        }
+    const buttons = document.querySelectorAll(
+        "#careerNavigation .nav-btn"
     );
 
+    buttons.forEach(button => {
 
-    renderClubSelector();
+        if (currentCareerId) {
 
-
-    renderSearchSelect(
-        "countrySelector",
-        "Choose continent first...",
-        [],
-        "",
-        country => {
-            selectedCountry = country;
-        }
-    );
-}
-
-
-/* =========================================================
-   LEAGUE SELECTOR
-========================================================= */
-
-function renderLeagueSelector() {
-
-    renderSearchSelect(
-        "leagueSelector",
-        "Search or choose FC 27 league...",
-        fc27Leagues,
-        selectedLeague,
-        league => {
-
-            selectedLeague = league;
-
-            selectedClub = "";
-
-            renderClubSelector();
-
-        }
-    );
-}
-
-
-/* =========================================================
-   CLUB SELECTOR
-========================================================= */
-
-function renderClubSelector() {
-
-    const clubs =
-        selectedLeague
-            ? (fc27ClubsByLeague[selectedLeague] || [])
-            : [];
-
-    renderSearchSelect(
-        "clubSelector",
-        selectedLeague
-            ? "Search or choose club..."
-            : "Choose a league first...",
-        clubs,
-        selectedClub,
-        club => {
-
-            selectedClub = club;
-
-        }
-    );
-}
-
-
-/* =========================================================
-   CONTINENT CHANGED
-========================================================= */
-
-function continentChanged() {
-
-    const select =
-        document.getElementById("continentSelect");
-
-    selectedContinent =
-        select.value;
-
-    selectedCountry = "";
-
-    const countries =
-        countriesByContinent[selectedContinent] || [];
-
-    renderSearchSelect(
-        "countrySelector",
-        countries.length
-            ? "Search or choose country..."
-            : "No countries available",
-        countries,
-        "",
-        country => {
-
-            selectedCountry = country;
-
-        }
-    );
-}
-
-
-/* =========================================================
-   SEARCHABLE DROPDOWN
-========================================================= */
-
-function renderSearchSelect(
-    containerId,
-    placeholder,
-    options,
-    selectedValue,
-    onSelect
-) {
-
-    const container =
-        document.getElementById(containerId);
-
-    if (!container) return;
-
-
-    const safeOptions =
-        [...options]
-            .filter(Boolean)
-            .filter(
-                (value, index, array) =>
-                    array.indexOf(value) === index
-            )
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
-
-
-    container.innerHTML = `
-
-        <input
-            type="text"
-            placeholder="${escapeAttribute(
-                selectedValue || placeholder
-            )}"
-            autocomplete="off"
-        >
-
-        <span class="dropdown-arrow">
-            ▼
-        </span>
-
-        <div class="search-results"></div>
-    `;
-
-
-    const input =
-        container.querySelector("input");
-
-    const results =
-        container.querySelector(".search-results");
-
-
-    function displayResults(searchText = "") {
-
-        const search =
-            searchText
-                .toLowerCase()
-                .trim();
-
-        const filtered =
-            safeOptions
-                .filter(option =>
-                    option
-                        .toLowerCase()
-                        .includes(search)
-                )
-                .slice(0, 100);
-
-
-        if (!filtered.length) {
-
-            results.innerHTML = `
-                <div class="search-result no-results">
-                    No results found
-                </div>
-            `;
+            button.classList.remove("disabled");
 
         } else {
 
-            results.innerHTML =
-                filtered
-                    .map(option => `
-                        <div
-                            class="search-result"
-                            data-value="${escapeAttribute(option)}"
-                        >
-                            ${escapeHTML(option)}
-                        </div>
-                    `)
-                    .join("");
+            button.classList.add("disabled");
+
         }
-
-        results.classList.add("open");
-    }
-
-
-    input.addEventListener("focus", () => {
-
-        input.select();
-
-        displayResults("");
 
     });
 
-
-    input.addEventListener("input", () => {
-
-        displayResults(input.value);
-
-    });
-
-
-    results.addEventListener("mousedown", event => {
-
-        const item =
-            event.target.closest(".search-result");
-
-        if (
-            !item ||
-            item.classList.contains("no-results")
-        ) {
-            return;
-        }
-
-
-        const value =
-            item.dataset.value;
-
-        input.value = value;
-
-        results.classList.remove("open");
-
-        onSelect(value);
-
-    });
-
-
-    document.addEventListener(
-        "click",
-        function closeDropdown(event) {
-
-            if (!container.contains(event.target)) {
-
-                results.classList.remove("open");
-
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   CREATE CAREER
-========================================================= */
-
-function createCareer() {
-
-    const manager =
-        document
-            .getElementById("managerName")
-            .value
-            .trim();
-
-    const clubType =
-        document
-            .getElementById("clubType")
-            .value;
-
-    const nationalType =
-        document
-            .getElementById("nationalType")
-            .value;
-
-
-    if (!manager) {
-
-        alert("Please enter your manager name.");
-
-        return;
-    }
-
-
-    if (!selectedLeague) {
-
-        alert("Please choose a league.");
-
-        return;
-    }
-
-
-    let club = "";
-
-
-    if (clubType === "original") {
-
-        if (!selectedClub) {
-
-            alert("Please choose a club.");
-
-            return;
-        }
-
-        club = selectedClub;
-
-    } else {
-
-        club =
-            document
-                .getElementById("createdClubName")
-                .value
-                .trim();
-
-        if (!club) {
-
-            alert("Please enter your created club name.");
-
-            return;
-        }
-    }
-
-
-    let nationalTeam = null;
-
-
-    if (nationalType === "national") {
-
-        if (!selectedContinent) {
-
-            alert("Please choose a continent.");
-
-            return;
-        }
-
-        if (!selectedCountry) {
-
-            alert("Please choose a national team.");
-
-            return;
-        }
-
-
-        nationalTeam = {
-
-            continent: selectedContinent,
-
-            country: selectedCountry
-
-        };
-
-    }
-
-
-    career = {
-
-        manager: manager,
-
-        clubType: clubType,
-
-        club: club,
-
-        league: selectedLeague,
-
-        season: "2026/27",
-
-        nationalTeam: nationalTeam,
-
-        stats: {
-
-            matches: 0,
-
-            wins: 0,
-
-            draws: 0,
-
-            losses: 0,
-
-            goalsFor: 0,
-
-            goalsAgainst: 0,
-
-            trophies: 0
-
-        },
-
-        createdAt:
-            new Date().toISOString()
-
-    };
-
-
-    saveCareer();
-
-    showPage("dashboard");
-
-}
-
-
-/* =========================================================
-   EXISTING CAREER
-========================================================= */
-
-function renderExistingCareer(container) {
-
-    const nationalTeam =
-        career.nationalTeam
-            ? career.nationalTeam.country
-            : "No national team";
-
-
-    container.innerHTML = `
-
-        <div class="card">
-
-            <div class="career-header">
-
-                <div>
-
-                    <div class="club-name">
-                        ${escapeHTML(career.club)}
-                    </div>
-
-                    <div class="career-info">
-                        ${escapeHTML(career.league)}
-                        ·
-                        ${escapeHTML(career.season)}
-                    </div>
-
-                </div>
-
-                <button
-                    class="secondary-btn"
-                    onclick="editCareer()"
-                >
-                    Edit Career
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>Career Details</h3>
-
-            <div class="grid">
-
-                <div>
-
-                    <label>Manager</label>
-
-                    <strong>
-                        ${escapeHTML(career.manager)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>Club Type</label>
-
-                    <strong>
-                        ${
-                            career.clubType === "create"
-                                ? "Create a Club"
-                                : "Original Club"
-                        }
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>League</label>
-
-                    <strong>
-                        ${escapeHTML(career.league)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>Season</label>
-
-                    <strong>
-                        ${escapeHTML(career.season)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>National Team</label>
-
-                    <strong>
-                        ${escapeHTML(nationalTeam)}
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>Season Progress</h3>
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${career.stats.matches}
-                    </div>
-                    <div class="stat-label">
-                        Matches
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${career.stats.wins}
-                    </div>
-                    <div class="stat-label">
-                        Wins
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${career.stats.draws}
-                    </div>
-                    <div class="stat-label">
-                        Draws
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${career.stats.losses}
-                    </div>
-                    <div class="stat-label">
-                        Losses
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>Danger Zone</h3>
-
-            <p style="color:#9ca3af;">
-                Delete your current career from this browser.
-            </p>
-
-            <button
-                class="danger-btn"
-                onclick="deleteCareer()"
-            >
-                Delete Career
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   EDIT CAREER
-========================================================= */
-
-function editCareer() {
-
-    if (
-        !confirm(
-            "Editing your career setup will reopen the setup screen. Your match statistics will remain saved."
-        )
-    ) {
-        return;
-    }
-
-    career = null;
-
-    renderCareer();
-
-}
-
-
-/* =========================================================
-   DELETE CAREER
-========================================================= */
-
-function deleteCareer() {
-
-    if (
-        !confirm(
-            "Are you sure you want to delete your career?"
-        )
-    ) {
-        return;
-    }
-
-    localStorage.removeItem(
-        "careerModeHubCareer"
-    );
-
-    career = null;
-
-    selectedLeague = "";
-    selectedClub = "";
-    selectedContinent = "";
-    selectedCountry = "";
-
-    showPage("career");
-}
-
-
-/* =========================================================
-   SAVE CAREER
-========================================================= */
-
-function saveCareer() {
-
-    localStorage.setItem(
-        "careerModeHubCareer",
-        JSON.stringify(career)
-    );
 }
 
 
@@ -1824,96 +906,1448 @@ function saveCareer() {
 
 function renderDashboard() {
 
-    const container =
-        document.getElementById(
-            "dashboardContent"
-        );
+    currentCareerId = null;
+
+    updateNavigation();
+
+    document.getElementById("pageContent").innerHTML = `
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    Dashboard
+                </div>
+
+                <div class="page-subtitle">
+                    Choose a career mode or create a new one.
+                </div>
+
+            </div>
+
+            <button class="primary-btn" onclick="startNewCareer()">
+                + New Career
+            </button>
+
+        </div>
 
 
-    if (!career) {
+        <div class="careers-header">
 
-        container.innerHTML = `
+            <div>
+                <div class="panel-title">
+                    Your Careers
+                </div>
 
-            <div class="card empty-message">
+                <div class="panel-subtitle">
+                    Run multiple career modes at the same time.
+                </div>
+            </div>
 
-                <h3>No Career Created Yet</h3>
+        </div>
+
+
+        ${
+            careers.length === 0
+
+            ?
+
+            `
+
+            <div class="empty-state">
+
+                <h2>No careers yet</h2>
 
                 <p>
-                    Go to My Career to create your
-                    Career Mode save.
+                    Create your first Career Mode save to get started.
                 </p>
 
                 <button
                     class="primary-btn"
-                    onclick="showPage('career')"
+                    onclick="startNewCareer()"
                 >
                     Create Career
                 </button>
 
             </div>
+
+            `
+
+            :
+
+            `
+
+            <div class="careers-grid">
+
+                ${careers.map(career => createCareerCard(career)).join("")}
+
+            </div>
+
+            `
+        }
+
+    `;
+
+}
+
+
+function createCareerCard(career) {
+
+    const nationalTeam = career.nationalTeam
+        ? career.nationalTeam
+        : "No National Team";
+
+    return `
+
+        <div class="career-card">
+
+            <div class="career-card-top">
+
+                <div>
+
+                    <div class="career-name">
+                        ${escapeHTML(career.managerName)}
+                    </div>
+
+                    <div class="career-club">
+                        ${escapeHTML(career.clubName)}
+                    </div>
+
+                    <div class="career-league">
+                        ${escapeHTML(career.league)}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="career-season">
+
+                <span>
+                    Current Year
+                </span>
+
+                <span class="season-value">
+                    ${escapeHTML(career.currentSeason)}
+                </span>
+
+            </div>
+
+
+            <div class="career-season">
+
+                <span>
+                    National Team
+                </span>
+
+                <span class="season-value">
+                    ${escapeHTML(nationalTeam)}
+                </span>
+
+            </div>
+
+
+            <div class="career-actions">
+
+                <button
+                    class="primary-btn"
+                    onclick="enterCareer('${career.id}')"
+                >
+                    Enter Career
+                </button>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteCareer('${career.id}', event)"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   NEW CAREER
+========================================================= */
+
+function startNewCareer() {
+
+    setupClubType = "original";
+
+    selectedLeague = "";
+    selectedClub = "";
+    selectedCountry = "";
+    selectedContinent = "";
+
+    renderCareerSetup();
+
+}
+
+
+/* =========================================================
+   CAREER SETUP
+========================================================= */
+
+function renderCareerSetup() {
+
+    currentCareerId = null;
+
+    document.getElementById("pageContent").innerHTML = `
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    Create Career
+                </div>
+
+                <div class="page-subtitle">
+                    Set up your new Career Mode save.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="setup-wrapper">
+
+            <div class="setup-panel">
+
+
+                <!-- MANAGER -->
+
+                <div class="setup-section">
+
+                    <label class="setup-label">
+                        Manager Name
+                    </label>
+
+                    <input
+                        id="managerName"
+                        class="form-input"
+                        placeholder="Enter manager name"
+                    >
+
+                </div>
+
+
+                <!-- CLUB TYPE -->
+
+                <div class="setup-section">
+
+                    <label class="setup-label">
+                        Club
+                    </label>
+
+                    <div class="type-buttons">
+
+                        <button
+                            id="originalClubButton"
+                            class="type-btn selected"
+                            onclick="selectClubType('original')"
+                        >
+
+                            <strong>
+                                Original Club
+                            </strong>
+
+                            <span>
+                                Manage an existing FC 27 club.
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            id="createClubButton"
+                            class="type-btn"
+                            onclick="selectClubType('create')"
+                        >
+
+                            <strong>
+                                Create a Club
+                            </strong>
+
+                            <span>
+                                Create your own custom club.
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LEAGUE -->
+
+                <div class="setup-section">
+
+                    <label class="setup-label">
+                        League
+                    </label>
+
+                    <div class="search-select">
+
+                        <input
+                            id="leagueSearch"
+                            class="search-input"
+                            placeholder="Search FC 27 leagues..."
+                            autocomplete="off"
+                            oninput="searchLeague(this.value)"
+                            onclick="openLeagueResults()"
+                        >
+
+                        <div
+                            id="leagueResults"
+                            class="search-results"
+                        ></div>
+
+                    </div>
+
+                    <div class="setup-help">
+                        Select a league from the FC 27 player database.
+                    </div>
+
+                </div>
+
+
+                <!-- CLUB -->
+
+                <div
+                    id="clubSection"
+                    class="setup-section"
+                >
+
+                    <label class="setup-label">
+                        Club
+                    </label>
+
+                    <div class="search-select">
+
+                        <input
+                            id="clubSearch"
+                            class="search-input"
+                            placeholder="Select a league first..."
+                            autocomplete="off"
+                            oninput="searchClub(this.value)"
+                            onclick="openClubResults()"
+                            disabled
+                        >
+
+                        <div
+                            id="clubResults"
+                            class="search-results"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CUSTOM CLUB -->
+
+                <div
+                    id="customClubSection"
+                    class="setup-section"
+                    style="display:none;"
+                >
+
+                    <label class="setup-label">
+                        Custom Club Name
+                    </label>
+
+                    <input
+                        id="customClubName"
+                        class="form-input"
+                        placeholder="Enter your club name"
+                    >
+
+                </div>
+
+
+                <!-- SEASON -->
+
+                <div class="setup-section">
+
+                    <label class="setup-label">
+                        Starting Season
+                    </label>
+
+                    <input
+                        class="form-input"
+                        value="2026/27"
+                        disabled
+                    >
+
+                    <div class="setup-help">
+                        Every new career starts in the 2026/27 season.
+                    </div>
+
+                </div>
+
+
+                <!-- NATIONAL TEAM -->
+
+                <div class="setup-section">
+
+                    <label class="setup-label">
+                        National Team
+                    </label>
+
+                    <select
+                        id="nationalTeamChoice"
+                        class="form-select"
+                        onchange="toggleNationalTeam(this.value)"
+                    >
+
+                        <option value="none">
+                            No National Team
+                        </option>
+
+                        <option value="add">
+                            Add National Team
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CONTINENT -->
+
+                <div
+                    id="continentSection"
+                    class="setup-section"
+                    style="display:none;"
+                >
+
+                    <label class="setup-label">
+                        Continent
+                    </label>
+
+                    <select
+                        id="continentSelect"
+                        class="form-select"
+                        onchange="selectContinent(this.value)"
+                    >
+
+                        <option value="">
+                            Select continent
+                        </option>
+
+                        <option value="Europe">
+                            Europe
+                        </option>
+
+                        <option value="Asia">
+                            Asia
+                        </option>
+
+                        <option value="Africa">
+                            Africa
+                        </option>
+
+                        <option value="NorthAmerica">
+                            North America
+                        </option>
+
+                        <option value="SouthAmerica">
+                            South America
+                        </option>
+
+                        <option value="Oceania">
+                            Oceania
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- COUNTRY -->
+
+                <div
+                    id="countrySection"
+                    class="setup-section"
+                    style="display:none;"
+                >
+
+                    <label class="setup-label">
+                        Country
+                    </label>
+
+                    <div class="search-select">
+
+                        <input
+                            id="countrySearch"
+                            class="search-input"
+                            placeholder="Select a continent first..."
+                            autocomplete="off"
+                            oninput="searchCountry(this.value)"
+                            onclick="openCountryResults()"
+                            disabled
+                        >
+
+                        <div
+                            id="countryResults"
+                            class="search-results"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setup-actions">
+
+                    <button
+                        class="secondary-btn"
+                        onclick="showPage('dashboard')"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        class="primary-btn"
+                        onclick="createCareer()"
+                    >
+                        Start Career
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   CLUB TYPE
+========================================================= */
+
+function selectClubType(type) {
+
+    setupClubType = type;
+
+    const originalButton =
+        document.getElementById("originalClubButton");
+
+    const createButton =
+        document.getElementById("createClubButton");
+
+    const clubSection =
+        document.getElementById("clubSection");
+
+    const customClubSection =
+        document.getElementById("customClubSection");
+
+
+    if (type === "original") {
+
+        originalButton.classList.add("selected");
+        createButton.classList.remove("selected");
+
+        clubSection.style.display = "block";
+        customClubSection.style.display = "none";
+
+    } else {
+
+        originalButton.classList.remove("selected");
+        createButton.classList.add("selected");
+
+        clubSection.style.display = "none";
+        customClubSection.style.display = "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   LEAGUE SEARCH
+========================================================= */
+
+function openLeagueResults() {
+
+    searchLeague(
+        document.getElementById("leagueSearch").value
+    );
+
+}
+
+
+function searchLeague(query) {
+
+    const results =
+        document.getElementById("leagueResults");
+
+    if (!results) return;
+
+    const q = query.trim().toLowerCase();
+
+    const matches = fc27Leagues
+        .filter(league =>
+            league.toLowerCase().includes(q)
+        )
+        .slice(0, 80);
+
+
+    if (matches.length === 0) {
+
+        results.innerHTML = `
+            <div class="no-results">
+                No FC 27 leagues found.
+            </div>
         `;
 
+    } else {
+
+        results.innerHTML = matches.map(league => `
+
+            <div
+                class="search-option"
+                onclick="chooseLeague('${escapeJS(league)}')"
+            >
+                ${escapeHTML(league)}
+            </div>
+
+        `).join("");
+
+    }
+
+    results.classList.add("open");
+
+}
+
+
+function chooseLeague(league) {
+
+    selectedLeague = league;
+
+    document.getElementById("leagueSearch").value = league;
+
+    document
+        .getElementById("leagueResults")
+        .classList.remove("open");
+
+
+    selectedClub = "";
+
+    const clubInput =
+        document.getElementById("clubSearch");
+
+    if (clubInput) {
+
+        clubInput.disabled = false;
+
+        clubInput.placeholder =
+            "Search clubs in this league...";
+
+        clubInput.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   CLUB SEARCH
+========================================================= */
+
+function openClubResults() {
+
+    if (!selectedLeague) return;
+
+    searchClub(
+        document.getElementById("clubSearch").value
+    );
+
+}
+
+
+function searchClub(query) {
+
+    if (!selectedLeague) return;
+
+    const results =
+        document.getElementById("clubResults");
+
+    if (!results) return;
+
+    const clubs =
+        fc27ClubsByLeague[selectedLeague] || [];
+
+    const q = query.trim().toLowerCase();
+
+    const matches = clubs
+        .filter(club =>
+            club.toLowerCase().includes(q)
+        )
+        .slice(0, 100);
+
+
+    if (matches.length === 0) {
+
+        results.innerHTML = `
+            <div class="no-results">
+                No clubs found in this league.
+            </div>
+        `;
+
+    } else {
+
+        results.innerHTML = matches.map(club => `
+
+            <div
+                class="search-option"
+                onclick="chooseClub('${escapeJS(club)}')"
+            >
+                ${escapeHTML(club)}
+            </div>
+
+        `).join("");
+
+    }
+
+    results.classList.add("open");
+
+}
+
+
+function chooseClub(club) {
+
+    selectedClub = club;
+
+    document.getElementById("clubSearch").value = club;
+
+    document
+        .getElementById("clubResults")
+        .classList.remove("open");
+
+}
+
+
+/* =========================================================
+   NATIONAL TEAM
+========================================================= */
+
+function toggleNationalTeam(value) {
+
+    const continentSection =
+        document.getElementById("continentSection");
+
+    const countrySection =
+        document.getElementById("countrySection");
+
+
+    if (value === "add") {
+
+        continentSection.style.display = "block";
+
+    } else {
+
+        continentSection.style.display = "none";
+        countrySection.style.display = "none";
+
+        selectedContinent = "";
+        selectedCountry = "";
+
+    }
+
+}
+
+
+function selectContinent(continent) {
+
+    selectedContinent = continent;
+
+    selectedCountry = "";
+
+    const countryInput =
+        document.getElementById("countrySearch");
+
+    const countrySection =
+        document.getElementById("countrySection");
+
+
+    if (!continent) {
+
+        countrySection.style.display = "none";
+        return;
+
+    }
+
+
+    countrySection.style.display = "block";
+
+    countryInput.disabled = false;
+
+    countryInput.placeholder =
+        "Search country...";
+
+    countryInput.value = "";
+
+}
+
+
+function openCountryResults() {
+
+    if (!selectedContinent) return;
+
+    searchCountry(
+        document.getElementById("countrySearch").value
+    );
+
+}
+
+
+function searchCountry(query) {
+
+    if (!selectedContinent) return;
+
+    const results =
+        document.getElementById("countryResults");
+
+    const countries =
+        countriesByContinent[selectedContinent] || [];
+
+    const q = query.trim().toLowerCase();
+
+    const matches = countries
+        .filter(country =>
+            country.toLowerCase().includes(q)
+        );
+
+
+    if (matches.length === 0) {
+
+        results.innerHTML = `
+            <div class="no-results">
+                No countries found.
+            </div>
+        `;
+
+    } else {
+
+        results.innerHTML = matches.map(country => `
+
+            <div
+                class="search-option"
+                onclick="chooseCountry('${escapeJS(country)}')"
+            >
+                ${escapeHTML(country)}
+            </div>
+
+        `).join("");
+
+    }
+
+    results.classList.add("open");
+
+}
+
+
+function chooseCountry(country) {
+
+    selectedCountry = country;
+
+    document.getElementById("countrySearch").value =
+        country;
+
+    document
+        .getElementById("countryResults")
+        .classList.remove("open");
+
+}
+
+
+/* =========================================================
+   CREATE CAREER
+========================================================= */
+
+function createCareer() {
+
+    const managerName =
+        document.getElementById("managerName").value.trim();
+
+
+    if (!managerName) {
+
+        alert("Please enter a manager name.");
+        return;
+
+    }
+
+
+    if (!selectedLeague) {
+
+        alert("Please select a league.");
+        return;
+
+    }
+
+
+    let clubName = "";
+
+
+    if (setupClubType === "original") {
+
+        if (!selectedClub) {
+
+            alert("Please select a club.");
+            return;
+
+        }
+
+        clubName = selectedClub;
+
+    } else {
+
+        clubName =
+            document
+                .getElementById("customClubName")
+                .value
+                .trim();
+
+
+        if (!clubName) {
+
+            alert("Please enter your custom club name.");
+            return;
+
+        }
+
+    }
+
+
+    const nationalChoice =
+        document.getElementById("nationalTeamChoice").value;
+
+
+    if (
+        nationalChoice === "add" &&
+        !selectedCountry
+    ) {
+
+        alert("Please select a national team.");
+        return;
+
+    }
+
+
+    const newCareer = {
+
+        id:
+            Date.now().toString() +
+            Math.random().toString(36).substring(2),
+
+        managerName: managerName,
+
+        clubType: setupClubType,
+
+        clubName: clubName,
+
+        league: selectedLeague,
+
+        currentSeason: "2026/27",
+
+        seasonNumber: 1,
+
+        nationalTeam:
+            nationalChoice === "add"
+                ? selectedCountry
+                : null,
+
+        continent:
+            nationalChoice === "add"
+                ? selectedContinent
+                : null,
+
+        createdAt: new Date().toISOString(),
+
+        /*
+         * These fields are ready for future features.
+         * Promotion/relegation will update the league.
+         */
+
+        leagueHistory: [
+            {
+                season: "2026/27",
+                league: selectedLeague
+            }
+        ],
+
+        seasonHistory: [],
+
+        matches: [],
+
+        transfers: [],
+
+        trophies: [],
+
+        squad: [],
+
+        youthAcademy: []
+
+    };
+
+
+    careers.push(newCareer);
+
+    saveCareers();
+
+    enterCareer(newCareer.id);
+
+}
+
+
+/* =========================================================
+   ENTER CAREER
+========================================================= */
+
+function enterCareer(id) {
+
+    const career =
+        careers.find(c => c.id === id);
+
+
+    if (!career) return;
+
+
+    currentCareerId = id;
+
+    updateNavigation();
+
+    showCareerBanner();
+
+    renderCareerHome();
+
+}
+
+
+/* =========================================================
+   CURRENT CAREER
+========================================================= */
+
+function getCurrentCareer() {
+
+    return careers.find(
+        career => career.id === currentCareerId
+    );
+
+}
+
+
+function showCareerBanner() {
+
+    const existing =
+        document.getElementById("careerBanner");
+
+    if (existing) return;
+
+}
+
+
+/* =========================================================
+   CAREER HOME
+========================================================= */
+
+function renderCareerHome() {
+
+    const career = getCurrentCareer();
+
+    if (!career) {
+
+        showPage("dashboard");
+        return;
+
+    }
+
+
+    document.getElementById("pageContent").innerHTML = `
+
+        <div class="career-banner">
+
+            <div class="career-banner-row">
+
+                <div>
+
+                    <div class="current-career-label">
+                        Current Career
+                    </div>
+
+                    <div class="current-career-name">
+                        ${escapeHTML(career.clubName)}
+                    </div>
+
+                    <div class="current-career-info">
+                        ${escapeHTML(career.managerName)}
+                        &nbsp; • &nbsp;
+                        ${escapeHTML(career.league)}
+                        &nbsp; • &nbsp;
+                        ${escapeHTML(career.currentSeason)}
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="back-dashboard"
+                    onclick="showPage('dashboard')"
+                >
+                    ← All Careers
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    My Career
+                </div>
+
+                <div class="page-subtitle">
+                    ${escapeHTML(career.clubName)}
+                    • ${escapeHTML(career.currentSeason)}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Current Season
+                </div>
+
+                <div class="stat-value">
+                    ${escapeHTML(career.currentSeason)}
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    League
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="font-size:18px;"
+                >
+                    ${escapeHTML(career.league)}
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Matches
+                </div>
+
+                <div class="stat-value">
+                    ${career.matches.length}
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Trophies
+                </div>
+
+                <div class="stat-value">
+                    ${career.trophies.length}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <div class="panel">
+
+            <div class="panel-title">
+                Career Overview
+            </div>
+
+            <div class="panel-subtitle">
+                Your career information will appear here as the
+                different Career Mode features are built.
+            </div>
+
+            <p style="color:#8d97a3; line-height:1.7;">
+
+                <strong style="color:white;">
+                    Manager:
+                </strong>
+                ${escapeHTML(career.managerName)}
+                <br>
+
+                <strong style="color:white;">
+                    Club:
+                </strong>
+                ${escapeHTML(career.clubName)}
+                <br>
+
+                <strong style="color:white;">
+                    League:
+                </strong>
+                ${escapeHTML(career.league)}
+                <br>
+
+                <strong style="color:white;">
+                    Current Year:
+                </strong>
+                ${escapeHTML(career.currentSeason)}
+                <br>
+
+                <strong style="color:white;">
+                    National Team:
+                </strong>
+                ${
+                    career.nationalTeam
+                    ? escapeHTML(career.nationalTeam)
+                    : "None"
+                }
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   DELETE CAREER
+========================================================= */
+
+function deleteCareer(id, event) {
+
+    if (event) {
+        event.stopPropagation();
+    }
+
+
+    const career =
+        careers.find(c => c.id === id);
+
+
+    if (!career) return;
+
+
+    const confirmed =
+        confirm(
+            `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
+        );
+
+
+    if (!confirmed) return;
+
+
+    careers =
+        careers.filter(c => c.id !== id);
+
+
+    saveCareers();
+
+
+    if (currentCareerId === id) {
+        currentCareerId = null;
+    }
+
+
+    renderDashboard();
+
+}
+
+
+/* =========================================================
+   FUTURE PLACEHOLDER PAGES
+========================================================= */
+
+function renderPlaceholder(title, description) {
+
+    const career = getCurrentCareer();
+
+    if (!career) {
+
+        showPage("dashboard");
+        return;
+
+    }
+
+
+    document.getElementById("pageContent").innerHTML = `
+
+        <div class="career-banner">
+
+            <div class="career-banner-row">
+
+                <div>
+
+                    <div class="current-career-label">
+                        ${escapeHTML(career.clubName)}
+                    </div>
+
+                    <div class="current-career-name">
+                        ${escapeHTML(career.currentSeason)}
+                    </div>
+
+                    <div class="current-career-info">
+                        ${escapeHTML(career.league)}
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="back-dashboard"
+                    onclick="showPage('dashboard')"
+                >
+                    ← All Careers
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    ${escapeHTML(title)}
+                </div>
+
+                <div class="page-subtitle">
+                    ${escapeHTML(description)}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <div class="panel-title">
+                Coming next
+            </div>
+
+            <div class="panel-subtitle">
+                This section is connected to your current career save.
+            </div>
+
+            <p style="color:#7f8996; line-height:1.7;">
+                The data for this page will be stored separately
+                for each career mode.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   PLAYER DATABASE
+========================================================= */
+
+function renderPlayers() {
+
+    const career = getCurrentCareer();
+
+    if (!career) {
+        showPage("dashboard");
         return;
     }
 
 
-    const stats =
-        career.stats;
+    document.getElementById("pageContent").innerHTML = `
 
+        <div class="career-banner">
 
-    const matches =
-        stats.matches || 0;
-
-    const wins =
-        stats.wins || 0;
-
-    const draws =
-        stats.draws || 0;
-
-    const losses =
-        stats.losses || 0;
-
-
-    const winRate =
-        matches > 0
-            ? Math.round(
-                (wins / matches) * 100
-            )
-            : 0;
-
-
-    const nationalTeam =
-        career.nationalTeam
-            ? career.nationalTeam.country
-            : "No national team";
-
-
-    container.innerHTML = `
-
-        <div class="card">
-
-            <div class="career-header">
+            <div class="career-banner-row">
 
                 <div>
 
-                    <div class="club-name">
-                        ${escapeHTML(career.club)}
+                    <div class="current-career-label">
+                        ${escapeHTML(career.clubName)}
                     </div>
 
-                    <div class="career-info">
-                        ${escapeHTML(career.league)}
-                        ·
-                        ${escapeHTML(career.season)}
+                    <div class="current-career-name">
+                        Players
+                    </div>
+
+                    <div class="current-career-info">
+                        ${escapeHTML(career.currentSeason)}
+                        • ${escapeHTML(career.league)}
                     </div>
 
                 </div>
 
-                <div>
 
-                    <strong>
-                        ${escapeHTML(career.manager)}
-                    </strong>
+                <button
+                    class="back-dashboard"
+                    onclick="showPage('dashboard')"
+                >
+                    ← All Careers
+                </button>
 
+            </div>
+
+        </div>
+
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    Players
+                </div>
+
+                <div class="page-subtitle">
+                    FC 27 men's player database.
                 </div>
 
             </div>
@@ -1921,129 +2355,149 @@ function renderDashboard() {
         </div>
 
 
-        <div class="card">
+        <div class="panel">
 
-            <h3>Season Overview</h3>
+            <input
+                id="playerSearch"
+                class="search-input"
+                placeholder="Search players..."
+                oninput="searchPlayers(this.value)"
+            >
 
-            <div class="stats-grid">
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${matches}
-                    </div>
-                    <div class="stat-label">
-                        Matches
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${wins}
-                    </div>
-                    <div class="stat-label">
-                        Wins
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${draws}
-                    </div>
-                    <div class="stat-label">
-                        Draws
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${losses}
-                    </div>
-                    <div class="stat-label">
-                        Losses
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${winRate}%
-                    </div>
-                    <div class="stat-label">
-                        Win Rate
-                    </div>
-                </div>
-
-
-                <div class="stat-card">
-                    <div class="stat-number">
-                        ${stats.trophies || 0}
-                    </div>
-                    <div class="stat-label">
-                        Trophies
-                    </div>
-                </div>
-
-            </div>
+            <div
+                id="playersList"
+                style="
+                    display:grid;
+                    grid-template-columns:
+                    repeat(auto-fill,minmax(250px,1fr));
+                    gap:12px;
+                    margin-top:18px;
+                "
+            ></div>
 
         </div>
 
-
-        <div class="card">
-
-            <h3>Career Information</h3>
-
-            <div class="grid">
-
-                <div>
-
-                    <label>Club</label>
-
-                    <strong>
-                        ${escapeHTML(career.club)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>League</label>
-
-                    <strong>
-                        ${escapeHTML(career.league)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>Season</label>
-
-                    <strong>
-                        ${escapeHTML(career.season)}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <label>National Team</label>
-
-                    <strong>
-                        ${escapeHTML(nationalTeam)}
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
     `;
+
+
+    displayPlayers(allPlayers.slice(0, 100));
+
+}
+
+
+function searchPlayers(query) {
+
+    const q =
+        query
+            .trim()
+            .toLowerCase();
+
+
+    const results =
+        allPlayers
+            .filter(player => {
+
+                const name =
+                    `${player.firstName || ""} ${player.lastName || ""} ${player.commonName || ""}`
+                        .toLowerCase();
+
+                return name.includes(q);
+
+            })
+            .slice(0, 100);
+
+
+    displayPlayers(results);
+
+}
+
+
+function displayPlayers(players) {
+
+    const container =
+        document.getElementById("playersList");
+
+    if (!container) return;
+
+
+    if (players.length === 0) {
+
+        container.innerHTML = `
+            <div style="color:#7f8996;">
+                No players found.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        players
+            .map(player => createPlayerCard(player))
+            .join("");
+
+}
+
+
+function createPlayerCard(player) {
+
+    const name =
+        player.commonName ||
+        `${player.firstName || ""} ${player.lastName || ""}`.trim();
+
+
+    const position =
+        player.position || "—";
+
+
+    const rating =
+        player.overallRating || "—";
+
+
+    return `
+
+        <div
+            style="
+                background:#171d25;
+                border:1px solid #252c35;
+                border-radius:10px;
+                padding:15px;
+            "
+        >
+
+            <div style="font-weight:800;font-size:16px;">
+                ${escapeHTML(name)}
+            </div>
+
+            <div style="color:#7f8996;font-size:13px;margin-top:5px;">
+                ${escapeHTML(player.club || "Free Agent")}
+            </div>
+
+            <div style="display:flex;gap:15px;margin-top:12px;font-size:12px;">
+
+                <span>
+                    <strong style="color:white;">
+                        ${escapeHTML(String(rating))}
+                    </strong>
+                    OVR
+                </span>
+
+                <span>
+                    ${escapeHTML(position)}
+                </span>
+
+                <span>
+                    ${escapeHTML(player.nationality || "—")}
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
 }
 
 
@@ -2056,282 +2510,171 @@ function parseCSV(text) {
     const rows = [];
 
     let row = [];
-
-    let field = "";
-
+    let value = "";
     let insideQuotes = false;
 
 
-    for (
-        let i = 0;
-        i < text.length;
-        i++
-    ) {
+    for (let i = 0; i < text.length; i++) {
 
-        const char =
-            text[i];
+        const char = text[i];
+        const next = text[i + 1];
 
-        const next =
-            text[i + 1];
+
+        if (char === '"' && insideQuotes && next === '"') {
+
+            value += '"';
+            i++;
+            continue;
+
+        }
+
+
+        if (char === '"') {
+
+            insideQuotes = !insideQuotes;
+            continue;
+
+        }
+
+
+        if (char === "," && !insideQuotes) {
+
+            row.push(value);
+            value = "";
+            continue;
+
+        }
 
 
         if (
-            char === '"' &&
-            insideQuotes &&
-            next === '"'
-        ) {
-
-            field += '"';
-
-            i++;
-
-        }
-
-        else if (
-            char === '"'
-        ) {
-
-            insideQuotes =
-                !insideQuotes;
-
-        }
-
-        else if (
-            char === "," &&
+            (char === "\n" || char === "\r") &&
             !insideQuotes
         ) {
 
-            row.push(field);
-
-            field = "";
-
-        }
-
-        else if (
-            (
-                char === "\n" ||
-                char === "\r"
-            ) &&
-            !insideQuotes
-        ) {
-
-            if (
-                char === "\r" &&
-                next === "\n"
-            ) {
+            if (char === "\r" && next === "\n") {
                 i++;
             }
 
-
-            row.push(field);
-
-            field = "";
+            row.push(value);
+            value = "";
 
 
-            if (
-                row.some(
-                    value =>
-                        value.trim() !== ""
-                )
-            ) {
-
+            if (row.some(cell => cell.trim() !== "")) {
                 rows.push(row);
-
             }
 
 
             row = [];
 
-        }
-
-        else {
-
-            field += char;
+            continue;
 
         }
+
+
+        value += char;
+
     }
 
 
-    if (
-        field.length ||
-        row.length
-    ) {
+    if (value !== "" || row.length > 0) {
 
-        row.push(field);
+        row.push(value);
 
-
-        if (
-            row.some(
-                value =>
-                    value.trim() !== ""
-            )
-        ) {
-
+        if (row.some(cell => cell.trim() !== "")) {
             rows.push(row);
-
         }
+
     }
 
 
-    if (!rows.length) {
-
+    if (rows.length === 0) {
         return [];
-
     }
 
 
     const headers =
-        rows[0].map(
-            header =>
-                header.trim()
+        rows[0].map(header =>
+            header.trim()
         );
 
 
     return rows
         .slice(1)
-        .map(values => {
+        .map(row => {
 
-            const obj = {};
+            const object = {};
 
+            headers.forEach((header, index) => {
 
-            headers.forEach(
-                (header, index) => {
+                object[header] =
+                    row[index] !== undefined
+                        ? row[index].trim()
+                        : "";
 
-                    obj[header] =
-                        values[index] !== undefined
-                            ? values[index].trim()
-                            : "";
+            });
 
-                }
-            );
-
-
-            return obj;
+            return object;
 
         });
+
 }
 
 
 /* =========================================================
-   PLAYER VALUE
+   PLAYER CONVERSION
 ========================================================= */
 
-function getPlayerValue(
-    player,
-    names
-) {
+function getPlayerValue(row, possibleNames) {
 
-    for (
-        const name of names
-    ) {
+    for (const name of possibleNames) {
 
         if (
-            player[name] !== undefined &&
-            player[name] !== null &&
-            String(player[name]).trim() !== ""
+            row[name] !== undefined &&
+            row[name] !== ""
         ) {
 
-            return String(
-                player[name]
-            ).trim();
+            return row[name];
 
         }
 
     }
 
     return "";
+
 }
 
 
-/* =========================================================
-   AGE
-========================================================= */
+function calculateAge(birthdate) {
 
-function calculateAge(
-    birthdate
-) {
+    if (!birthdate) return "";
 
-    if (!birthdate) {
+    const date =
+        new Date(birthdate);
 
+    if (isNaN(date.getTime())) {
         return "";
-
     }
 
 
-    let date;
-
-
-    if (
-        /^\d{1,2}\/\d{1,2}\/\d{4}/
-            .test(birthdate)
-    ) {
-
-        const parts =
-            birthdate
-                .split(" ")[0]
-                .split("/");
-
-
-        const month =
-            Number(parts[0]);
-
-        const day =
-            Number(parts[1]);
-
-        const year =
-            Number(parts[2]);
-
-
-        date =
-            new Date(
-                year,
-                month - 1,
-                day
-            );
-
-    }
-
-    else {
-
-        date =
-            new Date(
-                birthdate
-            );
-
-    }
-
-
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "";
-
-    }
-
-
-    const today =
+    const now =
         new Date();
 
 
     let age =
-        today.getFullYear() -
+        now.getFullYear() -
         date.getFullYear();
 
 
-    const monthDifference =
-        today.getMonth() -
+    const month =
+        now.getMonth() -
         date.getMonth();
 
 
     if (
-        monthDifference < 0 ||
+        month < 0 ||
         (
-            monthDifference === 0 &&
-            today.getDate() <
-            date.getDate()
+            month === 0 &&
+            now.getDate() < date.getDate()
         )
     ) {
 
@@ -2341,177 +2684,174 @@ function calculateAge(
 
 
     return age;
+
 }
 
 
-/* =========================================================
-   CONVERT PLAYER
-========================================================= */
-
-function convertPlayer(
-    player
-) {
-
-    const firstName =
-        getPlayerValue(
-            player,
-            ["firstName"]
-        );
-
-
-    const lastName =
-        getPlayerValue(
-            player,
-            ["lastName"]
-        );
-
-
-    const commonName =
-        getPlayerValue(
-            player,
-            ["commonName"]
-        );
-
+function convertPlayer(row) {
 
     return {
 
         id:
-            getPlayerValue(
-                player,
-                ["id"]
-            ),
+            getPlayerValue(row, ["id"]),
 
         rank:
-            getPlayerValue(
-                player,
-                ["rank"]
-            ),
+            getPlayerValue(row, ["rank"]),
 
-        name:
-            commonName ||
-            `${firstName} ${lastName}`.trim(),
+        overallRating:
+            getPlayerValue(row, [
+                "overallRating",
+                "overall",
+                "rating"
+            ]),
 
-        firstName,
+        firstName:
+            getPlayerValue(row, [
+                "firstName",
+                "first_name"
+            ]),
 
-        lastName,
+        lastName:
+            getPlayerValue(row, [
+                "lastName",
+                "last_name"
+            ]),
 
-        overall:
-            getPlayerValue(
-                player,
-                ["overallRating"]
-            ),
+        commonName:
+            getPlayerValue(row, [
+                "commonName",
+                "common_name"
+            ]),
+
+        birthdate:
+            getPlayerValue(row, [
+                "birthdate"
+            ]),
 
         age:
             calculateAge(
-                getPlayerValue(
-                    player,
-                    ["birthdate"]
-                )
-            ),
-
-        nationality:
-            getPlayerValue(
-                player,
-                ["nationality"]
-            ),
-
-        club:
-            getPlayerValue(
-                player,
-                ["team"]
+                getPlayerValue(row, ["birthdate"])
             ),
 
         league:
-            getPlayerValue(
-                player,
-                ["leagueName"]
-            ),
+            getPlayerValue(row, [
+                "leagueName",
+                "league"
+            ]),
+
+        club:
+            getPlayerValue(row, [
+                "team",
+                "club"
+            ]),
+
+        nationality:
+            getPlayerValue(row, [
+                "nationality"
+            ]),
 
         position:
-            getPlayerValue(
-                player,
-                [
-                    "positionShort",
-                    "position"
-                ]
-            ),
-
-        positionName:
-            getPlayerValue(
-                player,
-                ["position"]
-            ),
+            getPlayerValue(row, [
+                "positionShort",
+                "position"
+            ]),
 
         preferredFoot:
-            getPlayerValue(
-                player,
-                ["preferredFoot"]
-            ),
-
-        skillMoves:
-            getPlayerValue(
-                player,
-                ["skillMoves"]
-            ),
-
-        weakFoot:
-            getPlayerValue(
-                player,
-                ["weakFootAbility"]
-            ),
-
-        height:
-            getPlayerValue(
-                player,
-                ["height"]
-            ),
-
-        weight:
-            getPlayerValue(
-                player,
-                ["weight"]
-            ),
-
-        alternatePositions:
-            getPlayerValue(
-                player,
-                ["alternatePositions"]
-            ),
+            getPlayerValue(row, [
+                "preferredFoot"
+            ]),
 
         avatarUrl:
-            getPlayerValue(
-                player,
-                ["avatarUrl"]
-            ),
+            getPlayerValue(row, [
+                "avatarUrl"
+            ]),
 
         shieldUrl:
-            getPlayerValue(
-                player,
-                ["shieldUrl"]
-            )
+            getPlayerValue(row, [
+                "shieldUrl"
+            ])
 
     };
+
 }
 
 
 /* =========================================================
-   LOAD DATABASE
+   BUILD FC27 LEAGUE / CLUB DATABASE
+========================================================= */
+
+function buildFC27LeagueDatabase() {
+
+    const leagueSet =
+        new Set();
+
+
+    const clubsByLeague = {};
+
+
+    allPlayers.forEach(player => {
+
+        const league =
+            player.league;
+
+
+        const club =
+            player.club;
+
+
+        if (!league) return;
+
+
+        leagueSet.add(league);
+
+
+        if (!clubsByLeague[league]) {
+
+            clubsByLeague[league] = new Set();
+
+        }
+
+
+        if (club) {
+
+            clubsByLeague[league].add(club);
+
+        }
+
+    });
+
+
+    fc27Leagues =
+        Array.from(leagueSet)
+            .sort(
+                (a, b) =>
+                    a.localeCompare(b)
+            );
+
+
+    fc27ClubsByLeague = {};
+
+
+    Object.keys(clubsByLeague).forEach(league => {
+
+        fc27ClubsByLeague[league] =
+            Array.from(
+                clubsByLeague[league]
+            ).sort(
+                (a, b) =>
+                    a.localeCompare(b)
+            );
+
+    });
+
+}
+
+
+/* =========================================================
+   LOAD PLAYER DATABASE
 ========================================================= */
 
 async function loadDatabase() {
-
-    if (databaseLoaded) {
-
-        return;
-
-    }
-
-
-    const status =
-        document.getElementById(
-            "databaseStatus"
-        );
-
 
     try {
 
@@ -2525,436 +2865,174 @@ async function loadDatabase() {
         if (!response.ok) {
 
             throw new Error(
-                "Could not load CSV"
+                "Could not load players.csv"
             );
 
         }
 
 
-        const csv =
+        const text =
             await response.text();
 
 
-        const rawPlayers =
-            parseCSV(csv);
+        const rows =
+            parseCSV(text);
 
 
         allPlayers =
-            rawPlayers.map(
-                convertPlayer
-            );
-
-
-        databaseLoaded =
-            true;
+            rows.map(convertPlayer);
 
 
         buildFC27LeagueDatabase();
 
 
-        status.textContent =
-            `${allPlayers.length.toLocaleString()} FC 27 men's players loaded`;
-
-
-        displayPlayers(
-            allPlayers.slice(0, 100)
+        console.log(
+            "Loaded players:",
+            allPlayers.length
         );
 
 
-        /*
-         * If the career page was opened before
-         * the CSV finished loading, refresh it.
-         */
+        console.log(
+            "FC27 leagues:",
+            fc27Leagues.length
+        );
 
-        if (
-            document
-                .getElementById("career")
-                .classList
-                .contains("active")
-        ) {
 
-            renderCareer();
+    } catch (error) {
 
-        }
-
+        console.error(
+            "Player database error:",
+            error
+        );
 
     }
 
-    catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-            "Could not load player database.";
-
-    }
 }
 
 
 /* =========================================================
-   BUILD FC27 LEAGUE / CLUB DATABASE
+   SEASON / PROMOTION / RELEGATION READY
 ========================================================= */
-
-function buildFC27LeagueDatabase() {
-
-    const leagues =
-        new Set();
-
-    const clubs =
-        {};
-
-
-    allPlayers.forEach(
-        player => {
-
-            const league =
-                player.league;
-
-            const club =
-                player.club;
-
-
-            if (!league) {
-
-                return;
-
-            }
-
-
-            leagues.add(
-                league
-            );
-
-
-            if (!clubs[league]) {
-
-                clubs[league] =
-                    new Set();
-
-            }
-
-
-            if (club) {
-
-                clubs[league].add(
-                    club
-                );
-
-            }
-
-        }
-    );
-
-
-    fc27Leagues =
-        [...leagues]
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
-
-
-    fc27ClubsByLeague =
-        {};
-
-
-    Object.keys(clubs)
-        .forEach(
-            league => {
-
-                fc27ClubsByLeague[league] =
-                    [...clubs[league]]
-                        .sort(
-                            (a, b) =>
-                                a.localeCompare(b)
-                        );
-
-            }
-        );
-
-
-    /*
-     * Refresh the league selector if
-     * the career setup is currently visible.
-     */
-
-    if (
-        document
-            .getElementById("career")
-            .classList
-            .contains("active")
-    ) {
-
-        renderLeagueSelector();
-
-        renderClubSelector();
-
-    }
-}
-
-
-/* =========================================================
-   PLAYER SEARCH
-========================================================= */
-
-function searchPlayers() {
-
-    const search =
-        document
-            .getElementById(
-                "playerSearch"
-            )
-            .value
-            .toLowerCase()
-            .trim();
-
-
-    if (!search) {
-
-        displayPlayers(
-            allPlayers.slice(0, 100)
-        );
-
-        return;
-    }
-
-
-    const results =
-        allPlayers.filter(
-            player => {
-
-                const searchable = [
-
-                    player.name,
-
-                    player.firstName,
-
-                    player.lastName,
-
-                    player.club,
-
-                    player.nationality,
-
-                    player.position,
-
-                    player.positionName,
-
-                    player.league
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return searchable.includes(
-                    search
-                );
-
-            }
-        );
-
-
-    displayPlayers(
-        results.slice(0, 100)
-    );
-}
-
-
-/* =========================================================
-   DISPLAY PLAYERS
-========================================================= */
-
-function displayPlayers(
-    players
-) {
-
-    const container =
-        document.getElementById(
-            "playerResults"
-        );
-
-
-    if (!players.length) {
-
-        container.innerHTML = `
-            <div class="card empty-message">
-                No players found.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    container.innerHTML =
-        players
-            .map(
-                createPlayerCard
-            )
-            .join("");
-}
-
-
-/* =========================================================
-   PLAYER CARD
-========================================================= */
-
-function createPlayerCard(
-    player
-) {
-
-    const image =
-        player.avatarUrl
-            ? `
-                <img
-                    class="player-image"
-                    src="${escapeAttribute(
-                        player.avatarUrl
-                    )}"
-                    onerror="this.style.display='none'"
-                >
-            `
-            : "";
-
-
-    return `
-
-        <div class="player-card">
-
-            ${image}
-
-            <div class="player-info">
-
-                <div class="player-name">
-                    ${escapeHTML(
-                        player.name
-                    )}
-                </div>
-
-                <div class="rating">
-                    ${escapeHTML(
-                        player.overall || "—"
-                    )}
-
-                    <span
-                        style="
-                            font-size:12px;
-                            color:#9ca3af;
-                        "
-                    >
-                        OVR
-                    </span>
-                </div>
-
-                <div class="player-meta">
-
-                    Position:
-                    ${escapeHTML(
-                        player.position || "—"
-                    )}
-                    <br>
-
-                    Age:
-                    ${escapeHTML(
-                        String(
-                            player.age || "—"
-                        )
-                    )}
-                    <br>
-
-                    Nationality:
-                    ${escapeHTML(
-                        player.nationality || "—"
-                    )}
-                    <br>
-
-                    League:
-                    ${escapeHTML(
-                        player.league || "—"
-                    )}
-                    <br>
-
-                    Club:
-                    ${escapeHTML(
-                        player.club || "—"
-                    )}
-                    <br>
-
-                    Foot:
-                    ${escapeHTML(
-                        player.preferredFoot || "—"
-                    )}
-                    <br>
-
-                    Rank:
-                    ${escapeHTML(
-                        player.rank || "—"
-                    )}
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function escapeHTML(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-function escapeAttribute(
-    value
-) {
-
-    return escapeHTML(
-        value
-    );
-}
-
-
-/* =========================================================
-   STARTUP
-========================================================= */
-
-showPage("dashboard");
 
 /*
- * Load the player database immediately.
- * This gives the career setup access to
- * every FC 27 league and club.
- */
+   This function will be used later when the user
+   finishes a season.
+
+   Example:
+
+   updateCareerLeague(
+       career.id,
+       "EFL Championship",
+       "2027/28"
+   );
+
+   This changes the current league AND current year
+   while keeping the previous league in history.
+*/
+
+function updateCareerLeague(
+    careerId,
+    newLeague,
+    newSeason
+) {
+
+    const career =
+        careers.find(
+            c => c.id === careerId
+        );
+
+
+    if (!career) return;
+
+
+    career.leagueHistory.push({
+
+        season: newSeason,
+
+        league: newLeague
+
+    });
+
+
+    career.league =
+        newLeague;
+
+
+    career.currentSeason =
+        newSeason;
+
+
+    career.seasonNumber =
+        (career.seasonNumber || 1) + 1;
+
+
+    saveCareers();
+
+
+    if (currentCareerId === careerId) {
+
+        renderCareerHome();
+
+    }
+
+}
+
+
+/* =========================================================
+   HTML ESCAPING
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function escapeJS(value) {
+
+    return String(value ?? "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r");
+
+}
+
+
+/* =========================================================
+   CLOSE DROPDOWNS
+========================================================= */
+
+document.addEventListener("click", function(event) {
+
+    if (!event.target.closest(".search-select")) {
+
+        document
+            .querySelectorAll(".search-results")
+            .forEach(results => {
+
+                results.classList.remove("open");
+
+            });
+
+    }
+
+});
+
+
+/* =========================================================
+   START APP
+========================================================= */
+
+loadCareers();
+
+showPage("dashboard");
 
 loadDatabase();
 
