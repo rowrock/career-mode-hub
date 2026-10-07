@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Career Mode Hub</title>
 
 <style>
@@ -106,6 +105,7 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
     margin-bottom: 30px;
 }
 
@@ -163,13 +163,14 @@ button {
     background: #24161a;
 }
 
+.small-btn {
+    padding: 8px 11px;
+    font-size: 12px;
+}
+
 /* =========================
    DASHBOARD
 ========================= */
-
-.careers-header {
-    margin-bottom: 22px;
-}
 
 .careers-grid {
     display: grid;
@@ -319,28 +320,30 @@ button {
    STATS
 ========================= */
 
-.stats-grid {
+.match-summary-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
 }
 
-.stat-box {
+.match-stat {
     background: #171d25;
     border: 1px solid #252c35;
     border-radius: 9px;
-    padding: 18px;
+    padding: 15px;
 }
 
-.stat-label {
+.match-stat-label {
     color: #7f8996;
-    font-size: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
 }
 
-.stat-value {
-    font-size: 26px;
+.match-stat-number {
+    font-size: 23px;
     font-weight: 800;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 /* =========================
@@ -362,21 +365,11 @@ button {
     margin-bottom: 28px;
 }
 
-.setup-section:last-child {
-    margin-bottom: 0;
-}
-
 .setup-label {
     display: block;
     font-size: 13px;
     font-weight: 700;
     margin-bottom: 9px;
-}
-
-.setup-help {
-    color: #727c88;
-    font-size: 12px;
-    margin-top: 6px;
 }
 
 .type-buttons {
@@ -428,14 +421,8 @@ button {
     border-color: #3288e8;
 }
 
-.setup-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 30px;
-}
-
 /* =========================
-   SEARCH DROPDOWNS
+   SEARCH
 ========================= */
 
 .search-select {
@@ -471,41 +458,9 @@ button {
     background: #222a34;
 }
 
-.no-results {
-    padding: 14px;
-    color: #737d89;
-    font-size: 13px;
-}
-
 /* =========================
-   MATCHES
+   MATCH LIST
 ========================= */
-
-.match-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
-}
-
-.match-stat {
-    background: #171d25;
-    border: 1px solid #252c35;
-    border-radius: 9px;
-    padding: 15px;
-}
-
-.match-stat-label {
-    color: #7f8996;
-    font-size: 11px;
-    text-transform: uppercase;
-}
-
-.match-stat-number {
-    font-size: 23px;
-    font-weight: 800;
-    margin-top: 6px;
-}
 
 .match-list {
     display: flex;
@@ -583,8 +538,160 @@ button {
     font-size: 12px;
 }
 
-.match-delete {
-    margin-left: auto;
+/* =========================
+   ENTRY CHOICE
+========================= */
+
+.entry-choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.entry-choice {
+    background: #171d25;
+    border: 1px solid #303844;
+    border-radius: 11px;
+    padding: 25px;
+    text-align: left;
+    color: white;
+}
+
+.entry-choice:hover {
+    border-color: #3288e8;
+    background: #152337;
+}
+
+.entry-icon {
+    font-size: 30px;
+    margin-bottom: 13px;
+}
+
+.entry-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.entry-description {
+    color: #7f8996;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================
+   PLAYER ENTRY
+========================= */
+
+.player-entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.player-entry {
+    background: #171d25;
+    border: 1px solid #252c35;
+    border-radius: 9px;
+    padding: 13px;
+    display: grid;
+    grid-template-columns: 1fr 90px 75px 75px 80px 35px;
+    gap: 8px;
+    align-items: center;
+}
+
+.player-entry-header {
+    color: #737d89;
+    font-size: 10px;
+    text-transform: uppercase;
+    padding: 0 13px;
+}
+
+.player-name-input {
+    min-width: 0;
+}
+
+.remove-player {
+    background: transparent;
+    border: 0;
+    color: #d97886;
+    font-size: 20px;
+}
+
+.add-player-area {
+    margin-top: 14px;
+}
+
+/* =========================
+   UPLOAD
+========================= */
+
+.upload-area {
+    border: 2px dashed #34404d;
+    border-radius: 12px;
+    padding: 45px 25px;
+    text-align: center;
+    background: #151b22;
+}
+
+.upload-area:hover {
+    border-color: #3288e8;
+}
+
+.upload-icon {
+    font-size: 38px;
+    margin-bottom: 12px;
+}
+
+.upload-title {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.upload-description {
+    color: #7f8996;
+    font-size: 13px;
+    margin: 8px auto 20px;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+.file-list {
+    margin-top: 18px;
+    text-align: left;
+}
+
+.file-item {
+    background: #1b222b;
+    border: 1px solid #2b3440;
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #b9c1ca;
+}
+
+/* =========================
+   REVIEW
+========================= */
+
+.review-box {
+    background: #151b22;
+    border: 1px solid #303844;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.review-warning {
+    background: #282319;
+    border: 1px solid #594a2b;
+    color: #d8c47e;
+    border-radius: 8px;
+    padding: 13px;
+    font-size: 12px;
+    margin-bottom: 15px;
 }
 
 /* =========================
@@ -604,8 +711,8 @@ button {
 
 .modal {
     width: 100%;
-    max-width: 650px;
-    max-height: 90vh;
+    max-width: 900px;
+    max-height: 92vh;
     overflow-y: auto;
     background: #11161d;
     border: 1px solid #303844;
@@ -708,12 +815,12 @@ button {
 
 @media (max-width: 1000px) {
 
-    .stats-grid {
-        grid-template-columns: repeat(2,1fr);
-    }
-
     .match-summary-grid {
         grid-template-columns: repeat(3,1fr);
+    }
+
+    .player-entry {
+        grid-template-columns: 1fr 80px 65px 65px;
     }
 
 }
@@ -737,6 +844,10 @@ button {
         grid-template-columns: 1fr 1fr;
     }
 
+    .entry-choice-grid {
+        grid-template-columns: 1fr;
+    }
+
 }
 
 @media (max-width: 600px) {
@@ -750,7 +861,6 @@ button {
         grid-column: auto;
     }
 
-    .stats-grid,
     .match-summary-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -763,91 +873,81 @@ button {
 
 <body>
 
-<div class="app">
+<aside class="sidebar">
 
-    <!-- SIDEBAR -->
+    <div class="logo">
+        Career Mode <span>Hub</span>
+    </div>
 
-    <aside class="sidebar">
+    <div class="nav-title">
+        Career
+    </div>
 
-        <div class="logo">
-            Career Mode <span>Hub</span>
-        </div>
+    <button
+        class="nav-btn active"
+        data-page="dashboard"
+        onclick="showPage('dashboard')"
+    >
+        Dashboard
+    </button>
 
-        <div class="nav-title">
-            Career
-        </div>
+    <div id="careerNavigation">
 
-        <button
-            class="nav-btn active"
-            data-page="dashboard"
-            onclick="showPage('dashboard')"
-        >
-            Dashboard
+        <button class="nav-btn disabled" data-page="mycareer" onclick="showPage('mycareer')">
+            My Career
         </button>
 
-        <div id="careerNavigation">
+        <button class="nav-btn disabled" data-page="matches" onclick="showPage('matches')">
+            Matches
+        </button>
 
-            <button class="nav-btn disabled" data-page="mycareer" onclick="showPage('mycareer')">
-                My Career
-            </button>
+        <button class="nav-btn disabled" data-page="squad" onclick="showPage('squad')">
+            Squad
+        </button>
 
-            <button class="nav-btn disabled" data-page="matches" onclick="showPage('matches')">
-                Matches
-            </button>
+        <button class="nav-btn disabled" data-page="players" onclick="showPage('players')">
+            Players
+        </button>
 
-            <button class="nav-btn disabled" data-page="squad" onclick="showPage('squad')">
-                Squad
-            </button>
+        <button class="nav-btn disabled" data-page="youth" onclick="showPage('youth')">
+            Youth Academy
+        </button>
 
-            <button class="nav-btn disabled" data-page="players" onclick="showPage('players')">
-                Players
-            </button>
+        <button class="nav-btn disabled" data-page="transfers" onclick="showPage('transfers')">
+            Transfers
+        </button>
 
-            <button class="nav-btn disabled" data-page="youth" onclick="showPage('youth')">
-                Youth Academy
-            </button>
+        <button class="nav-btn disabled" data-page="competitions" onclick="showPage('competitions')">
+            Competitions
+        </button>
 
-            <button class="nav-btn disabled" data-page="transfers" onclick="showPage('transfers')">
-                Transfers
-            </button>
+        <button class="nav-btn disabled" data-page="league" onclick="showPage('league')">
+            League Centre
+        </button>
 
-            <button class="nav-btn disabled" data-page="competitions" onclick="showPage('competitions')">
-                Competitions
-            </button>
+        <button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
+            Past Seasons
+        </button>
 
-            <button class="nav-btn disabled" data-page="league" onclick="showPage('league')">
-                League Centre
-            </button>
+        <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
+            Trophy Cabinet
+        </button>
 
-            <button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
-                Past Seasons
-            </button>
+        <button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
+            National Team
+        </button>
 
-            <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
-                Trophy Cabinet
-            </button>
+    </div>
 
-            <button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
-                National Team
-            </button>
-
-        </div>
-
-    </aside>
+</aside>
 
 
-    <!-- MAIN -->
+<main class="main">
 
-    <main class="main">
+    <div id="pageContent"></div>
 
-        <div id="pageContent"></div>
+</main>
 
-    </main>
-
-</div>
-
-
-<!-- MODAL CONTAINER -->
 
 <div id="modalContainer"></div>
 
@@ -855,7 +955,7 @@ button {
 <script>
 
 /* =========================================================
-   GLOBAL VARIABLES
+   GLOBAL DATA
 ========================================================= */
 
 let allPlayers = [];
@@ -878,56 +978,7 @@ let selectedCountry = "";
 
 let selectedContinent = "";
 
-
-/* =========================================================
-   COUNTRIES
-========================================================= */
-
-const countriesByContinent = {
-
-    Europe: [
-        "Albania","Andorra","Austria","Belarus",
-        "Belgium","Bosnia and Herzegovina","Bulgaria",
-        "Croatia","Cyprus","Czech Republic","Denmark",
-        "England","Estonia","Faroe Islands","Finland",
-        "France","Georgia","Germany","Greece","Hungary",
-        "Iceland","Ireland","Israel","Italy","Kosovo",
-        "Latvia","Liechtenstein","Lithuania","Luxembourg",
-        "Malta","Moldova","Montenegro","Netherlands",
-        "North Macedonia","Northern Ireland","Norway",
-        "Poland","Portugal","Republic of Ireland",
-        "Romania","Russia","San Marino","Scotland",
-        "Serbia","Slovakia","Slovenia","Spain",
-        "Sweden","Switzerland","Turkey","Ukraine","Wales"
-    ],
-
-    Asia: [
-        "China PR","India","Indonesia","Iran","Iraq",
-        "Japan","Korea Republic","Malaysia",
-        "Saudi Arabia","Thailand","United Arab Emirates"
-    ],
-
-    Africa: [
-        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast",
-        "Mali","Morocco","Nigeria","Senegal","South Africa",
-        "Tunisia"
-    ],
-
-    NorthAmerica: [
-        "Canada","Costa Rica","Honduras","Jamaica",
-        "Mexico","Panama","United States"
-    ],
-
-    SouthAmerica: [
-        "Argentina","Bolivia","Brazil","Chile","Colombia",
-        "Ecuador","Paraguay","Peru","Uruguay","Venezuela"
-    ],
-
-    Oceania: [
-        "Australia","New Zealand"
-    ]
-
-};
+let manualPlayers = [];
 
 
 /* =========================================================
@@ -945,12 +996,38 @@ function loadCareers() {
 
         if (saved) {
 
-            careers =
-                JSON.parse(saved);
+            careers = JSON.parse(saved);
+
+            /*
+             * Compatibility:
+             * If an older career was created before
+             * matches/player data existed, make sure
+             * those arrays exist.
+             */
+
+            careers.forEach(career => {
+
+                if (!Array.isArray(career.matches)) {
+                    career.matches = [];
+                }
+
+                if (!Array.isArray(career.squad)) {
+                    career.squad = [];
+                }
+
+                if (!Array.isArray(career.transfers)) {
+                    career.transfers = [];
+                }
+
+                if (!Array.isArray(career.trophies)) {
+                    career.trophies = [];
+                }
+
+            });
 
         }
 
-    } catch (error) {
+    } catch(error) {
 
         careers = [];
 
@@ -970,7 +1047,7 @@ function saveCareers() {
 
 
 /* =========================================================
-   GET CURRENT CAREER
+   CURRENT CAREER
 ========================================================= */
 
 function getCurrentCareer() {
@@ -995,6 +1072,7 @@ function showPage(page) {
     ) {
 
         renderDashboard();
+
         return;
 
     }
@@ -1058,19 +1136,12 @@ function pageTitle(page) {
     const titles = {
 
         squad: "Squad",
-
         youth: "Youth Academy",
-
         transfers: "Transfers",
-
         competitions: "Competitions",
-
         league: "League Centre",
-
         past: "Past Seasons",
-
         trophies: "Trophy Cabinet",
-
         national: "National Team"
 
     };
@@ -1123,6 +1194,7 @@ function renderDashboard() {
 
     updateNavigation();
 
+
     document.getElementById(
         "pageContent"
     ).innerHTML = `
@@ -1141,6 +1213,7 @@ function renderDashboard() {
 
             </div>
 
+
             <button
                 class="primary-btn"
                 onclick="startNewCareer()"
@@ -1151,7 +1224,7 @@ function renderDashboard() {
         </div>
 
 
-        <div class="careers-header">
+        <div style="margin-bottom:22px">
 
             <div class="panel-title">
                 Your Careers
@@ -1205,6 +1278,7 @@ function renderDashboard() {
             </div>
 
             `
+
         }
 
     `;
@@ -1280,14 +1354,14 @@ function createCareerCard(career) {
 
                 <button
                     class="primary-btn"
-                    onclick="enterCareer('${career.id}')"
+                    onclick="enterCareer('${escapeJS(career.id)}')"
                 >
                     Enter Career
                 </button>
 
                 <button
                     class="delete-btn"
-                    onclick="deleteCareer('${career.id}', event)"
+                    onclick="deleteCareer('${escapeJS(career.id)}',event)"
                 >
                     Delete
                 </button>
@@ -1302,7 +1376,7 @@ function createCareerCard(career) {
 
 
 /* =========================================================
-   NEW CAREER
+   CAREER SETUP
 ========================================================= */
 
 function startNewCareer() {
@@ -1322,13 +1396,12 @@ function startNewCareer() {
 }
 
 
-/* =========================================================
-   CAREER SETUP
-========================================================= */
-
 function renderCareerSetup() {
 
     currentCareerId = null;
+
+    updateNavigation();
+
 
     document.getElementById(
         "pageContent"
@@ -1651,6 +1724,7 @@ function selectClubType(type) {
 
     setupClubType = type;
 
+
     const original =
         document.getElementById(
             "originalClubButton"
@@ -1674,37 +1748,25 @@ function selectClubType(type) {
 
     if (type === "original") {
 
-        original.classList.add(
-            "selected"
-        );
+        original.classList.add("selected");
 
-        create.classList.remove(
-            "selected"
-        );
+        create.classList.remove("selected");
 
-        clubSection.style.display =
-            "block";
+        clubSection.style.display = "block";
 
-        customSection.style.display =
-            "none";
+        customSection.style.display = "none";
 
     }
 
     else {
 
-        original.classList.remove(
-            "selected"
-        );
+        original.classList.remove("selected");
 
-        create.classList.add(
-            "selected"
-        );
+        create.classList.add("selected");
 
-        clubSection.style.display =
-            "none";
+        clubSection.style.display = "none";
 
-        customSection.style.display =
-            "block";
+        customSection.style.display = "block";
 
     }
 
@@ -1776,7 +1838,7 @@ function searchLeague(query) {
         :
 
         `
-            <div class="no-results">
+            <div class="search-option">
                 No FC 27 leagues found.
             </div>
         `;
@@ -1792,6 +1854,7 @@ function chooseLeague(league) {
     selectedLeague = league;
 
     selectedClub = "";
+
 
     document.getElementById(
         "leagueSearch"
@@ -1809,16 +1872,12 @@ function chooseLeague(league) {
         );
 
 
-    if (clubInput) {
+    clubInput.disabled = false;
 
-        clubInput.disabled = false;
+    clubInput.value = "";
 
-        clubInput.value = "";
-
-        clubInput.placeholder =
-            "Search clubs in this league...";
-
-    }
+    clubInput.placeholder =
+        "Search clubs in this league...";
 
 }
 
@@ -1897,7 +1956,7 @@ function searchClub(query) {
         :
 
         `
-            <div class="no-results">
+            <div class="search-option">
                 No clubs found.
             </div>
         `;
@@ -1911,6 +1970,7 @@ function searchClub(query) {
 function chooseClub(club) {
 
     selectedClub = club;
+
 
     document.getElementById(
         "clubSearch"
@@ -1928,6 +1988,49 @@ function chooseClub(club) {
    NATIONAL TEAM
 ========================================================= */
 
+const countriesByContinent = {
+
+    Europe: [
+        "Albania","Andorra","Austria","Belgium",
+        "Bosnia and Herzegovina","Bulgaria","Croatia",
+        "Cyprus","Czech Republic","Denmark","England",
+        "Finland","France","Germany","Greece","Hungary",
+        "Iceland","Ireland","Italy","Kosovo","Netherlands",
+        "Northern Ireland","Norway","Poland","Portugal",
+        "Republic of Ireland","Romania","Scotland","Serbia",
+        "Slovakia","Slovenia","Spain","Sweden","Switzerland",
+        "Turkey","Ukraine","Wales"
+    ],
+
+    Asia: [
+        "China PR","India","Indonesia","Iran","Iraq",
+        "Japan","Korea Republic","Malaysia",
+        "Saudi Arabia","Thailand","United Arab Emirates"
+    ],
+
+    Africa: [
+        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast",
+        "Mali","Morocco","Nigeria","Senegal","South Africa",
+        "Tunisia"
+    ],
+
+    NorthAmerica: [
+        "Canada","Costa Rica","Honduras","Jamaica",
+        "Mexico","Panama","United States"
+    ],
+
+    SouthAmerica: [
+        "Argentina","Bolivia","Brazil","Chile","Colombia",
+        "Ecuador","Paraguay","Peru","Uruguay","Venezuela"
+    ],
+
+    Oceania: [
+        "Australia","New Zealand"
+    ]
+
+};
+
+
 function toggleNationalTeam(value) {
 
     const continent =
@@ -1943,18 +2046,15 @@ function toggleNationalTeam(value) {
 
     if (value === "add") {
 
-        continent.style.display =
-            "block";
+        continent.style.display = "block";
 
     }
 
     else {
 
-        continent.style.display =
-            "none";
+        continent.style.display = "none";
 
-        country.style.display =
-            "none";
+        country.style.display = "none";
 
         selectedContinent = "";
 
@@ -1972,12 +2072,12 @@ function selectContinent(value) {
     selectedCountry = "";
 
 
-    const countrySection =
+    const section =
         document.getElementById(
             "countrySection"
         );
 
-    const countryInput =
+    const input =
         document.getElementById(
             "countrySearch"
         );
@@ -1985,22 +2085,20 @@ function selectContinent(value) {
 
     if (!value) {
 
-        countrySection.style.display =
-            "none";
+        section.style.display = "none";
 
         return;
 
     }
 
 
-    countrySection.style.display =
-        "block";
+    section.style.display = "block";
 
-    countryInput.disabled = false;
+    input.disabled = false;
 
-    countryInput.value = "";
+    input.value = "";
 
-    countryInput.placeholder =
+    input.placeholder =
         "Search country...";
 
 }
@@ -2073,22 +2171,10 @@ function searchCountry(query) {
 }
 
 
-function openCountryResults() {
-
-    if (!selectedContinent) return;
-
-    searchCountry(
-        document.getElementById(
-            "countrySearch"
-        ).value
-    );
-
-}
-
-
 function chooseCountry(country) {
 
     selectedCountry = country;
+
 
     document.getElementById(
         "countrySearch"
@@ -2204,12 +2290,14 @@ function createCareer() {
                 .toString(36)
                 .substring(2),
 
-        managerName: manager,
+        managerName:
+            manager,
 
         clubType:
             setupClubType,
 
-        clubName: club,
+        clubName:
+            club,
 
         league:
             selectedLeague,
@@ -2267,15 +2355,6 @@ function createCareer() {
 
 function enterCareer(id) {
 
-    const career =
-        careers.find(
-            c => c.id === id
-        );
-
-
-    if (!career) return;
-
-
     currentCareerId = id;
 
     updateNavigation();
@@ -2298,6 +2377,7 @@ function renderCareerHome() {
     if (!career) {
 
         renderDashboard();
+
         return;
 
     }
@@ -2329,118 +2409,81 @@ function renderCareerHome() {
         </div>
 
 
-        <div class="stats-grid">
+        <div class="match-summary-grid">
 
-            <div class="stat-box">
+            <div class="match-stat">
 
-                <div class="stat-label">
-                    Current Season
+                <div class="match-stat-label">
+                    Season
                 </div>
 
-                <div class="stat-value">
+                <div class="match-stat-number">
                     ${escapeHTML(career.currentSeason)}
                 </div>
 
             </div>
 
 
-            <div class="stat-box">
+            <div class="match-stat">
 
-                <div class="stat-label">
+                <div class="match-stat-label">
                     League
                 </div>
 
-                <div class="stat-value"
-                     style="font-size:17px">
+                <div class="match-stat-number"
+                     style="font-size:15px">
                     ${escapeHTML(career.league)}
                 </div>
 
             </div>
 
 
-            <div class="stat-box">
+            <div class="match-stat">
 
-                <div class="stat-label">
+                <div class="match-stat-label">
                     Matches
                 </div>
 
-                <div class="stat-value">
+                <div class="match-stat-number">
                     ${career.matches.length}
                 </div>
 
             </div>
 
 
-            <div class="stat-box">
+            <div class="match-stat">
 
-                <div class="stat-label">
+                <div class="match-stat-label">
                     Trophies
                 </div>
 
-                <div class="stat-value">
+                <div class="match-stat-number">
                     ${career.trophies.length}
                 </div>
 
             </div>
 
-        </div>
 
+            <div class="match-stat">
 
-        <br>
+                <div class="match-stat-label">
+                    National Team
+                </div>
 
+                <div class="match-stat-number"
+                     style="font-size:15px">
 
-        <div class="panel">
-
-            <div class="panel-title">
-                Career Overview
-            </div>
-
-            <div class="panel-subtitle">
-                Your career information.
-            </div>
-
-            <p style="color:#8d97a3;line-height:1.8">
-
-                <strong style="color:white">
-                    Manager:
-                </strong>
-                ${escapeHTML(career.managerName)}
-
-                <br>
-
-                <strong style="color:white">
-                    Club:
-                </strong>
-                ${escapeHTML(career.clubName)}
-
-                <br>
-
-                <strong style="color:white">
-                    League:
-                </strong>
-                ${escapeHTML(career.league)}
-
-                <br>
-
-                <strong style="color:white">
-                    Season:
-                </strong>
-                ${escapeHTML(career.currentSeason)}
-
-                <br>
-
-                <strong style="color:white">
-                    National Team:
-                </strong>
-                ${
-                    career.nationalTeam
-                    ? escapeHTML(
+                    ${
                         career.nationalTeam
-                    )
-                    : "None"
-                }
+                        ? escapeHTML(
+                            career.nationalTeam
+                        )
+                        : "None"
+                    }
 
-            </p>
+                </div>
+
+            </div>
 
         </div>
 
@@ -2511,7 +2554,7 @@ function careerBanner(career) {
 
 
 /* =========================================================
-   MATCHES PAGE
+   MATCHES
 ========================================================= */
 
 function renderMatches() {
@@ -2523,6 +2566,7 @@ function renderMatches() {
     if (!career) {
 
         renderDashboard();
+
         return;
 
     }
@@ -2581,7 +2625,7 @@ function renderMatches() {
                 </div>
 
                 <div class="page-subtitle">
-                    Track every match in this career.
+                    Record your matches manually or use Match Facts AI.
                 </div>
 
             </div>
@@ -2589,7 +2633,7 @@ function renderMatches() {
 
             <button
                 class="primary-btn"
-                onclick="openMatchModal()"
+                onclick="openMatchMethod()"
             >
                 + Add Match
             </button>
@@ -2600,67 +2644,28 @@ function renderMatches() {
         <div class="match-summary-grid">
 
             <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Played
-                </div>
-
-                <div class="match-stat-number">
-                    ${matches.length}
-                </div>
-
+                <div class="match-stat-label">Played</div>
+                <div class="match-stat-number">${matches.length}</div>
             </div>
 
-
             <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Wins
-                </div>
-
-                <div class="match-stat-number">
-                    ${wins}
-                </div>
-
+                <div class="match-stat-label">Wins</div>
+                <div class="match-stat-number">${wins}</div>
             </div>
 
-
             <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Draws
-                </div>
-
-                <div class="match-stat-number">
-                    ${draws}
-                </div>
-
+                <div class="match-stat-label">Draws</div>
+                <div class="match-stat-number">${draws}</div>
             </div>
 
-
             <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Losses
-                </div>
-
-                <div class="match-stat-number">
-                    ${losses}
-                </div>
-
+                <div class="match-stat-label">Losses</div>
+                <div class="match-stat-number">${losses}</div>
             </div>
 
-
             <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Clean Sheets
-                </div>
-
-                <div class="match-stat-number">
-                    ${cleanSheets}
-                </div>
-
+                <div class="match-stat-label">Clean Sheets</div>
+                <div class="match-stat-number">${cleanSheets}</div>
             </div>
 
         </div>
@@ -2673,9 +2678,7 @@ function renderMatches() {
             </div>
 
             <div class="panel-subtitle">
-                ${matches.length}
-                ${matches.length === 1 ? "match" : "matches"}
-                recorded in ${escapeHTML(career.currentSeason)}.
+                All matches belong to this career save.
             </div>
 
 
@@ -2693,12 +2696,12 @@ function renderMatches() {
                     </h2>
 
                     <p>
-                        Add your first match to start building your career history.
+                        Add a match manually or upload Match Facts screenshots.
                     </p>
 
                     <button
                         class="primary-btn"
-                        onclick="openMatchModal()"
+                        onclick="openMatchMethod()"
                     >
                         + Add Match
                     </button>
@@ -2716,10 +2719,7 @@ function renderMatches() {
                     ${
                         matches
                             .map(
-                                match =>
-                                    createMatchRow(
-                                        match
-                                    )
+                                createMatchRow
                             )
                             .join("")
                     }
@@ -2738,174 +2738,10 @@ function renderMatches() {
 
 
 /* =========================================================
-   MATCH ROW
+   MATCH METHOD
 ========================================================= */
 
-function createMatchRow(match) {
-
-    const resultClass =
-        match.result === "W"
-        ? "result-win"
-        : match.result === "D"
-        ? "result-draw"
-        : "result-loss";
-
-
-    const resultText =
-        match.result === "W"
-        ? "WIN"
-        : match.result === "D"
-        ? "DRAW"
-        : "LOSS";
-
-
-    const date =
-        formatDate(match.date);
-
-
-    const venue =
-        match.homeAway === "Home"
-        ? "Home"
-        : "Away";
-
-
-    return `
-
-        <div class="match-row">
-
-            <div class="match-row-main">
-
-                <div>
-
-                    <div class="match-date">
-                        ${escapeHTML(date)}
-                    </div>
-
-                    <div class="match-competition">
-                        ${escapeHTML(
-                            match.competition
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div>
-
-                    <div class="match-opponent">
-                        ${escapeHTML(
-                            match.opponent
-                        )}
-                    </div>
-
-                    <div class="match-home-away">
-                        ${venue}
-                    </div>
-
-                </div>
-
-
-                <div class="match-score">
-
-                    ${
-                        match.homeAway === "Home"
-                        ?
-
-                        `${match.goalsFor}
-                         -
-                         ${match.goalsAgainst}`
-
-                        :
-
-                        `${match.goalsAgainst}
-                         -
-                         ${match.goalsFor}`
-
-                    }
-
-                </div>
-
-
-                <div class="match-result ${resultClass}">
-                    ${resultText}
-                </div>
-
-            </div>
-
-
-            <div class="match-details">
-
-                ${
-                    match.rating
-                    ?
-                    `<span>
-                        GK Rating:
-                        <strong style="color:white">
-                            ${escapeHTML(match.rating)}
-                        </strong>
-                    </span>`
-                    : ""
-                }
-
-
-                ${
-                    match.saves !== ""
-                    ?
-                    `<span>
-                        Saves:
-                        <strong style="color:white">
-                            ${escapeHTML(match.saves)}
-                        </strong>
-                    </span>`
-                    : ""
-                }
-
-
-                <span>
-                    Goals Conceded:
-                    <strong style="color:white">
-                        ${match.goalsAgainst}
-                    </strong>
-                </span>
-
-
-                ${
-                    match.cleanSheet
-                    ?
-                    `<span style="color:#69d38b">
-                        ✓ Clean Sheet
-                    </span>`
-                    : ""
-                }
-
-
-                <button
-                    class="delete-btn match-delete"
-                    onclick="deleteMatch('${match.id}')"
-                >
-                    Delete
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   ADD MATCH MODAL
-========================================================= */
-
-function openMatchModal() {
-
-    const today =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
+function openMatchMethod() {
 
     document.getElementById(
         "modalContainer"
@@ -2937,197 +2773,57 @@ function openMatchModal() {
                 </div>
 
 
-                <div class="form-grid">
+                <div class="panel-subtitle">
+                    Choose how you want to record this match.
+                </div>
 
 
-                    <div class="form-group">
-
-                        <label>
-                            Date
-                        </label>
-
-                        <input
-                            id="matchDate"
-                            class="form-input"
-                            type="date"
-                            value="${today}"
-                        >
-
-                    </div>
+                <div class="entry-choice-grid">
 
 
-                    <div class="form-group">
+                    <button
+                        class="entry-choice"
+                        onclick="openManualMatch()"
+                    >
 
-                        <label>
-                            Competition
-                        </label>
-
-                        <select
-                            id="matchCompetition"
-                            class="form-select"
-                        >
-
-                            <option>
-                                League
-                            </option>
-
-                            <option>
-                                Domestic Cup
-                            </option>
-
-                            <option>
-                                Continental Competition
-                            </option>
-
-                            <option>
-                                Super Cup
-                            </option>
-
-                            <option>
-                                Friendly
-                            </option>
-
-                            <option>
-                                Other
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Home / Away
-                        </label>
-
-                        <select
-                            id="matchHomeAway"
-                            class="form-select"
-                        >
-
-                            <option value="Home">
-                                Home
-                            </option>
-
-                            <option value="Away">
-                                Away
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Opponent
-                        </label>
-
-                        <input
-                            id="matchOpponent"
-                            class="form-input"
-                            placeholder="e.g. Manchester United"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group full">
-
-                        <label>
-                            Score
-                        </label>
-
-
-                        <div class="score-inputs">
-
-                            <input
-                                id="goalsFor"
-                                class="form-input"
-                                type="number"
-                                min="0"
-                                value="0"
-                                placeholder="Your goals"
-                            >
-
-                            <span>
-                                -
-                            </span>
-
-                            <input
-                                id="goalsAgainst"
-                                class="form-input"
-                                type="number"
-                                min="0"
-                                value="0"
-                                placeholder="Their goals"
-                            >
-
+                        <div class="entry-icon">
+                            ✍️
                         </div>
 
-                    </div>
+                        <div class="entry-title">
+                            Manual Entry
+                        </div>
+
+                        <div class="entry-description">
+                            Enter the match yourself. Player ratings,
+                            goals, assists and cards are all optional.
+                        </div>
+
+                    </button>
 
 
-                    <div class="form-group">
+                    <button
+                        class="entry-choice"
+                        onclick="openAIMatchUpload()"
+                    >
 
-                        <label>
-                            GK Rating
-                        </label>
+                        <div class="entry-icon">
+                            📸
+                        </div>
 
-                        <input
-                            id="matchRating"
-                            class="form-input"
-                            type="number"
-                            min="0"
-                            max="10"
-                            step="0.1"
-                            placeholder="e.g. 7.4"
-                        >
+                        <div class="entry-title">
+                            Upload Match Facts
+                        </div>
 
-                    </div>
+                        <div class="entry-description">
+                            Upload one or multiple EA FC Match Facts
+                            screenshots and let AI extract the match data.
+                        </div>
 
-
-                    <div class="form-group">
-
-                        <label>
-                            Saves
-                        </label>
-
-                        <input
-                            id="matchSaves"
-                            class="form-input"
-                            type="number"
-                            min="0"
-                            placeholder="e.g. 5"
-                        >
-
-                    </div>
+                    </button>
 
 
                 </div>
-
-
-                <div class="modal-actions">
-
-                    <button
-                        class="secondary-btn"
-                        onclick="closeModal()"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        class="primary-btn"
-                        onclick="saveMatch()"
-                    >
-                        Save Match
-                    </button>
-
-                </div>
-
 
             </div>
 
@@ -3138,24 +2834,399 @@ function openMatchModal() {
 }
 
 
-function closeModal() {
+/* =========================================================
+   MANUAL MATCH
+========================================================= */
 
-    document.getElementById(
-        "modalContainer"
-    ).innerHTML = "";
+function openManualMatch() {
+
+    manualPlayers = [];
+
+    closeModal();
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "modalContainer"
+            ).innerHTML = `
+
+                <div
+                    class="modal-overlay"
+                    onclick="closeModalOutside(event)"
+                >
+
+                    <div
+                        class="modal"
+                        onclick="event.stopPropagation()"
+                    >
+
+                        <div class="modal-header">
+
+                            <div class="modal-title">
+                                Manual Match Entry
+                            </div>
+
+                            <button
+                                class="close-btn"
+                                onclick="closeModal()"
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Date
+                                </label>
+
+                                <input
+                                    id="matchDate"
+                                    class="form-input"
+                                    type="date"
+                                    value="${todayDate()}"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Competition
+                                </label>
+
+                                <select
+                                    id="matchCompetition"
+                                    class="form-select"
+                                >
+
+                                    <option>
+                                        League
+                                    </option>
+
+                                    <option>
+                                        Domestic Cup
+                                    </option>
+
+                                    <option>
+                                        Continental Competition
+                                    </option>
+
+                                    <option>
+                                        Super Cup
+                                    </option>
+
+                                    <option>
+                                        Friendly
+                                    </option>
+
+                                    <option>
+                                        Other
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Home / Away
+                                </label>
+
+                                <select
+                                    id="matchHomeAway"
+                                    class="form-select"
+                                >
+
+                                    <option value="Home">
+                                        Home
+                                    </option>
+
+                                    <option value="Away">
+                                        Away
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Opponent
+                                </label>
+
+                                <input
+                                    id="matchOpponent"
+                                    class="form-input"
+                                    placeholder="e.g. Manchester United"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group full">
+
+                                <label>
+                                    Score
+                                </label>
+
+                                <div class="score-inputs">
+
+                                    <input
+                                        id="goalsFor"
+                                        class="form-input"
+                                        type="number"
+                                        min="0"
+                                        value="0"
+                                        placeholder="Your goals"
+                                    >
+
+                                    <span>-</span>
+
+                                    <input
+                                        id="goalsAgainst"
+                                        class="form-input"
+                                        type="number"
+                                        min="0"
+                                        value="0"
+                                        placeholder="Their goals"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div
+                            style="
+                                margin-top:20px;
+                                padding-top:20px;
+                                border-top:1px solid #252c35
+                            "
+                        >
+
+                            <div class="panel-title">
+                                Player Performance
+                            </div>
+
+                            <div class="panel-subtitle">
+                                Optional. Add as many players as you want.
+                                Leave anything blank if you don't know it.
+                            </div>
+
+
+                            <div
+                                class="player-entry player-entry-header"
+                            >
+
+                                <div>Player</div>
+                                <div>Rating</div>
+                                <div>Goals</div>
+                                <div>Assists</div>
+                                <div>Cards</div>
+                                <div></div>
+
+                            </div>
+
+
+                            <div
+                                id="manualPlayers"
+                                class="player-entry-list"
+                            ></div>
+
+
+                            <div class="add-player-area">
+
+                                <button
+                                    class="secondary-btn"
+                                    onclick="addManualPlayer()"
+                                >
+                                    + Add Player
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="modal-actions">
+
+                            <button
+                                class="secondary-btn"
+                                onclick="openMatchMethod()"
+                            >
+                                Back
+                            </button>
+
+                            <button
+                                class="primary-btn"
+                                onclick="saveManualMatch()"
+                            >
+                                Save Match
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            /*
+             * Start with an empty player list.
+             * You can add as many as you need.
+             */
+
+            addManualPlayer();
+
+        },
+        10
+    );
 
 }
 
 
-function closeModalOutside(event) {
+/* =========================================================
+   MANUAL PLAYERS
+========================================================= */
 
-    if (
-        event.target.classList.contains(
-            "modal-overlay"
-        )
-    ) {
+function addManualPlayer() {
 
-        closeModal();
+    const container =
+        document.getElementById(
+            "manualPlayers"
+        );
+
+
+    if (!container) return;
+
+
+    const id =
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2);
+
+
+    manualPlayers.push(id);
+
+
+    const row =
+        document.createElement("div");
+
+
+    row.className =
+        "player-entry";
+
+
+    row.dataset.playerId =
+        id;
+
+
+    row.innerHTML = `
+
+        <input
+            class="form-input player-name-input"
+            data-field="name"
+            placeholder="Player name"
+        >
+
+        <input
+            class="form-input"
+            data-field="rating"
+            type="number"
+            min="0"
+            max="10"
+            step="0.1"
+            placeholder="—"
+        >
+
+        <input
+            class="form-input"
+            data-field="goals"
+            type="number"
+            min="0"
+            placeholder="0"
+        >
+
+        <input
+            class="form-input"
+            data-field="assists"
+            type="number"
+            min="0"
+            placeholder="0"
+        >
+
+        <select
+            class="form-select"
+            data-field="cards"
+        >
+
+            <option value="">
+                —
+            </option>
+
+            <option value="Yellow">
+                Yellow
+            </option>
+
+            <option value="Red">
+                Red
+            </option>
+
+        </select>
+
+
+        <button
+            class="remove-player"
+            onclick="removeManualPlayer('${id}')"
+        >
+            ×
+        </button>
+
+    `;
+
+
+    container.appendChild(row);
+
+}
+
+
+function removeManualPlayer(id) {
+
+    manualPlayers =
+        manualPlayers.filter(
+            playerId =>
+                playerId !== id
+        );
+
+
+    const row =
+        document.querySelector(
+            `[data-player-id="${id}"]`
+        );
+
+
+    if (row) {
+
+        row.remove();
 
     }
 
@@ -3163,10 +3234,10 @@ function closeModalOutside(event) {
 
 
 /* =========================================================
-   SAVE MATCH
+   SAVE MANUAL MATCH
 ========================================================= */
 
-function saveMatch() {
+function saveManualMatch() {
 
     const career =
         getCurrentCareer();
@@ -3192,29 +3263,11 @@ function saveMatch() {
     }
 
 
-    const date =
-        document.getElementById(
-            "matchDate"
-        ).value;
-
-
-    const competition =
-        document.getElementById(
-            "matchCompetition"
-        ).value;
-
-
-    const homeAway =
-        document.getElementById(
-            "matchHomeAway"
-        ).value;
-
-
     const goalsFor =
         Number(
             document.getElementById(
                 "goalsFor"
-            ).value
+            ).value || 0
         );
 
 
@@ -3222,20 +3275,8 @@ function saveMatch() {
         Number(
             document.getElementById(
                 "goalsAgainst"
-            ).value
+            ).value || 0
         );
-
-
-    const rating =
-        document.getElementById(
-            "matchRating"
-        ).value;
-
-
-    const saves =
-        document.getElementById(
-            "matchSaves"
-        ).value;
 
 
     let result;
@@ -3247,7 +3288,9 @@ function saveMatch() {
 
     }
 
-    else if (goalsFor === goalsAgainst) {
+    else if (
+        goalsFor === goalsAgainst
+    ) {
 
         result = "D";
 
@@ -3260,25 +3303,103 @@ function saveMatch() {
     }
 
 
+    const playerRows =
+        document.querySelectorAll(
+            "#manualPlayers .player-entry"
+        );
+
+
+    const players = [];
+
+
+    playerRows.forEach(row => {
+
+        const name =
+            row.querySelector(
+                '[data-field="name"]'
+            ).value.trim();
+
+
+        /*
+         * Ignore completely empty rows.
+         */
+
+        if (!name) return;
+
+
+        const rating =
+            row.querySelector(
+                '[data-field="rating"]'
+            ).value;
+
+
+        const goals =
+            row.querySelector(
+                '[data-field="goals"]'
+            ).value;
+
+
+        const assists =
+            row.querySelector(
+                '[data-field="assists"]'
+            ).value;
+
+
+        const cards =
+            row.querySelector(
+                '[data-field="cards"]'
+            ).value;
+
+
+        players.push({
+
+            name: name,
+
+            rating:
+                rating === ""
+                ? null
+                : Number(rating),
+
+            goals:
+                goals === ""
+                ? 0
+                : Number(goals),
+
+            assists:
+                assists === ""
+                ? 0
+                : Number(assists),
+
+            cards:
+                cards || null
+
+        });
+
+    });
+
+
     const match = {
 
         id:
-            Date.now().toString() +
-            Math.random()
-                .toString(36)
-                .substring(2),
+            createId(),
 
         season:
             career.currentSeason,
 
         date:
-            date,
+            document.getElementById(
+                "matchDate"
+            ).value,
 
         competition:
-            competition,
+            document.getElementById(
+                "matchCompetition"
+            ).value,
 
         homeAway:
-            homeAway,
+            document.getElementById(
+                "matchHomeAway"
+            ).value,
 
         opponent:
             opponent,
@@ -3292,14 +3413,17 @@ function saveMatch() {
         result:
             result,
 
-        rating:
-            rating,
-
-        saves:
-            saves,
-
         cleanSheet:
-            goalsAgainst === 0
+            goalsAgainst === 0,
+
+        entryMethod:
+            "manual",
+
+        players:
+            players,
+
+        aiSource:
+            false
 
     };
 
@@ -3311,6 +3435,499 @@ function saveMatch() {
     closeModal();
 
     renderMatches();
+
+}
+
+
+/* =========================================================
+   AI UPLOAD
+========================================================= */
+
+function openAIMatchUpload() {
+
+    document.getElementById(
+        "modalContainer"
+    ).innerHTML = `
+
+        <div
+            class="modal-overlay"
+            onclick="closeModalOutside(event)"
+        >
+
+            <div
+                class="modal"
+                onclick="event.stopPropagation()"
+            >
+
+                <div class="modal-header">
+
+                    <div class="modal-title">
+                        Upload Match Facts
+                    </div>
+
+                    <button
+                        class="close-btn"
+                        onclick="closeModal()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="panel-subtitle">
+
+                    Upload one or multiple screenshots from
+                    EA FC Match Facts. The AI will eventually
+                    read the screenshots and build the match
+                    automatically.
+
+                </div>
+
+
+                <label
+                    for="matchFactsFiles"
+                    class="upload-area"
+                    style="display:block;cursor:pointer"
+                >
+
+                    <div class="upload-icon">
+                        📸
+                    </div>
+
+                    <div class="upload-title">
+                        Select Match Facts screenshots
+                    </div>
+
+                    <div class="upload-description">
+
+                        You can select multiple screenshots at once.
+                        For example, upload the Match Facts screens
+                        containing player ratings, goals, assists
+                        and cards.
+
+                    </div>
+
+                    <span class="primary-btn">
+                        Choose Screenshots
+                    </span>
+
+                    <input
+                        id="matchFactsFiles"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style="display:none"
+                        onchange="showSelectedMatchFiles(this.files)"
+                    >
+
+                </label>
+
+
+                <div
+                    id="selectedMatchFiles"
+                    class="file-list"
+                ></div>
+
+
+                <div
+                    class="review-box"
+                    style="margin-top:20px"
+                >
+
+                    <strong>
+                        AI workflow
+                    </strong>
+
+                    <p
+                        style="
+                            color:#7f8996;
+                            font-size:12px;
+                            line-height:1.6;
+                            margin-bottom:0
+                        "
+                    >
+
+                        Screenshots → AI extraction →
+                        Review results → Edit if needed →
+                        Save Match.
+
+                    </p>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        class="secondary-btn"
+                        onclick="openMatchMethod()"
+                    >
+                        Back
+                    </button>
+
+                    <button
+                        id="analyseButton"
+                        class="primary-btn"
+                        onclick="startAIAnalysis()"
+                        disabled
+                    >
+                        Analyse Screenshots
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+function showSelectedMatchFiles(files) {
+
+    const container =
+        document.getElementById(
+            "selectedMatchFiles"
+        );
+
+
+    const analyseButton =
+        document.getElementById(
+            "analyseButton"
+        );
+
+
+    if (!files || files.length === 0) {
+
+        container.innerHTML = "";
+
+        analyseButton.disabled = true;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    Array.from(files).forEach(
+        (file,index) => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "file-item";
+
+
+            div.innerHTML =
+                `
+                    Screenshot ${index + 1}:
+                    ${escapeHTML(file.name)}
+                `;
+
+
+            container.appendChild(div);
+
+        }
+    );
+
+
+    analyseButton.disabled = false;
+
+}
+
+
+/* =========================================================
+   AI ANALYSIS PLACEHOLDER
+========================================================= */
+
+function startAIAnalysis() {
+
+    const files =
+        document.getElementById(
+            "matchFactsFiles"
+        ).files;
+
+
+    if (!files || files.length === 0) {
+
+        return;
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * This is intentionally NOT fake AI.
+     *
+     * The next technical step is connecting this
+     * upload to an AI vision API/backend.
+     *
+     * Once connected, the returned information will
+     * be passed into openAIReview().
+     */
+
+
+    document.getElementById(
+        "modalContainer"
+    ).innerHTML = `
+
+        <div
+            class="modal-overlay"
+        >
+
+            <div class="modal">
+
+                <div class="modal-header">
+
+                    <div class="modal-title">
+                        Match Facts AI
+                    </div>
+
+                </div>
+
+
+                <div class="review-box">
+
+                    <div
+                        style="
+                            font-size:22px;
+                            margin-bottom:12px
+                        "
+                    >
+                        📸
+                    </div>
+
+                    <strong>
+                        Screenshots received
+                    </strong>
+
+                    <p
+                        style="
+                            color:#7f8996;
+                            line-height:1.7;
+                            font-size:13px
+                        "
+                    >
+
+                        ${files.length}
+                        screenshot${files.length === 1 ? "" : "s"}
+                        selected.
+
+                        <br><br>
+
+                        The next step is to connect these
+                        screenshots to the AI vision system so
+                        it can automatically identify the match,
+                        score, players, ratings, goals, assists
+                        and cards.
+
+                    </p>
+
+                    <div class="review-warning">
+
+                        AI results will always be shown for
+                        review before they are saved.
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        class="secondary-btn"
+                        onclick="openAIMatchUpload()"
+                    >
+                        Back
+                    </button>
+
+                    <button
+                        class="primary-btn"
+                        onclick="openManualMatch()"
+                    >
+                        Enter Manually Instead
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   MATCH ROW
+========================================================= */
+
+function createMatchRow(match) {
+
+    const resultClass =
+        match.result === "W"
+        ? "result-win"
+        : match.result === "D"
+        ? "result-draw"
+        : "result-loss";
+
+
+    const resultText =
+        match.result === "W"
+        ? "WIN"
+        : match.result === "D"
+        ? "DRAW"
+        : "LOSS";
+
+
+    const playerCount =
+        Array.isArray(match.players)
+        ? match.players.length
+        : 0;
+
+
+    return `
+
+        <div class="match-row">
+
+            <div class="match-row-main">
+
+                <div>
+
+                    <div class="match-date">
+                        ${escapeHTML(
+                            formatDate(match.date)
+                        )}
+                    </div>
+
+                    <div class="match-competition">
+                        ${escapeHTML(
+                            match.competition
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div class="match-opponent">
+                        ${escapeHTML(
+                            match.opponent
+                        )}
+                    </div>
+
+                    <div class="match-home-away">
+                        ${escapeHTML(
+                            match.homeAway
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="match-score">
+
+                    ${
+                        match.homeAway === "Home"
+
+                        ?
+
+                        `${match.goalsFor}
+                         -
+                         ${match.goalsAgainst}`
+
+                        :
+
+                        `${match.goalsAgainst}
+                         -
+                         ${match.goalsFor}`
+
+                    }
+
+                </div>
+
+
+                <div
+                    class="match-result ${resultClass}"
+                >
+                    ${resultText}
+                </div>
+
+            </div>
+
+
+            <div class="match-details">
+
+                <span>
+                    Players entered:
+                    <strong style="color:white">
+                        ${playerCount}
+                    </strong>
+                </span>
+
+
+                <span>
+                    Goals conceded:
+                    <strong style="color:white">
+                        ${match.goalsAgainst}
+                    </strong>
+                </span>
+
+
+                ${
+                    match.cleanSheet
+
+                    ?
+
+                    `<span style="color:#69d38b">
+                        ✓ Clean Sheet
+                    </span>`
+
+                    :
+
+                    ""
+
+                }
+
+
+                <span>
+                    Entry:
+                    <strong style="color:white">
+                        ${
+                            match.entryMethod === "ai"
+                            ? "AI"
+                            : "Manual"
+                        }
+                    </strong>
+                </span>
+
+
+                <button
+                    class="delete-btn small-btn"
+                    onclick="deleteMatch('${escapeJS(match.id)}')"
+                    style="margin-left:auto"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
 
 }
 
@@ -3328,13 +3945,15 @@ function deleteMatch(id) {
     if (!career) return;
 
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             "Delete this match?"
-        );
+        )
+    ) {
 
+        return;
 
-    if (!confirmed) return;
+    }
 
 
     career.matches =
@@ -3352,7 +3971,7 @@ function deleteMatch(id) {
 
 
 /* =========================================================
-   PLAYERS
+   PLAYERS PAGE
 ========================================================= */
 
 function renderPlayers() {
@@ -3364,6 +3983,7 @@ function renderPlayers() {
     if (!career) {
 
         renderDashboard();
+
         return;
 
     }
@@ -3374,6 +3994,7 @@ function renderPlayers() {
     ).innerHTML = `
 
         ${careerBanner(career)}
+
 
         <div class="topbar">
 
@@ -3462,20 +4083,11 @@ function displayPlayers(players) {
     if (!container) return;
 
 
-    if (players.length === 0) {
-
-        container.innerHTML = `
-            <div style="color:#7f8996">
-                No players found.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
     container.innerHTML =
+        players.length
+
+        ?
+
         players
             .map(
                 player => `
@@ -3541,16 +4153,27 @@ function displayPlayers(players) {
 
                 `
             )
-            .join("");
+            .join("")
+
+        :
+
+        `
+            <div style="color:#7f8996">
+                No players found.
+            </div>
+        `;
 
 }
 
 
 /* =========================================================
-   PLACEHOLDER PAGES
+   PLACEHOLDER
 ========================================================= */
 
-function renderPlaceholder(title, description) {
+function renderPlaceholder(
+    title,
+    description
+) {
 
     const career =
         getCurrentCareer();
@@ -3559,6 +4182,7 @@ function renderPlaceholder(title, description) {
     if (!career) {
 
         renderDashboard();
+
         return;
 
     }
@@ -3629,25 +4253,29 @@ function deleteCareer(id,event) {
 
     const career =
         careers.find(
-            c => c.id === id
+            c =>
+                c.id === id
         );
 
 
     if (!career) return;
 
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
-        );
+        )
+    ) {
 
+        return;
 
-    if (!confirmed) return;
+    }
 
 
     careers =
         careers.filter(
-            c => c.id !== id
+            c =>
+                c.id !== id
         );
 
 
@@ -3659,7 +4287,7 @@ function deleteCareer(id,event) {
 
 
 /* =========================================================
-   CSV PARSER
+   CSV
 ========================================================= */
 
 function parseCSV(text) {
@@ -3679,11 +4307,9 @@ function parseCSV(text) {
         i++
     ) {
 
-        const char =
-            text[i];
+        const char = text[i];
 
-        const next =
-            text[i + 1];
+        const next = text[i + 1];
 
 
         if (
@@ -3793,7 +4419,7 @@ function parseCSV(text) {
     }
 
 
-    if (rows.length === 0) {
+    if (!rows.length) {
 
         return [];
 
@@ -3833,17 +4459,13 @@ function parseCSV(text) {
 }
 
 
-/* =========================================================
-   PLAYER VALUE
-========================================================= */
-
 function getPlayerValue(
     row,
-    possibleNames
+    names
 ) {
 
     for (
-        const name of possibleNames
+        const name of names
     ) {
 
         if (
@@ -3856,6 +4478,7 @@ function getPlayerValue(
         }
 
     }
+
 
     return "";
 
@@ -4041,7 +4664,7 @@ function convertPlayer(row) {
 
 
 /* =========================================================
-   BUILD LEAGUES AND CLUBS
+   BUILD FC27 LEAGUES
 ========================================================= */
 
 function buildFC27LeagueDatabase() {
@@ -4175,12 +4798,6 @@ async function loadDatabase() {
         );
 
 
-        console.log(
-            "FC27 leagues:",
-            fc27Leagues.length
-        );
-
-
     }
 
     catch(error) {
@@ -4196,7 +4813,7 @@ async function loadDatabase() {
 
 
 /* =========================================================
-   SEASON / PROMOTION / RELEGATION
+   PROMOTION / RELEGATION FOUNDATION
 ========================================================= */
 
 function updateCareerLeague(
@@ -4242,8 +4859,7 @@ function updateCareerLeague(
 
 
     if (
-        currentCareerId ===
-        careerId
+        currentCareerId === careerId
     ) {
 
         renderCareerHome();
@@ -4254,8 +4870,29 @@ function updateCareerLeague(
 
 
 /* =========================================================
-   DATE
+   HELPERS
 ========================================================= */
+
+function createId() {
+
+    return (
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2)
+    );
+
+}
+
+
+function todayDate() {
+
+    return new Date()
+        .toISOString()
+        .split("T")[0];
+
+}
+
 
 function formatDate(dateString) {
 
@@ -4292,35 +4929,16 @@ function formatDate(dateString) {
 }
 
 
-/* =========================================================
-   ESCAPE
-========================================================= */
-
 function escapeHTML(value) {
 
     return String(
         value ?? ""
     )
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
@@ -4330,28 +4948,16 @@ function escapeJS(value) {
     return String(
         value ?? ""
     )
-    .replace(
-        /\\/g,
-        "\\\\"
-    )
-    .replace(
-        /'/g,
-        "\\'"
-    )
-    .replace(
-        /\n/g,
-        "\\n"
-    )
-    .replace(
-        /\r/g,
-        "\\r"
-    );
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'")
+    .replace(/\n/g,"\\n")
+    .replace(/\r/g,"\\r");
 
 }
 
 
 /* =========================================================
-   CLOSE SEARCH DROPDOWNS
+   CLOSE DROPDOWNS
 ========================================================= */
 
 document.addEventListener(
@@ -4369,13 +4975,10 @@ document.addEventListener(
                     ".search-results"
                 )
                 .forEach(
-                    results => {
-
-                        results.classList.remove(
+                    result =>
+                        result.classList.remove(
                             "open"
-                        );
-
-                    }
+                        )
                 );
 
         }
