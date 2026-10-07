@@ -1,240 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Mode Hub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Mode Hub</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #0f1117;
-            color: #f5f5f5;
-        }
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #111827;
+        color: #f9fafb;
+    }
 
+    header {
+        background: #0b1220;
+        border-bottom: 1px solid #263244;
+        padding: 18px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    nav button {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        padding: 9px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    nav button:hover,
+    nav button.active {
+        background: #1f2937;
+        color: white;
+    }
+
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 35px 25px 60px;
+    }
+
+    .page {
+        display: none;
+    }
+
+    .page.active {
+        display: block;
+    }
+
+    h2 {
+        margin-top: 0;
+        font-size: 30px;
+    }
+
+    h3 {
+        margin-top: 0;
+    }
+
+    .subtitle {
+        color: #9ca3af;
+        margin-top: -15px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: #182235;
+        border: 1px solid #29364c;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 15px;
+    }
+
+    label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 14px;
+        margin-bottom: 7px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        background: #0f172a;
+        color: white;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 11px 12px;
+        font-size: 15px;
+        outline: none;
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #64748b;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 11px 17px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .primary-btn {
+        background: #2563eb;
+        color: white;
+    }
+
+    .primary-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .secondary-btn {
+        background: #334155;
+        color: white;
+    }
+
+    .secondary-btn:hover {
+        background: #475569;
+    }
+
+    .danger-btn {
+        background: #7f1d1d;
+        color: white;
+    }
+
+    .danger-btn:hover {
+        background: #991b1b;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .stat-card {
+        background: #111827;
+        border: 1px solid #29364c;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #9ca3af;
+        font-size: 13px;
+    }
+
+    .career-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .club-name {
+        font-size: 27px;
+        font-weight: bold;
+    }
+
+    .career-info {
+        color: #9ca3af;
+        margin-top: 5px;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 50px 20px;
+        color: #9ca3af;
+    }
+
+    .database-status {
+        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .player-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 15px;
+    }
+
+    .player-card {
+        background: #182235;
+        border: 1px solid #29364c;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .player-image {
+        width: 100%;
+        height: 190px;
+        object-fit: contain;
+        background: #111827;
+    }
+
+    .player-info {
+        padding: 15px;
+    }
+
+    .player-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .player-meta {
+        color: #9ca3af;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .rating {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    @media (max-width: 800px) {
         header {
-            background: #171a23;
-            border-bottom: 1px solid #2a2e3a;
-            padding: 18px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 24px;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 15px;
         }
 
         nav {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            width: 100%;
         }
 
         nav button {
-            background: transparent;
-            border: 1px solid transparent;
-            color: #b9bfcc;
-            padding: 9px 12px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        nav button:hover,
-        nav button.active {
-            background: #252a36;
-            color: white;
-            border-color: #353b49;
+            padding: 8px 9px;
         }
 
         main {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px;
+            padding: 25px 15px 50px;
         }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        h2 {
-            margin-top: 0;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #9da4b3;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: #171a23;
-            border: 1px solid #292e39;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .placeholder {
-            text-align: center;
-            padding: 70px 20px;
-            color: #8f97a7;
-        }
-
-        .database-status {
-            margin-bottom: 20px;
-            padding: 13px 16px;
-            border-radius: 8px;
-            background: #171a23;
-            border: 1px solid #292e39;
-            color: #aeb5c3;
-        }
-
-        .search-area {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .search-area input {
-            width: 100%;
-            background: #11141b;
-            color: white;
-            border: 1px solid #343a48;
-            border-radius: 8px;
-            padding: 13px 15px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .search-area input:focus {
-            border-color: #667085;
-        }
-
-        .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-            gap: 16px;
-        }
-
-        .player-card {
-            background: #171a23;
-            border: 1px solid #292e39;
-            border-radius: 12px;
-            padding: 17px;
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-
-        .player-card:hover {
-            transform: translateY(-2px);
-            border-color: #4a5160;
-        }
-
-        .player-top {
-            display: flex;
-            gap: 13px;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .player-photo {
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: #242936;
-        }
-
-        .player-name {
-            font-weight: bold;
-            font-size: 17px;
-            margin-bottom: 5px;
-        }
-
-        .player-club {
-            color: #9da4b3;
-            font-size: 13px;
-        }
-
-        .overall {
-            margin-left: auto;
-            text-align: center;
-            min-width: 45px;
-        }
-
-        .overall-number {
-            font-size: 23px;
-            font-weight: bold;
-        }
-
-        .overall-label {
-            font-size: 10px;
-            color: #8f97a7;
-            text-transform: uppercase;
-        }
-
-        .player-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 9px;
-            font-size: 13px;
-        }
-
-        .info-item {
-            background: #11141b;
-            padding: 9px;
-            border-radius: 7px;
-        }
-
-        .info-label {
-            display: block;
-            color: #777f90;
-            font-size: 10px;
-            text-transform: uppercase;
-            margin-bottom: 3px;
-        }
-
-        .info-value {
-            color: #e7eaf0;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 60px;
-            color: #8f97a7;
-        }
-
-        .loading {
-            color: #aeb5c3;
-        }
-
-        @media (max-width: 900px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            main {
-                padding: 20px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 
 <body>
@@ -261,1190 +313,1181 @@
 <main>
 
     <!-- DASHBOARD -->
-    <section class="page" id="dashboard">
-        <h2>Dashboard</h2>
-        <p class="subtitle">Your Career Mode command centre.</p>
+    <section id="dashboard" class="page">
 
-        <div class="card placeholder">
-            Dashboard coming soon.
-        </div>
+        <h2>Dashboard</h2>
+        <p class="subtitle">Your Career Mode overview.</p>
+
+        <div id="dashboardContent"></div>
+
     </section>
+
 
     <!-- MY CAREER -->
-    <section class="page" id="career">
-        <h2>My Career</h2>
-        <p class="subtitle">Manage your career mode save.</p>
+    <section id="career" class="page">
 
-        <div class="card placeholder">
-            Career management coming soon.
-        </div>
+        <h2>My Career</h2>
+        <p class="subtitle">Set up and manage your Career Mode save.</p>
+
+        <div id="careerSetup"></div>
+
     </section>
 
+
     <!-- MATCHES -->
-    <section class="page" id="matches">
+    <section id="matches" class="page">
+
         <h2>Matches</h2>
         <p class="subtitle">Track every match in your career.</p>
 
-        <div class="card placeholder">
-            Match tracking coming soon.
+        <div class="card empty-message">
+            Match tracking will be built next.
         </div>
+
     </section>
+
 
     <!-- SQUAD -->
-    <section class="page" id="squad">
-        <h2>Squad</h2>
-        <p class="subtitle">Manage your current squad.</p>
+    <section id="squad" class="page">
 
-        <div class="card placeholder">
-            Squad management coming soon.
+        <h2>Squad</h2>
+        <p class="subtitle">Manage your Career Mode squad.</p>
+
+        <div class="card empty-message">
+            Squad management will be built after Match tracking.
         </div>
+
     </section>
 
+
     <!-- PLAYERS -->
-    <section class="page" id="players">
+    <section id="players" class="page">
 
         <h2>FC 27 Players</h2>
+        <p class="subtitle">Search the complete FC 27 men's player database.</p>
 
-        <p class="subtitle">
-            Master FC 27 player database.
-        </p>
-
-        <div class="database-status" id="databaseStatus">
-            Loading FC 27 player database...
+        <div id="databaseStatus" class="database-status">
+            Loading player database...
         </div>
 
-        <div class="search-area">
+        <div class="search-box">
             <input
                 type="text"
                 id="playerSearch"
-                placeholder="Search player, club, nationality, position or league..."
+                placeholder="Search player, club, nationality or position..."
                 oninput="searchPlayers()"
             >
         </div>
 
-        <div id="playerResults" class="players-grid">
-            <div class="no-results">
-                Loading players...
-            </div>
-        </div>
+        <div id="playerResults" class="player-grid"></div>
 
     </section>
 
-    <!-- YOUTH -->
-    <section class="page" id="youth">
+
+    <!-- OTHER PAGES -->
+
+    <section id="youth" class="page">
         <h2>Youth Academy</h2>
-        <p class="subtitle">Track your youth academy prospects.</p>
-
-        <div class="card placeholder">
-            Youth Academy coming soon.
-        </div>
+        <p class="subtitle">Track your youth academy players.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- TRANSFERS -->
-    <section class="page" id="transfers">
+    <section id="transfers" class="page">
         <h2>Transfers</h2>
-        <p class="subtitle">Track transfers, loans and free agents.</p>
-
-        <div class="card placeholder">
-            Transfer tracking coming soon.
-        </div>
+        <p class="subtitle">Track transfers in and out of your club.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- COMPETITIONS -->
-    <section class="page" id="competitions">
+    <section id="competitions" class="page">
         <h2>Competitions</h2>
-        <p class="subtitle">Manage your competitions.</p>
-
-        <div class="card placeholder">
-            Competition management coming soon.
-        </div>
+        <p class="subtitle">Track your competitions and results.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- LEAGUE -->
-    <section class="page" id="league">
+    <section id="league" class="page">
         <h2>League Centre</h2>
-        <p class="subtitle">League tables and standings.</p>
-
-        <div class="card placeholder">
-            League Centre coming soon.
-        </div>
+        <p class="subtitle">Track league tables and standings.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- SEASONS -->
-    <section class="page" id="seasons">
+    <section id="seasons" class="page">
         <h2>Past Seasons</h2>
-        <p class="subtitle">Review previous seasons.</p>
-
-        <div class="card placeholder">
-            Past Seasons coming soon.
-        </div>
+        <p class="subtitle">Your previous Career Mode seasons.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- TROPHIES -->
-    <section class="page" id="trophies">
+    <section id="trophies" class="page">
         <h2>Trophy Cabinet</h2>
-        <p class="subtitle">Your career achievements.</p>
-
-        <div class="card placeholder">
-            Trophy Cabinet coming soon.
-        </div>
+        <p class="subtitle">Every trophy you've won.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
-    <!-- NATIONAL TEAM -->
-    <section class="page" id="national">
+    <section id="national" class="page">
         <h2>National Team</h2>
-        <p class="subtitle">Track international football.</p>
-
-        <div class="card placeholder">
-            National Team coming soon.
-        </div>
+        <p class="subtitle">Track your international career.</p>
+        <div class="card empty-message">Coming soon.</div>
     </section>
 
 </main>
 
+
 <script>
 
-    let allPlayers = [];
+/* =========================================================
+   CAREER DATA
+========================================================= */
+
+let career = JSON.parse(localStorage.getItem("careerModeHubCareer")) || null;
 
 
-    /* =========================
-       PAGE NAVIGATION
-    ========================= */
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
 
-    function showPage(pageId) {
+function showPage(pageId) {
 
-        document.querySelectorAll(".page").forEach(page => {
-            page.classList.remove("active");
-        });
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
 
-        document.querySelectorAll("nav button").forEach(button => {
-            button.classList.remove("active");
-        });
+    document.querySelectorAll("nav button").forEach(button => {
+        button.classList.remove("active");
+    });
 
-        const page = document.getElementById(pageId);
+    const page = document.getElementById(pageId);
 
-        if (page) {
-            page.classList.add("active");
-        }
+    if (page) {
+        page.classList.add("active");
+    }
 
-        const navButton = document.getElementById("nav-" + pageId);
+    const navButton = document.getElementById("nav-" + pageId);
 
-        if (navButton) {
-            navButton.classList.add("active");
-        }
+    if (navButton) {
+        navButton.classList.add("active");
+    }
 
-        if (pageId === "players") {
-            loadDatabase();
-        }
+    if (pageId === "career") {
+        renderCareer();
+    }
+
+    if (pageId === "dashboard") {
+        renderDashboard();
+    }
+
+    if (pageId === "players") {
+        loadDatabase();
+    }
+}
+
+
+/* =========================================================
+   CAREER SETUP
+========================================================= */
+
+function renderCareer() {
+
+    const container = document.getElementById("careerSetup");
+
+    if (!career) {
+
+        container.innerHTML = `
+            <div class="card">
+
+                <h3>Create Your Career</h3>
+
+                <div class="grid">
+
+                    <div>
+                        <label>Manager Name</label>
+                        <input id="managerName" placeholder="e.g. Rowan Petersen">
+                    </div>
+
+                    <div>
+                        <label>Club</label>
+                        <input id="clubName" placeholder="e.g. Real Madrid">
+                    </div>
+
+                    <div>
+                        <label>League</label>
+                        <input id="leagueName" placeholder="e.g. LaLiga">
+                    </div>
+
+                    <div>
+                        <label>Season</label>
+                        <input id="seasonName" placeholder="e.g. 2026/27">
+                    </div>
+
+                    <div>
+                        <label>Difficulty</label>
+                        <select id="difficulty">
+                            <option>Amateur</option>
+                            <option>Semi-Pro</option>
+                            <option>Professional</option>
+                            <option>World Class</option>
+                            <option>Legendary</option>
+                            <option>Ultimate</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Match Length</label>
+                        <select id="matchLength">
+                            <option>4 minutes</option>
+                            <option>5 minutes</option>
+                            <option selected>6 minutes</option>
+                            <option>7 minutes</option>
+                            <option>8 minutes</option>
+                            <option>10 minutes</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Starting Budget (€)</label>
+                        <input id="startingBudget" type="number" placeholder="100000000">
+                    </div>
+
+                </div>
+
+                <div class="button-row">
+                    <button class="primary-btn" onclick="createCareer()">
+                        Create Career
+                    </button>
+                </div>
+
+            </div>
+        `;
+
+        return;
     }
 
 
-    /* =========================
-       CSV PARSER
-    ========================= */
+    container.innerHTML = `
 
-    function parseCSV(text) {
+        <div class="card">
 
-        const rows = [];
-        let row = [];
-        let value = "";
-        let insideQuotes = false;
+            <div class="career-header">
 
-        for (let i = 0; i < text.length; i++) {
+                <div>
+                    <div class="club-name">${escapeHTML(career.club)}</div>
+                    <div class="career-info">
+                        ${escapeHTML(career.league)} · ${escapeHTML(career.season)}
+                    </div>
+                </div>
 
-            const char = text[i];
-            const next = text[i + 1];
+                <button class="secondary-btn" onclick="editCareer()">
+                    Edit Career
+                </button>
 
-            if (char === '"' && insideQuotes && next === '"') {
-                value += '"';
-                i++;
-                continue;
-            }
+            </div>
 
-            if (char === '"') {
-                insideQuotes = !insideQuotes;
-                continue;
-            }
+        </div>
 
-            if (char === "," && !insideQuotes) {
-                row.push(value);
-                value = "";
-                continue;
-            }
 
-            if (char === "\n" && !insideQuotes) {
+        <div class="card">
 
-                row.push(value);
-                rows.push(row);
+            <h3>Career Settings</h3>
 
-                row = [];
-                value = "";
+            <div class="grid">
 
-                continue;
-            }
+                <div>
+                    <label>Manager</label>
+                    <strong>${escapeHTML(career.manager)}</strong>
+                </div>
 
-            if (char !== "\r") {
-                value += char;
-            }
-        }
+                <div>
+                    <label>Difficulty</label>
+                    <strong>${escapeHTML(career.difficulty)}</strong>
+                </div>
 
-        if (value.length > 0 || row.length > 0) {
-            row.push(value);
-            rows.push(row);
-        }
+                <div>
+                    <label>Match Length</label>
+                    <strong>${escapeHTML(career.matchLength)}</strong>
+                </div>
 
-        return rows;
+                <div>
+                    <label>Starting Budget</label>
+                    <strong>€${formatMoney(career.startingBudget)}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Season Progress</h3>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Matches</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Draws</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">0%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Trophies</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Danger Zone</h3>
+
+            <p style="color:#9ca3af;">
+                This deletes your current Career Mode Hub career from this browser.
+            </p>
+
+            <button class="danger-btn" onclick="deleteCareer()">
+                Delete Career
+            </button>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   CREATE CAREER
+========================================================= */
+
+function createCareer() {
+
+    const manager = document.getElementById("managerName").value.trim();
+    const club = document.getElementById("clubName").value.trim();
+    const league = document.getElementById("leagueName").value.trim();
+    const season = document.getElementById("seasonName").value.trim();
+    const difficulty = document.getElementById("difficulty").value;
+    const matchLength = document.getElementById("matchLength").value;
+    const startingBudget = Number(
+        document.getElementById("startingBudget").value
+    ) || 0;
+
+
+    if (!manager || !club || !league || !season) {
+
+        alert("Please fill in Manager, Club, League and Season.");
+
+        return;
     }
 
 
-    /* =========================
-       NUMBER HELPER
-    ========================= */
+    career = {
 
-    function numberValue(value) {
+        manager,
+        club,
+        league,
+        season,
+        difficulty,
+        matchLength,
+        startingBudget,
 
-        if (
-            value === undefined ||
-            value === null ||
-            value === ""
+        createdAt: new Date().toISOString(),
+
+        stats: {
+            matches: 0,
+            wins: 0,
+            draws: 0,
+            losses: 0,
+            goalsFor: 0,
+            goalsAgainst: 0,
+            trophies: 0
+        }
+
+    };
+
+
+    saveCareer();
+
+    renderCareer();
+
+    renderDashboard();
+}
+
+
+/* =========================================================
+   EDIT CAREER
+========================================================= */
+
+function editCareer() {
+
+    const container = document.getElementById("careerSetup");
+
+    container.innerHTML = `
+
+        <div class="card">
+
+            <h3>Edit Career</h3>
+
+            <div class="grid">
+
+                <div>
+                    <label>Manager Name</label>
+                    <input id="managerName" value="${escapeAttribute(career.manager)}">
+                </div>
+
+                <div>
+                    <label>Club</label>
+                    <input id="clubName" value="${escapeAttribute(career.club)}">
+                </div>
+
+                <div>
+                    <label>League</label>
+                    <input id="leagueName" value="${escapeAttribute(career.league)}">
+                </div>
+
+                <div>
+                    <label>Season</label>
+                    <input id="seasonName" value="${escapeAttribute(career.season)}">
+                </div>
+
+                <div>
+                    <label>Difficulty</label>
+                    <select id="difficulty">
+                        ${difficultyOptions(career.difficulty)}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Match Length</label>
+                    <select id="matchLength">
+                        ${matchLengthOptions(career.matchLength)}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Starting Budget (€)</label>
+                    <input id="startingBudget" type="number" value="${career.startingBudget}">
+                </div>
+
+            </div>
+
+            <div class="button-row">
+
+                <button class="primary-btn" onclick="updateCareer()">
+                    Save Changes
+                </button>
+
+                <button class="secondary-btn" onclick="renderCareer()">
+                    Cancel
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   UPDATE CAREER
+========================================================= */
+
+function updateCareer() {
+
+    career.manager = document.getElementById("managerName").value.trim();
+    career.club = document.getElementById("clubName").value.trim();
+    career.league = document.getElementById("leagueName").value.trim();
+    career.season = document.getElementById("seasonName").value.trim();
+    career.difficulty = document.getElementById("difficulty").value;
+    career.matchLength = document.getElementById("matchLength").value;
+    career.startingBudget =
+        Number(document.getElementById("startingBudget").value) || 0;
+
+    saveCareer();
+
+    renderCareer();
+    renderDashboard();
+}
+
+
+/* =========================================================
+   DELETE CAREER
+========================================================= */
+
+function deleteCareer() {
+
+    const confirmed = confirm(
+        "Are you sure you want to delete your career?"
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem("careerModeHubCareer");
+
+    career = null;
+
+    renderCareer();
+    renderDashboard();
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+
+    const container = document.getElementById("dashboardContent");
+
+    if (!career) {
+
+        container.innerHTML = `
+
+            <div class="card empty-message">
+
+                <h3>No Career Created Yet</h3>
+
+                <p>
+                    Go to <strong>My Career</strong> to create your Career Mode save.
+                </p>
+
+                <button class="primary-btn" onclick="showPage('career')">
+                    Create Career
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    const stats = career.stats || {};
+
+    const matches = stats.matches || 0;
+    const wins = stats.wins || 0;
+    const draws = stats.draws || 0;
+    const losses = stats.losses || 0;
+
+    const winRate =
+        matches > 0
+            ? Math.round((wins / matches) * 100)
+            : 0;
+
+
+    container.innerHTML = `
+
+        <div class="card">
+
+            <div class="career-header">
+
+                <div>
+
+                    <div class="club-name">
+                        ${escapeHTML(career.club)}
+                    </div>
+
+                    <div class="career-info">
+                        ${escapeHTML(career.league)}
+                        ·
+                        ${escapeHTML(career.season)}
+                    </div>
+
+                </div>
+
+                <div>
+                    <strong>
+                        ${escapeHTML(career.manager)}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Season Overview</h3>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-number">${matches}</div>
+                    <div class="stat-label">Matches</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${wins}</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${draws}</div>
+                    <div class="stat-label">Draws</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${losses}</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${winRate}%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${stats.trophies || 0}</div>
+                    <div class="stat-label">Trophies</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Career Settings</h3>
+
+            <div class="grid">
+
+                <div>
+                    <label>Difficulty</label>
+                    <strong>${escapeHTML(career.difficulty)}</strong>
+                </div>
+
+                <div>
+                    <label>Match Length</label>
+                    <strong>${escapeHTML(career.matchLength)}</strong>
+                </div>
+
+                <div>
+                    <label>Starting Budget</label>
+                    <strong>€${formatMoney(career.startingBudget)}</strong>
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   SAVE CAREER
+========================================================= */
+
+function saveCareer() {
+
+    localStorage.setItem(
+        "careerModeHubCareer",
+        JSON.stringify(career)
+    );
+}
+
+
+/* =========================================================
+   PLAYER DATABASE
+========================================================= */
+
+let allPlayers = [];
+let databaseLoaded = false;
+
+
+function parseCSV(text) {
+
+    const rows = [];
+    let row = [];
+    let field = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && insideQuotes && next === '"') {
+
+            field += '"';
+            i++;
+
+        } else if (char === '"') {
+
+            insideQuotes = !insideQuotes;
+
+        } else if (char === "," && !insideQuotes) {
+
+            row.push(field);
+            field = "";
+
+        } else if (
+            (char === "\n" || char === "\r") &&
+            !insideQuotes
         ) {
-            return null;
-        }
 
-        const number = Number(value);
+            if (char === "\r" && next === "\n") {
+                i++;
+            }
 
-        return Number.isFinite(number)
-            ? number
-            : null;
-    }
+            row.push(field);
+            field = "";
 
+            if (row.some(value => value.trim() !== "")) {
+                rows.push(row);
+            }
 
-    /* =========================
-       AGE CALCULATOR
-    ========================= */
-
-    function calculateAge(birthdate) {
-
-        if (!birthdate) {
-            return null;
-        }
-
-        let birth;
-
-        /*
-         * EA uses dates such as:
-         * 12/20/1998 0:00
-         */
-
-        const match = String(birthdate).match(
-            /^(\d{1,2})\/(\d{1,2})\/(\d{4})/
-        );
-
-        if (match) {
-
-            const month = Number(match[1]) - 1;
-            const day = Number(match[2]);
-            const year = Number(match[3]);
-
-            birth = new Date(
-                year,
-                month,
-                day
-            );
+            row = [];
 
         } else {
 
-            birth = new Date(birthdate);
+            field += char;
+
         }
+    }
 
-        if (Number.isNaN(birth.getTime())) {
-            return null;
+    if (field.length || row.length) {
+
+        row.push(field);
+
+        if (row.some(value => value.trim() !== "")) {
+            rows.push(row);
         }
+    }
 
-        const today = new Date();
+    if (!rows.length) return [];
 
-        let age =
-            today.getFullYear() -
-            birth.getFullYear();
+    const headers = rows[0].map(header =>
+        header.trim()
+    );
 
-        const monthDifference =
-            today.getMonth() -
-            birth.getMonth();
+    return rows.slice(1).map(values => {
+
+        const obj = {};
+
+        headers.forEach((header, index) => {
+
+            obj[header] =
+                values[index] !== undefined
+                    ? values[index].trim()
+                    : "";
+
+        });
+
+        return obj;
+
+    });
+}
+
+
+function getPlayerValue(player, names) {
+
+    for (const name of names) {
 
         if (
-            monthDifference < 0 ||
-            (
-                monthDifference === 0 &&
-                today.getDate() < birth.getDate()
-            )
+            player[name] !== undefined &&
+            player[name] !== null &&
+            String(player[name]).trim() !== ""
         ) {
-            age--;
+            return String(player[name]).trim();
         }
-
-        return age;
     }
 
+    return "";
+}
 
-    /* =========================
-       CONVERT CSV PLAYER
-    ========================= */
 
-    function convertPlayer(headers, row) {
+function calculateAge(birthdate) {
 
-        function get(name) {
+    if (!birthdate) return "";
 
-            const index = headers.indexOf(name);
+    const date = new Date(birthdate);
 
-            if (index === -1) {
-                return "";
-            }
+    if (isNaN(date.getTime())) return "";
 
-            return row[index] !== undefined
-                ? row[index].trim()
-                : "";
-        }
+    const today = new Date();
 
+    let age =
+        today.getFullYear() -
+        date.getFullYear();
 
-        const firstName = get("firstName");
-        const lastName = get("lastName");
-        const commonName = get("commonName");
+    const monthDifference =
+        today.getMonth() -
+        date.getMonth();
 
-
-        const fullName =
-            commonName ||
-            [firstName, lastName]
-                .filter(Boolean)
-                .join(" ") ||
-            "Unknown Player";
-
-
-        const birthdate = get("birthdate");
-
-
-        return {
-
-            id:
-                get("id"),
-
-            name:
-                fullName,
-
-            firstName:
-                firstName,
-
-            lastName:
-                lastName,
-
-            commonName:
-                commonName,
-
-
-            overall:
-                numberValue(
-                    get("overallRating")
-                ),
-
-            rank:
-                numberValue(
-                    get("rank")
-                ),
-
-
-            age:
-                calculateAge(
-                    birthdate
-                ),
-
-            birthdate:
-                birthdate,
-
-
-            /* =====================
-               CORRECT FC27 FIELDS
-            ===================== */
-
-            nationality:
-                get("nationality"),
-
-            nationalityId:
-                get("nationalityId"),
-
-            nationalityImage:
-                get("nationalityImageUrl"),
-
-
-            club:
-                get("team"),
-
-            clubId:
-                get("teamId"),
-
-            clubImage:
-                get("teamImageUrl"),
-
-
-            league:
-                get("leagueName"),
-
-
-            position:
-                get("positionShort") ||
-                get("position"),
-
-            positionName:
-                get("position"),
-
-
-            alternatePositions:
-                get("alternatePositions"),
-
-
-            preferredFoot:
-                get("preferredFoot"),
-
-
-            skillMoves:
-                numberValue(
-                    get("skillMoves")
-                ),
-
-            weakFoot:
-                numberValue(
-                    get("weakFootAbility")
-                ),
-
-
-            height:
-                numberValue(
-                    get("height")
-                ),
-
-            weight:
-                numberValue(
-                    get("weight")
-                ),
-
-
-            avatar:
-                get("avatarUrl"),
-
-            shield:
-                get("shieldUrl"),
-
-
-            /* =====================
-               MAIN STATS
-            ===================== */
-
-            pace:
-                numberValue(
-                    get("stats.pac.value")
-                ),
-
-            shooting:
-                numberValue(
-                    get("stats.sho.value")
-                ),
-
-            passing:
-                numberValue(
-                    get("stats.pas.value")
-                ),
-
-            dribbling:
-                numberValue(
-                    get("stats.dri.value")
-                ),
-
-            defending:
-                numberValue(
-                    get("stats.def.value")
-                ),
-
-            physical:
-                numberValue(
-                    get("stats.phy.value")
-                ),
-
-
-            /* =====================
-               ATTACKING
-            ===================== */
-
-            finishing:
-                numberValue(
-                    get("stats.finishing.value")
-                ),
-
-            shotPower:
-                numberValue(
-                    get("stats.shotPower.value")
-                ),
-
-            volleys:
-                numberValue(
-                    get("stats.volleys.value")
-                ),
-
-            penalties:
-                numberValue(
-                    get("stats.penalties.value")
-                ),
-
-            headingAccuracy:
-                numberValue(
-                    get("stats.headingAccuracy.value")
-                ),
-
-
-            /* =====================
-               PASSING
-            ===================== */
-
-            crossing:
-                numberValue(
-                    get("stats.crossing.value")
-                ),
-
-            vision:
-                numberValue(
-                    get("stats.vision.value")
-                ),
-
-            shortPassing:
-                numberValue(
-                    get("stats.shortPassing.value")
-                ),
-
-            longPassing:
-                numberValue(
-                    get("stats.longPassing.value")
-                ),
-
-
-            /* =====================
-               DRIBBLING
-            ===================== */
-
-            ballControl:
-                numberValue(
-                    get("stats.ballControl.value")
-                ),
-
-            dribblingStat:
-                numberValue(
-                    get("stats.dribbling.value")
-                ),
-
-            agility:
-                numberValue(
-                    get("stats.agility.value")
-                ),
-
-            balance:
-                numberValue(
-                    get("stats.balance.value")
-                ),
-
-
-            /* =====================
-               PHYSICAL
-            ===================== */
-
-            acceleration:
-                numberValue(
-                    get("stats.acceleration.value")
-                ),
-
-            sprintSpeed:
-                numberValue(
-                    get("stats.sprintSpeed.value")
-                ),
-
-            stamina:
-                numberValue(
-                    get("stats.stamina.value")
-                ),
-
-            strength:
-                numberValue(
-                    get("stats.strength.value")
-                ),
-
-            jumping:
-                numberValue(
-                    get("stats.jumping.value")
-                ),
-
-
-            /* =====================
-               MENTAL
-            ===================== */
-
-            reactions:
-                numberValue(
-                    get("stats.reactions.value")
-                ),
-
-            composure:
-                numberValue(
-                    get("stats.composure.value")
-                ),
-
-            aggression:
-                numberValue(
-                    get("stats.aggression.value")
-                ),
-
-            positioning:
-                numberValue(
-                    get("stats.positioning.value")
-                ),
-
-
-            /* =====================
-               GOALKEEPING
-            ===================== */
-
-            gkDiving:
-                numberValue(
-                    get("stats.gkDiving.value")
-                ),
-
-            gkHandling:
-                numberValue(
-                    get("stats.gkHandling.value")
-                ),
-
-            gkKicking:
-                numberValue(
-                    get("stats.gkKicking.value")
-                ),
-
-            gkPositioning:
-                numberValue(
-                    get("stats.gkPositioning.value")
-                ),
-
-            gkReflexes:
-                numberValue(
-                    get("stats.gkReflexes.value")
-                )
-        };
+    if (
+        monthDifference < 0 ||
+        (
+            monthDifference === 0 &&
+            today.getDate() < date.getDate()
+        )
+    ) {
+        age--;
     }
 
+    return age;
+}
 
-    /* =========================
-       LOAD DATABASE
-    ========================= */
 
-    async function loadDatabase() {
+function convertPlayer(player) {
 
-        const status =
-            document.getElementById(
-                "databaseStatus"
+    const firstName =
+        getPlayerValue(player, ["firstName"]);
+
+    const lastName =
+        getPlayerValue(player, ["lastName"]);
+
+    const commonName =
+        getPlayerValue(player, ["commonName"]);
+
+    const name =
+        commonName ||
+        `${firstName} ${lastName}`.trim();
+
+
+    return {
+
+        id: getPlayerValue(player, ["id"]),
+
+        rank: getPlayerValue(player, ["rank"]),
+
+        name,
+
+        firstName,
+        lastName,
+
+        overall:
+            getPlayerValue(player, ["overallRating"]),
+
+        age:
+            calculateAge(
+                getPlayerValue(player, ["birthdate"])
+            ),
+
+        nationality:
+            getPlayerValue(player, ["nationality"]),
+
+        club:
+            getPlayerValue(player, ["team"]),
+
+        league:
+            getPlayerValue(player, ["leagueName"]),
+
+        position:
+            getPlayerValue(player, [
+                "positionShort",
+                "position"
+            ]),
+
+        positionName:
+            getPlayerValue(player, ["position"]),
+
+        preferredFoot:
+            getPlayerValue(player, ["preferredFoot"]),
+
+        skillMoves:
+            getPlayerValue(player, ["skillMoves"]),
+
+        weakFoot:
+            getPlayerValue(player, ["weakFootAbility"]),
+
+        height:
+            getPlayerValue(player, ["height"]),
+
+        weight:
+            getPlayerValue(player, ["weight"]),
+
+        alternatePositions:
+            getPlayerValue(player, ["alternatePositions"]),
+
+        avatarUrl:
+            getPlayerValue(player, ["avatarUrl"]),
+
+        shieldUrl:
+            getPlayerValue(player, ["shieldUrl"])
+
+    };
+}
+
+
+async function loadDatabase() {
+
+    if (databaseLoaded) return;
+
+    const status =
+        document.getElementById("databaseStatus");
+
+    try {
+
+        const response =
+            await fetch(
+                "data/players.csv?cache=" +
+                Date.now()
             );
 
-        const results =
-            document.getElementById(
-                "playerResults"
-            );
-
-
-        if (allPlayers.length > 0) {
-
-            status.textContent =
-                "FC 27 database loaded — " +
-                allPlayers.length +
-                " players";
-
-            return;
+        if (!response.ok) {
+            throw new Error("Could not load CSV");
         }
 
+        const csv =
+            await response.text();
+
+        const rawPlayers =
+            parseCSV(csv);
+
+        allPlayers =
+            rawPlayers.map(convertPlayer);
+
+        databaseLoaded = true;
 
         status.textContent =
-            "Loading FC 27 player database...";
+            `${allPlayers.length.toLocaleString()} FC 27 men's players loaded`;
 
+        displayPlayers(allPlayers.slice(0, 100));
 
-        results.innerHTML = `
-            <div class="no-results">
-                Loading FC 27 players...
-            </div>
-        `;
+    } catch (error) {
 
+        console.error(error);
 
-        try {
+        status.textContent =
+            "Could not load player database.";
 
-            const response =
-                await fetch(
-                    "data/players.csv?cache=" +
-                    Date.now()
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Could not load players.csv"
-                );
-            }
-
-
-            const csv =
-                await response.text();
-
-
-            const rows =
-                parseCSV(csv);
-
-
-            if (!rows.length) {
-
-                throw new Error(
-                    "CSV is empty"
-                );
-            }
-
-
-            const headers =
-                rows[0].map(
-                    header =>
-                        header
-                            .trim()
-                            .replace(/^\uFEFF/, "")
-                );
-
-
-            console.log(
-                "CSV headers:",
-                headers
-            );
-
-
-            allPlayers = [];
-
-
-            for (
-                let i = 1;
-                i < rows.length;
-                i++
-            ) {
-
-                const row = rows[i];
-
-
-                if (
-                    !row ||
-                    row.length === 0
-                ) {
-                    continue;
-                }
-
-
-                const player =
-                    convertPlayer(
-                        headers,
-                        row
-                    );
-
-
-                if (
-                    player.name &&
-                    player.name !==
-                    "Unknown Player"
-                ) {
-
-                    allPlayers.push(
-                        player
-                    );
-                }
-            }
-
-
-            status.textContent =
-                "FC 27 database loaded — " +
-                allPlayers.length +
-                " players";
-
-
-            displayPlayers(
-                allPlayers
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Player database error:",
-                error
-            );
-
-
-            status.textContent =
-                "Error loading FC 27 database";
-
-
-            results.innerHTML = `
-                <div class="no-results">
-                    <strong>
-                        Could not load player database.
-                    </strong>
-                    <br><br>
-                    ${escapeHTML(error.message)}
-                </div>
-            `;
-        }
     }
+}
 
 
-    /* =========================
-       SEARCH
-    ========================= */
+function searchPlayers() {
 
-    function searchPlayers() {
-
-        const input =
-            document.getElementById(
-                "playerSearch"
-            );
+    const search =
+        document.getElementById(
+            "playerSearch"
+        ).value
+        .toLowerCase()
+        .trim();
 
 
-        const query =
-            input.value
-                .trim()
-                .toLowerCase();
-
-
-        if (!query) {
-
-            displayPlayers(
-                allPlayers
-            );
-
-            return;
-        }
-
-
-        const filtered =
-            allPlayers.filter(
-                player => {
-
-                    return (
-
-                        (player.name || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                        ||
-
-                        (player.club || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                        ||
-
-                        (player.nationality || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                        ||
-
-                        (player.position || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                        ||
-
-                        (player.positionName || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                        ||
-
-                        (player.league || "")
-                            .toLowerCase()
-                            .includes(query)
-
-                    );
-                }
-            );
-
+    if (!search) {
 
         displayPlayers(
-            filtered
+            allPlayers.slice(0, 100)
         );
+
+        return;
     }
 
 
-    /* =========================
-       DISPLAY PLAYERS
-    ========================= */
+    const results =
+        allPlayers.filter(player => {
 
-    function displayPlayers(players) {
+            const searchable = [
 
-        const container =
-            document.getElementById(
-                "playerResults"
-            );
+                player.name,
+                player.firstName,
+                player.lastName,
+                player.club,
+                player.nationality,
+                player.position,
+                player.positionName,
+                player.league
 
+            ]
+            .join(" ")
+            .toLowerCase();
 
-        if (!players.length) {
+            return searchable.includes(search);
 
-            container.innerHTML = `
-                <div class="no-results">
-                    No players found.
-                    <br><br>
-                    Try another search.
-                </div>
-            `;
-
-            return;
-        }
+        });
 
 
-        const visiblePlayers =
-            players.slice(0, 100);
+    displayPlayers(
+        results.slice(0, 100)
+    );
+}
 
+
+function displayPlayers(players) {
+
+    const container =
+        document.getElementById(
+            "playerResults"
+        );
+
+    if (!players.length) {
 
         container.innerHTML =
-            visiblePlayers
-                .map(
-                    player =>
-                        createPlayerCard(
-                            player
-                        )
-                )
-                .join("");
+            `<div class="card empty-message">
+                No players found.
+            </div>`;
 
-
-        if (players.length > 100) {
-
-            container.innerHTML += `
-                <div class="no-results"
-                     style="grid-column:1/-1;">
-                    Showing first 100 results
-                    out of ${players.length}.
-                    <br>
-                    Use the search box to narrow
-                    your results.
-                </div>
-            `;
-        }
+        return;
     }
 
 
-    /* =========================
-       PLAYER CARD
-    ========================= */
-
-    function createPlayerCard(player) {
-
-        const image =
-            player.avatar
-                ? `
-                    <img
-                        class="player-photo"
-                        src="${escapeAttribute(player.avatar)}"
-                        alt=""
-                        onerror="this.style.display='none'"
-                    >
-                  `
-                : `
-                    <div class="player-photo"></div>
-                  `;
+    container.innerHTML =
+        players
+            .map(createPlayerCard)
+            .join("");
+}
 
 
-        const overall =
-            player.overall !== null
-                ? player.overall
-                : "—";
+function createPlayerCard(player) {
+
+    const image =
+        player.avatarUrl
+            ? `<img
+                class="player-image"
+                src="${escapeAttribute(player.avatarUrl)}"
+                onerror="this.style.display='none'"
+              >`
+            : "";
 
 
-        const age =
-            player.age !== null
-                ? player.age
-                : "—";
+    return `
 
+        <div class="player-card">
 
-        const position =
-            player.position ||
-            "—";
+            ${image}
 
+            <div class="player-info">
 
-        const club =
-            player.club ||
-            "Free Agent";
-
-
-        const nationality =
-            player.nationality ||
-            "—";
-
-
-        const league =
-            player.league ||
-            "—";
-
-
-        const foot =
-            player.preferredFoot ||
-            "—";
-
-
-        return `
-            <div class="player-card">
-
-                <div class="player-top">
-
-                    ${image}
-
-                    <div style="flex:1; min-width:0;">
-
-                        <div class="player-name">
-                            ${escapeHTML(player.name)}
-                        </div>
-
-                        <div class="player-club">
-                            ${escapeHTML(club)}
-                        </div>
-
-                    </div>
-
-                    <div class="overall">
-
-                        <div class="overall-number">
-                            ${overall}
-                        </div>
-
-                        <div class="overall-label">
-                            OVR
-                        </div>
-
-                    </div>
-
+                <div class="player-name">
+                    ${escapeHTML(player.name)}
                 </div>
 
+                <div class="rating">
+                    ${escapeHTML(player.overall || "—")}
+                    <span style="font-size:12px;color:#9ca3af;">
+                        OVR
+                    </span>
+                </div>
 
-                <div class="player-info">
+                <div class="player-meta">
 
-                    <div class="info-item">
+                    Position:
+                    ${escapeHTML(player.position || "—")}
+                    <br>
 
-                        <span class="info-label">
-                            Position
-                        </span>
+                    Age:
+                    ${escapeHTML(String(player.age || "—"))}
+                    <br>
 
-                        <span class="info-value">
-                            ${escapeHTML(position)}
-                        </span>
+                    Nationality:
+                    ${escapeHTML(player.nationality || "—")}
+                    <br>
 
-                    </div>
+                    League:
+                    ${escapeHTML(player.league || "—")}
+                    <br>
 
+                    Club:
+                    ${escapeHTML(player.club || "—")}
+                    <br>
 
-                    <div class="info-item">
+                    Foot:
+                    ${escapeHTML(player.preferredFoot || "—")}
+                    <br>
 
-                        <span class="info-label">
-                            Age
-                        </span>
-
-                        <span class="info-value">
-                            ${age}
-                        </span>
-
-                    </div>
-
-
-                    <div class="info-item">
-
-                        <span class="info-label">
-                            Nationality
-                        </span>
-
-                        <span class="info-value">
-                            ${escapeHTML(nationality)}
-                        </span>
-
-                    </div>
-
-
-                    <div class="info-item">
-
-                        <span class="info-label">
-                            League
-                        </span>
-
-                        <span class="info-value">
-                            ${escapeHTML(league)}
-                        </span>
-
-                    </div>
-
-
-                    <div class="info-item">
-
-                        <span class="info-label">
-                            Foot
-                        </span>
-
-                        <span class="info-value">
-                            ${escapeHTML(foot)}
-                        </span>
-
-                    </div>
-
-
-                    <div class="info-item">
-
-                        <span class="info-label">
-                            Rank
-                        </span>
-
-                        <span class="info-value">
-                            ${
-                                player.rank !== null
-                                    ? player.rank
-                                    : "—"
-                            }
-                        </span>
-
-                    </div>
+                    Rank:
+                    ${escapeHTML(player.rank || "—")}
 
                 </div>
 
             </div>
-        `;
-    }
+
+        </div>
+    `;
+}
 
 
-    /* =========================
-       SECURITY / HTML ESCAPING
-    ========================= */
+/* =========================================================
+   HELPERS
+========================================================= */
 
-    function escapeHTML(value) {
+function escapeHTML(value) {
 
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-
-    function escapeAttribute(value) {
-
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 
-    /* =========================
-       START SITE
-    ========================= */
+function escapeAttribute(value) {
 
-    showPage("dashboard");
+    return escapeHTML(value);
+}
+
+
+function formatMoney(number) {
+
+    return Number(number || 0)
+        .toLocaleString("en-US");
+}
+
+
+function difficultyOptions(selected) {
+
+    const options = [
+        "Amateur",
+        "Semi-Pro",
+        "Professional",
+        "World Class",
+        "Legendary",
+        "Ultimate"
+    ];
+
+    return options.map(option =>
+        `<option ${option === selected ? "selected" : ""}>
+            ${option}
+        </option>`
+    ).join("");
+}
+
+
+function matchLengthOptions(selected) {
+
+    const options = [
+        "4 minutes",
+        "5 minutes",
+        "6 minutes",
+        "7 minutes",
+        "8 minutes",
+        "10 minutes"
+    ];
+
+    return options.map(option =>
+        `<option ${option === selected ? "selected" : ""}>
+            ${option}
+        </option>`
+    ).join("");
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+showPage("dashboard");
 
 </script>
 
