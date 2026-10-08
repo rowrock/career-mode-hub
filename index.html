@@ -6,1057 +6,1104 @@
 <title>Career Mode Hub</title>
 
 <style>
+*{box-sizing:border-box}
 
-* {
-    box-sizing: border-box;
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#0b0f14;
+    color:#f5f7fa;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0b0f14;
-    color: #f5f7fa;
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:235px;
+    background:#11161d;
+    border-right:1px solid #252c35;
+    padding:24px 14px;
+    z-index:20;
+    overflow-y:auto;
 }
 
-button,
-input,
-select {
-    font-family: inherit;
+.logo{
+    font-size:22px;
+    font-weight:800;
+    padding:8px 12px 25px;
 }
 
-button {
-    cursor: pointer;
+.logo span{color:#4da3ff}
+
+.nav-title{
+    color:#707986;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    padding:0 12px 8px;
+    letter-spacing:1px;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 230px;
-    background: #11161d;
-    border-right: 1px solid #252c35;
-    padding: 24px 14px;
-    z-index: 10;
-    overflow-y: auto;
+.nav-btn{
+    width:100%;
+    background:transparent;
+    border:0;
+    color:#9ca5b1;
+    text-align:left;
+    padding:11px 12px;
+    border-radius:8px;
+    margin-bottom:3px;
+    font-size:14px;
 }
 
-.logo {
-    font-size: 22px;
-    font-weight: 800;
-    padding: 8px 12px 25px;
+.nav-btn:hover{
+    background:#1a2028;
+    color:white;
 }
 
-.logo span {
-    color: #4da3ff;
+.nav-btn.active{
+    background:#1d2835;
+    color:white;
+    font-weight:700;
 }
 
-.nav-title {
-    color: #707986;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 0 12px 8px;
-    letter-spacing: 1px;
+.nav-btn.disabled{
+    opacity:.5;
 }
 
-.nav-btn {
-    width: 100%;
-    background: transparent;
-    border: 0;
-    color: #9ca5b1;
-    text-align: left;
-    padding: 11px 12px;
-    border-radius: 8px;
-    margin-bottom: 3px;
-    font-size: 14px;
+.main{
+    margin-left:235px;
+    min-height:100vh;
+    padding:32px 38px;
 }
 
-.nav-btn:hover {
-    background: #1a2028;
-    color: white;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:28px;
 }
 
-.nav-btn.active {
-    background: #1d2835;
-    color: white;
-    font-weight: 700;
+.page-title{
+    font-size:28px;
+    font-weight:800;
 }
 
-.nav-btn.disabled {
-    opacity: 0.55;
+.page-subtitle{
+    color:#7f8996;
+    margin-top:5px;
+    font-size:14px;
 }
 
-/* =========================
-   MAIN
-========================= */
-
-.main {
-    margin-left: 230px;
-    min-height: 100vh;
-    padding: 32px 38px;
+.primary-btn{
+    background:#3288e8;
+    color:white;
+    border:0;
+    padding:11px 17px;
+    border-radius:8px;
+    font-weight:700;
+    font-size:14px;
 }
 
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
+.primary-btn:hover{background:#2576d0}
+
+.secondary-btn{
+    background:#1a2028;
+    color:#e7ebf0;
+    border:1px solid #303844;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:600;
 }
 
-.page-title {
-    font-size: 28px;
-    font-weight: 800;
+.secondary-btn:hover{background:#222a34}
+
+.delete-btn{
+    background:transparent;
+    border:1px solid #493038;
+    color:#d97886;
+    padding:9px 13px;
+    border-radius:7px;
 }
 
-.page-subtitle {
-    color: #7f8996;
-    margin-top: 5px;
-    font-size: 14px;
+.panel{
+    background:#11161d;
+    border:1px solid #252c35;
+    border-radius:12px;
+    padding:22px;
 }
 
-/* =========================
-   BUTTONS
-========================= */
-
-.primary-btn {
-    background: #3288e8;
-    color: white;
-    border: none;
-    padding: 11px 17px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 14px;
+.panel-title{
+    font-size:17px;
+    font-weight:800;
+    margin-bottom:5px;
 }
 
-.primary-btn:hover {
-    background: #2576d0;
+.panel-subtitle{
+    color:#7f8996;
+    font-size:13px;
+    margin-bottom:20px;
 }
 
-.secondary-btn {
-    background: #1a2028;
-    color: #e7ebf0;
-    border: 1px solid #303844;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-weight: 600;
+.careers-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+    gap:18px;
 }
 
-.secondary-btn:hover {
-    background: #222a34;
+.career-card{
+    background:#11161d;
+    border:1px solid #252c35;
+    border-radius:12px;
+    padding:20px;
 }
 
-.delete-btn {
-    background: transparent;
-    border: 1px solid #493038;
-    color: #d97886;
-    padding: 9px 13px;
-    border-radius: 7px;
+.career-card:hover{
+    border-color:#3b4653;
 }
 
-.delete-btn:hover {
-    background: #24161a;
+.career-name{
+    font-size:19px;
+    font-weight:800;
 }
 
-.small-btn {
-    padding: 8px 11px;
-    font-size: 12px;
+.career-club{
+    color:#d8dde4;
+    margin-top:5px;
 }
 
-/* =========================
-   DASHBOARD
-========================= */
-
-.careers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 18px;
+.career-league{
+    color:#7f8996;
+    font-size:13px;
+    margin-top:3px;
 }
 
-.career-card {
-    background: #11161d;
-    border: 1px solid #252c35;
-    border-radius: 12px;
-    padding: 20px;
-    transition: 0.15s;
+.career-season{
+    margin-top:15px;
+    padding-top:13px;
+    border-top:1px solid #252c35;
+    display:flex;
+    justify-content:space-between;
+    color:#8d97a3;
+    font-size:13px;
 }
 
-.career-card:hover {
-    border-color: #3b4653;
-    transform: translateY(-2px);
+.season-value{
+    color:white;
+    font-weight:700;
 }
 
-.career-name {
-    font-size: 19px;
-    font-weight: 800;
+.career-actions{
+    display:flex;
+    gap:8px;
+    margin-top:17px;
 }
 
-.career-club {
-    color: #d8dde4;
-    margin-top: 5px;
+.career-actions .primary-btn{flex:1}
+
+.empty-state{
+    background:#11161d;
+    border:1px dashed #303844;
+    border-radius:12px;
+    padding:50px 20px;
+    text-align:center;
+    color:#7f8996;
 }
 
-.career-league {
-    color: #7f8996;
-    font-size: 13px;
-    margin-top: 3px;
+.empty-state h2{
+    color:white;
+    margin-top:0;
 }
 
-.career-season {
-    margin-top: 15px;
-    padding-top: 13px;
-    border-top: 1px solid #252c35;
-    display: flex;
-    justify-content: space-between;
-    color: #8d97a3;
-    font-size: 13px;
+.career-banner{
+    background:#11161d;
+    border:1px solid #252c35;
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:24px;
 }
 
-.season-value {
-    color: white;
-    font-weight: 700;
+.career-banner-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
 }
 
-.career-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 17px;
+.current-career-label{
+    color:#737d89;
+    font-size:11px;
+    text-transform:uppercase;
+    font-weight:700;
+    letter-spacing:1px;
 }
 
-.career-actions .primary-btn {
-    flex: 1;
+.current-career-name{
+    font-size:22px;
+    font-weight:800;
+    margin-top:4px;
 }
 
-.empty-state {
-    background: #11161d;
-    border: 1px dashed #303844;
-    border-radius: 12px;
-    padding: 55px 20px;
-    text-align: center;
-    color: #7f8996;
+.current-career-info{
+    color:#8d97a3;
+    font-size:13px;
+    margin-top:5px;
 }
 
-.empty-state h2 {
-    color: white;
-    margin-top: 0;
+.back-dashboard{
+    background:#1a2028;
+    border:1px solid #303844;
+    color:white;
+    padding:9px 13px;
+    border-radius:7px;
 }
 
-/* =========================
-   CAREER BANNER
-========================= */
-
-.career-banner {
-    background: #11161d;
-    border: 1px solid #252c35;
-    border-radius: 12px;
-    padding: 20px 22px;
-    margin-bottom: 24px;
+.match-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:22px;
 }
 
-.career-banner-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
+.match-stat{
+    background:#171d25;
+    border:1px solid #252c35;
+    border-radius:9px;
+    padding:15px;
 }
 
-.current-career-label {
-    color: #737d89;
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
+.match-stat-label{
+    color:#7f8996;
+    font-size:11px;
+    text-transform:uppercase;
 }
 
-.current-career-name {
-    font-size: 22px;
-    font-weight: 800;
-    margin-top: 4px;
+.match-stat-number{
+    font-size:23px;
+    font-weight:800;
+    margin-top:6px;
 }
 
-.current-career-info {
-    color: #8d97a3;
-    font-size: 13px;
-    margin-top: 5px;
+.setup-wrapper{max-width:850px}
+
+.setup-panel{
+    background:#11161d;
+    border:1px solid #252c35;
+    border-radius:12px;
+    padding:28px;
 }
 
-.back-dashboard {
-    background: #1a2028;
-    border: 1px solid #303844;
-    color: white;
-    padding: 9px 13px;
-    border-radius: 7px;
+.setup-section{margin-bottom:26px}
+
+.setup-label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:9px;
 }
 
-/* =========================
-   PANELS
-========================= */
-
-.panel {
-    background: #11161d;
-    border: 1px solid #252c35;
-    border-radius: 12px;
-    padding: 22px;
+.type-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
 }
 
-.panel-title {
-    font-size: 17px;
-    font-weight: 800;
-    margin-bottom: 5px;
+.type-btn{
+    background:#171d25;
+    border:1px solid #303844;
+    color:#cdd3db;
+    border-radius:9px;
+    padding:17px;
+    text-align:left;
 }
 
-.panel-subtitle {
-    color: #7f8996;
-    font-size: 13px;
-    margin-bottom: 20px;
+.type-btn strong{
+    display:block;
+    color:white;
+    margin-bottom:5px;
 }
 
-/* =========================
-   STATS
-========================= */
-
-.match-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
+.type-btn span{
+    color:#7f8996;
+    font-size:12px;
 }
 
-.match-stat {
-    background: #171d25;
-    border: 1px solid #252c35;
-    border-radius: 9px;
-    padding: 15px;
+.type-btn.selected{
+    border-color:#3288e8;
+    background:#152337;
 }
 
-.match-stat-label {
-    color: #7f8996;
-    font-size: 11px;
-    text-transform: uppercase;
-}
-
-.match-stat-number {
-    font-size: 23px;
-    font-weight: 800;
-    margin-top: 6px;
-}
-
-/* =========================
-   SETUP
-========================= */
-
-.setup-wrapper {
-    max-width: 760px;
-}
-
-.setup-panel {
-    background: #11161d;
-    border: 1px solid #252c35;
-    border-radius: 12px;
-    padding: 28px;
-}
-
-.setup-section {
-    margin-bottom: 28px;
-}
-
-.setup-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 9px;
-}
-
-.type-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.type-btn {
-    background: #171d25;
-    border: 1px solid #303844;
-    color: #cdd3db;
-    border-radius: 9px;
-    padding: 17px;
-    text-align: left;
-}
-
-.type-btn strong {
-    display: block;
-    color: white;
-    margin-bottom: 5px;
-}
-
-.type-btn span {
-    color: #7f8996;
-    font-size: 12px;
-}
-
-.type-btn.selected {
-    border-color: #3288e8;
-    background: #152337;
-}
-
-.form-input,
-.search-input,
-.form-select {
-    width: 100%;
-    background: #171d25;
-    border: 1px solid #303844;
-    color: white;
-    padding: 12px 13px;
-    border-radius: 8px;
-    outline: none;
+.form-input,.search-input,.form-select{
+    width:100%;
+    background:#171d25;
+    border:1px solid #303844;
+    color:white;
+    padding:12px 13px;
+    border-radius:8px;
+    outline:0;
 }
 
 .form-input:focus,
 .search-input:focus,
-.form-select:focus {
-    border-color: #3288e8;
+.form-select:focus{
+    border-color:#3288e8;
 }
 
-/* =========================
-   SEARCH
-========================= */
+.search-select{position:relative}
 
-.search-select {
-    position: relative;
+.search-results{
+    position:absolute;
+    left:0;
+    right:0;
+    top:calc(100% + 4px);
+    background:#171d25;
+    border:1px solid #303844;
+    border-radius:8px;
+    max-height:260px;
+    overflow-y:auto;
+    z-index:100;
+    display:none;
 }
 
-.search-results {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100% + 4px);
-    background: #171d25;
-    border: 1px solid #303844;
-    border-radius: 8px;
-    max-height: 250px;
-    overflow-y: auto;
-    z-index: 50;
-    display: none;
+.search-results.open{display:block}
+
+.search-option{
+    padding:11px 13px;
+    cursor:pointer;
+    border-bottom:1px solid #242b34;
+    font-size:13px;
 }
 
-.search-results.open {
-    display: block;
+.search-option:hover{
+    background:#222a34;
 }
 
-.search-option {
-    padding: 11px 13px;
-    cursor: pointer;
-    border-bottom: 1px solid #242b34;
-    font-size: 13px;
+.match-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
 
-.search-option:hover {
-    background: #222a34;
+.match-row{
+    background:#171d25;
+    border:1px solid #252c35;
+    border-radius:9px;
+    padding:16px;
 }
 
-/* =========================
-   MATCH LIST
-========================= */
-
-.match-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.match-row-main{
+    display:grid;
+    grid-template-columns:90px 1fr 100px 90px;
+    align-items:center;
+    gap:15px;
 }
 
-.match-row {
-    background: #171d25;
-    border: 1px solid #252c35;
-    border-radius: 9px;
-    padding: 16px;
+.match-date{
+    color:#7f8996;
+    font-size:12px;
 }
 
-.match-row-main {
-    display: grid;
-    grid-template-columns: 90px 1fr 100px 90px;
-    align-items: center;
-    gap: 15px;
+.match-competition{
+    color:#7f8996;
+    font-size:11px;
+    margin-top:4px;
 }
 
-.match-date {
-    color: #7f8996;
-    font-size: 12px;
+.match-opponent{
+    font-weight:800;
+    font-size:15px;
 }
 
-.match-competition {
-    color: #7f8996;
-    font-size: 11px;
-    margin-top: 4px;
+.match-home-away{
+    color:#8d97a3;
+    font-size:12px;
+    margin-top:4px;
 }
 
-.match-opponent {
-    font-weight: 800;
-    font-size: 15px;
+.match-score{
+    text-align:center;
+    font-size:21px;
+    font-weight:800;
 }
 
-.match-home-away {
-    color: #8d97a3;
-    font-size: 12px;
-    margin-top: 4px;
+.match-result{
+    text-align:center;
+    font-weight:800;
 }
 
-.match-score {
-    text-align: center;
-    font-size: 21px;
-    font-weight: 800;
+.result-win{color:#69d38b}
+.result-draw{color:#e0bd68}
+.result-loss{color:#e27684}
+
+.match-details{
+    border-top:1px solid #252c35;
+    margin-top:14px;
+    padding-top:12px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    align-items:center;
+    color:#8d97a3;
+    font-size:12px;
 }
 
-.match-result {
-    text-align: center;
-    font-weight: 800;
+.entry-choice-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
 }
 
-.result-win {
-    color: #69d38b;
+.entry-choice{
+    background:#171d25;
+    border:1px solid #303844;
+    border-radius:11px;
+    padding:25px;
+    text-align:left;
+    color:white;
 }
 
-.result-draw {
-    color: #e0bd68;
+.entry-choice:hover{
+    border-color:#3288e8;
+    background:#152337;
 }
 
-.result-loss {
-    color: #e27684;
+.entry-icon{
+    font-size:30px;
+    margin-bottom:13px;
 }
 
-.match-details {
-    border-top: 1px solid #252c35;
-    margin-top: 14px;
-    padding-top: 12px;
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    color: #8d97a3;
-    font-size: 12px;
+.entry-title{
+    font-size:17px;
+    font-weight:800;
+    margin-bottom:7px;
 }
 
-/* =========================
-   ENTRY CHOICE
-========================= */
-
-.entry-choice-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.entry-description{
+    color:#7f8996;
+    font-size:13px;
+    line-height:1.5;
 }
 
-.entry-choice {
-    background: #171d25;
-    border: 1px solid #303844;
-    border-radius: 11px;
-    padding: 25px;
-    text-align: left;
-    color: white;
+.player-entry-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:15px;
 }
 
-.entry-choice:hover {
-    border-color: #3288e8;
-    background: #152337;
+.player-entry{
+    background:#171d25;
+    border:1px solid #252c35;
+    border-radius:9px;
+    padding:13px;
+    display:grid;
+    grid-template-columns:1fr 90px 75px 75px 80px 35px;
+    gap:8px;
+    align-items:center;
 }
 
-.entry-icon {
-    font-size: 30px;
-    margin-bottom: 13px;
+.player-entry-header{
+    color:#737d89;
+    font-size:10px;
+    text-transform:uppercase;
+    padding:0 13px;
 }
 
-.entry-title {
-    font-size: 17px;
-    font-weight: 800;
-    margin-bottom: 7px;
+.remove-player{
+    background:transparent;
+    border:0;
+    color:#d97886;
+    font-size:20px;
 }
 
-.entry-description {
-    color: #7f8996;
-    font-size: 13px;
-    line-height: 1.5;
+.upload-area{
+    border:2px dashed #34404d;
+    border-radius:12px;
+    padding:45px 25px;
+    text-align:center;
+    background:#151b22;
 }
 
-/* =========================
-   PLAYER ENTRY
-========================= */
-
-.player-entry-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
+.upload-icon{
+    font-size:38px;
+    margin-bottom:12px;
 }
 
-.player-entry {
-    background: #171d25;
-    border: 1px solid #252c35;
-    border-radius: 9px;
-    padding: 13px;
-    display: grid;
-    grid-template-columns: 1fr 90px 75px 75px 80px 35px;
-    gap: 8px;
-    align-items: center;
+.upload-title{
+    font-size:18px;
+    font-weight:800;
 }
 
-.player-entry-header {
-    color: #737d89;
-    font-size: 10px;
-    text-transform: uppercase;
-    padding: 0 13px;
+.upload-description{
+    color:#7f8996;
+    font-size:13px;
+    margin:8px auto 20px;
+    max-width:500px;
+    line-height:1.6;
 }
 
-.player-name-input {
-    min-width: 0;
+.file-list{
+    margin-top:18px;
 }
 
-.remove-player {
-    background: transparent;
-    border: 0;
-    color: #d97886;
-    font-size: 20px;
+.file-item{
+    background:#1b222b;
+    border:1px solid #2b3440;
+    border-radius:7px;
+    padding:10px 12px;
+    margin-bottom:7px;
+    font-size:12px;
+    color:#b9c1ca;
 }
 
-.add-player-area {
-    margin-top: 14px;
+.review-box{
+    background:#151b22;
+    border:1px solid #303844;
+    border-radius:10px;
+    padding:18px;
+    margin-top:15px;
 }
 
-/* =========================
-   UPLOAD
-========================= */
-
-.upload-area {
-    border: 2px dashed #34404d;
-    border-radius: 12px;
-    padding: 45px 25px;
-    text-align: center;
-    background: #151b22;
+.review-warning{
+    background:#282319;
+    border:1px solid #594a2b;
+    color:#d8c47e;
+    border-radius:8px;
+    padding:13px;
+    font-size:12px;
+    margin-bottom:15px;
 }
 
-.upload-area:hover {
-    border-color: #3288e8;
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:200;
 }
 
-.upload-icon {
-    font-size: 38px;
-    margin-bottom: 12px;
+.modal{
+    width:100%;
+    max-width:950px;
+    max-height:92vh;
+    overflow-y:auto;
+    background:#11161d;
+    border:1px solid #303844;
+    border-radius:13px;
+    padding:25px;
 }
 
-.upload-title {
-    font-size: 18px;
-    font-weight: 800;
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
 }
 
-.upload-description {
-    color: #7f8996;
-    font-size: 13px;
-    margin: 8px auto 20px;
-    max-width: 500px;
-    line-height: 1.6;
+.modal-title{
+    font-size:21px;
+    font-weight:800;
 }
 
-.file-list {
-    margin-top: 18px;
-    text-align: left;
+.close-btn{
+    background:#171d25;
+    border:1px solid #303844;
+    color:#cdd3db;
+    font-size:20px;
+    width:36px;
+    height:36px;
+    border-radius:7px;
 }
 
-.file-item {
-    background: #1b222b;
-    border: 1px solid #2b3440;
-    border-radius: 7px;
-    padding: 10px 12px;
-    margin-bottom: 7px;
-    font-size: 12px;
-    color: #b9c1ca;
+.close-btn:hover{
+    background:#252c35;
+    color:white;
 }
 
-/* =========================
-   REVIEW
-========================= */
-
-.review-box {
-    background: #151b22;
-    border: 1px solid #303844;
-    border-radius: 10px;
-    padding: 18px;
-    margin-top: 15px;
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
 }
 
-.review-warning {
-    background: #282319;
-    border: 1px solid #594a2b;
-    color: #d8c47e;
-    border-radius: 8px;
-    padding: 13px;
-    font-size: 12px;
-    margin-bottom: 15px;
+.form-group{margin-bottom:17px}
+
+.form-group.full{
+    grid-column:1/-1;
 }
 
-/* =========================
-   MODAL
-========================= */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.72);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 100;
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:#cdd3db;
+    margin-bottom:7px;
 }
 
-.modal {
-    width: 100%;
-    max-width: 900px;
-    max-height: 92vh;
-    overflow-y: auto;
-    background: #11161d;
-    border: 1px solid #303844;
-    border-radius: 13px;
-    padding: 25px;
+.score-inputs{
+    display:grid;
+    grid-template-columns:1fr 45px 1fr;
+    gap:10px;
+    align-items:center;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+.score-inputs span{
+    text-align:center;
+    color:#7f8996;
 }
 
-.modal-title {
-    font-size: 21px;
-    font-weight: 800;
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:25px;
 }
 
-.close-btn {
-    background: transparent;
-    border: 0;
-    color: #7f8996;
-    font-size: 23px;
+.player-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:12px;
+    margin-top:18px;
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.player-card{
+    background:#171d25;
+    border:1px solid #252c35;
+    border-radius:10px;
+    padding:15px;
 }
 
-.form-group {
-    margin-bottom: 17px;
+.player-name{
+    font-weight:800;
+    font-size:16px;
 }
 
-.form-group.full {
-    grid-column: 1 / -1;
+.player-club{
+    color:#7f8996;
+    font-size:13px;
+    margin-top:5px;
 }
 
-.form-group label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: #cdd3db;
-    margin-bottom: 7px;
+/* CALENDAR */
+
+.calendar-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:18px;
 }
 
-.score-inputs {
-    display: grid;
-    grid-template-columns: 1fr 45px 1fr;
-    gap: 10px;
-    align-items: center;
+.calendar-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
 
-.score-inputs span {
-    text-align: center;
-    color: #7f8996;
+.calendar-match{
+    position:relative;
+    border:1px solid #303844;
+    border-radius:11px;
+    padding:17px;
+    cursor:pointer;
+    overflow:hidden;
+    transition:.15s;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 25px;
+.calendar-match:hover{
+    transform:translateY(-1px);
+    border-color:#5b6775;
 }
 
-/* =========================
-   PLAYERS
-========================= */
-
-.player-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
-    gap: 12px;
-    margin-top: 18px;
+.calendar-match.favorite{
+    border-color:#e0bd68;
 }
 
-.player-card {
-    background: #171d25;
-    border: 1px solid #252c35;
-    border-radius: 10px;
-    padding: 15px;
+.calendar-match.favorite:before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:4px;
+    background:#e0bd68;
 }
 
-.player-name {
-    font-weight: 800;
-    font-size: 16px;
+.calendar-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-.player-club {
-    color: #7f8996;
-    font-size: 13px;
-    margin-top: 5px;
+.calendar-date{
+    font-size:12px;
+    color:#cbd2da;
+    min-width:90px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+.calendar-competition{
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+}
 
-@media (max-width: 1000px) {
+.calendar-opponent{
+    margin-top:8px;
+    font-size:17px;
+    font-weight:800;
+}
 
-    .match-summary-grid {
-        grid-template-columns: repeat(3,1fr);
+.calendar-meta{
+    color:#8993a0;
+    font-size:12px;
+    margin-top:5px;
+}
+
+.favorite-btn{
+    margin-left:auto;
+    background:transparent;
+    border:0;
+    font-size:20px;
+    color:#68727e;
+}
+
+.favorite-btn.active{
+    color:#e0bd68;
+}
+
+.calendar-empty{
+    text-align:center;
+    padding:50px 20px;
+    color:#7f8996;
+}
+
+/* COMPETITION THEMES */
+
+.theme-premier{
+    background:
+        linear-gradient(135deg,rgba(25,60,110,.75),rgba(12,17,25,.95));
+}
+
+.theme-fa{
+    background:
+        linear-gradient(135deg,rgba(35,65,110,.75),rgba(12,17,25,.95));
+}
+
+.theme-carabao{
+    background:
+        linear-gradient(135deg,rgba(70,70,80,.75),rgba(12,17,25,.95));
+}
+
+.theme-champions{
+    background:
+        linear-gradient(135deg,rgba(32,35,95,.8),rgba(12,17,25,.95));
+}
+
+.theme-europa{
+    background:
+        linear-gradient(135deg,rgba(100,55,25,.8),rgba(12,17,25,.95));
+}
+
+.theme-conference{
+    background:
+        linear-gradient(135deg,rgba(30,90,65,.8),rgba(12,17,25,.95));
+}
+
+.theme-la-liga{
+    background:
+        linear-gradient(135deg,rgba(115,45,35,.8),rgba(12,17,25,.95));
+}
+
+.theme-bundesliga{
+    background:
+        linear-gradient(135deg,rgba(110,35,35,.8),rgba(12,17,25,.95));
+}
+
+.theme-seriea{
+    background:
+        linear-gradient(135deg,rgba(35,80,110,.8),rgba(12,17,25,.95));
+}
+
+.theme-ligue1{
+    background:
+        linear-gradient(135deg,rgba(45,45,85,.8),rgba(12,17,25,.95));
+}
+
+.theme-friendly{
+    background:
+        linear-gradient(135deg,rgba(60,70,60,.75),rgba(12,17,25,.95));
+}
+
+.theme-international{
+    background:
+        linear-gradient(135deg,rgba(25,90,75,.8),rgba(12,17,25,.95));
+}
+
+.theme-worldcup{
+    background:
+        linear-gradient(135deg,rgba(85,45,90,.85),rgba(12,17,25,.95));
+}
+
+.team-selector{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.selected-team{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    background:#171d25;
+    border:1px solid #303844;
+    border-radius:8px;
+}
+
+.selected-team button{
+    background:transparent;
+    border:0;
+    color:#d97886;
+    font-size:18px;
+}
+
+.season-team-search{
+    margin-top:10px;
+}
+
+.info-box{
+    background:#151b22;
+    border:1px solid #303844;
+    border-radius:9px;
+    padding:14px;
+    color:#8d97a3;
+    font-size:12px;
+    line-height:1.6;
+}
+
+@media(max-width:1000px){
+    .match-summary-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:750px){
+    .sidebar{
+        position:static;
+        width:100%;
+        height:auto;
+        border-right:0;
+        border-bottom:1px solid #252c35;
     }
 
-    .player-entry {
-        grid-template-columns: 1fr 80px 65px 65px;
+    .main{
+        margin-left:0;
+        padding:20px;
     }
 
-}
-
-@media (max-width: 750px) {
-
-    .sidebar {
-        position: static;
-        width: 100%;
-        height: auto;
-        border-right: 0;
-        border-bottom: 1px solid #252c35;
+    .match-row-main{
+        grid-template-columns:1fr 1fr;
     }
 
-    .main {
-        margin-left: 0;
-        padding: 20px;
-    }
-
-    .match-row-main {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .entry-choice-grid {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-@media (max-width: 600px) {
-
+    .entry-choice-grid,
     .type-buttons,
-    .form-grid {
-        grid-template-columns: 1fr;
+    .team-selector{
+        grid-template-columns:1fr;
     }
-
-    .form-group.full {
-        grid-column: auto;
-    }
-
-    .match-summary-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
 }
 
+@media(max-width:600px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+
+    .match-summary-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .player-entry{
+        grid-template-columns:1fr 75px 65px;
+    }
+}
 </style>
 </head>
-
 
 <body>
 
 <aside class="sidebar">
 
-    <div class="logo">
-        Career Mode <span>Hub</span>
-    </div>
+<div class="logo">
+Career Mode <span>Hub</span>
+</div>
 
-    <div class="nav-title">
-        Career
-    </div>
+<div class="nav-title">Career</div>
 
-    <button
-        class="nav-btn active"
-        data-page="dashboard"
-        onclick="showPage('dashboard')"
-    >
-        Dashboard
-    </button>
+<button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+Dashboard
+</button>
 
-    <div id="careerNavigation">
+<div id="careerNavigation">
 
-        <button class="nav-btn disabled" data-page="mycareer" onclick="showPage('mycareer')">
-            My Career
-        </button>
+<button class="nav-btn disabled" data-page="mycareer" onclick="showPage('mycareer')">
+My Career
+</button>
 
-        <button class="nav-btn disabled" data-page="matches" onclick="showPage('matches')">
-            Matches
-        </button>
+<button class="nav-btn disabled" data-page="calendar" onclick="showPage('calendar')">
+Calendar
+</button>
 
-        <button class="nav-btn disabled" data-page="squad" onclick="showPage('squad')">
-            Squad
-        </button>
+<button class="nav-btn disabled" data-page="matches" onclick="showPage('matches')">
+Matches
+</button>
 
-        <button class="nav-btn disabled" data-page="players" onclick="showPage('players')">
-            Players
-        </button>
+<button class="nav-btn disabled" data-page="squad" onclick="showPage('squad')">
+Squad
+</button>
 
-        <button class="nav-btn disabled" data-page="youth" onclick="showPage('youth')">
-            Youth Academy
-        </button>
+<button class="nav-btn disabled" data-page="players" onclick="showPage('players')">
+Players
+</button>
 
-        <button class="nav-btn disabled" data-page="transfers" onclick="showPage('transfers')">
-            Transfers
-        </button>
+<button class="nav-btn disabled" data-page="youth" onclick="showPage('youth')">
+Youth Academy
+</button>
 
-        <button class="nav-btn disabled" data-page="competitions" onclick="showPage('competitions')">
-            Competitions
-        </button>
+<button class="nav-btn disabled" data-page="transfers" onclick="showPage('transfers')">
+Transfers
+</button>
 
-        <button class="nav-btn disabled" data-page="league" onclick="showPage('league')">
-            League Centre
-        </button>
+<button class="nav-btn disabled" data-page="competitions" onclick="showPage('competitions')">
+Competitions
+</button>
 
-        <button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
-            Past Seasons
-        </button>
+<button class="nav-btn disabled" data-page="league" onclick="showPage('league')">
+League Centre
+</button>
 
-        <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
-            Trophy Cabinet
-        </button>
+<button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
+Past Seasons
+</button>
 
-        <button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
-            National Team
-        </button>
+<button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
+Trophy Cabinet
+</button>
 
-    </div>
+<button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
+National Team
+</button>
 
+</div>
 </aside>
 
-
 <main class="main">
-
-    <div id="pageContent"></div>
-
+<div id="pageContent"></div>
 </main>
 
-
 <div id="modalContainer"></div>
-
 
 <script>
 
 /* =========================================================
-   GLOBAL DATA
+   GLOBALS
 ========================================================= */
 
-let allPlayers = [];
+let allPlayers=[];
+let fc27Leagues=[];
+let fc27ClubsByLeague={};
 
-let fc27Leagues = [];
+let careers=[];
+let currentCareerId=null;
 
-let fc27ClubsByLeague = {};
+let setupClubType="original";
+let selectedLeague="";
+let selectedClub="";
+let selectedCountry="";
+let selectedContinent="";
 
-let careers = [];
+let manualPlayers=[];
+let selectedSeasonTeams=[];
 
-let currentCareerId = null;
-
-let setupClubType = "original";
-
-let selectedLeague = "";
-
-let selectedClub = "";
-
-let selectedCountry = "";
-
-let selectedContinent = "";
-
-let manualPlayers = [];
+let calendarUploadFiles=[];
 
 
 /* =========================================================
    STORAGE
 ========================================================= */
 
-function loadCareers() {
+function loadCareers(){
 
-    try {
+    try{
 
-        const saved =
-            localStorage.getItem(
-                "careerModeHubCareers"
-            );
+        const saved=localStorage.getItem("careerModeHubCareers");
 
-        if (saved) {
-
-            careers = JSON.parse(saved);
-
-            /*
-             * Compatibility:
-             * If an older career was created before
-             * matches/player data existed, make sure
-             * those arrays exist.
-             */
-
-            careers.forEach(career => {
-
-                if (!Array.isArray(career.matches)) {
-                    career.matches = [];
-                }
-
-                if (!Array.isArray(career.squad)) {
-                    career.squad = [];
-                }
-
-                if (!Array.isArray(career.transfers)) {
-                    career.transfers = [];
-                }
-
-                if (!Array.isArray(career.trophies)) {
-                    career.trophies = [];
-                }
-
-            });
-
+        if(saved){
+            careers=JSON.parse(saved);
         }
 
-    } catch(error) {
+        careers.forEach(c=>{
 
-        careers = [];
+            if(!Array.isArray(c.matches))
+                c.matches=[];
+
+            if(!Array.isArray(c.squad))
+                c.squad=[];
+
+            if(!Array.isArray(c.transfers))
+                c.transfers=[];
+
+            if(!Array.isArray(c.trophies))
+                c.trophies=[];
+
+            if(!Array.isArray(c.calendar))
+                c.calendar=[];
+
+            if(!Array.isArray(c.seasons))
+                c.seasons=[];
+
+            if(!c.currentSeason)
+                c.currentSeason="2026/27";
+
+            if(!c.seasonNumber)
+                c.seasonNumber=1;
+
+        });
+
+    }catch(e){
+
+        careers=[];
 
     }
-
 }
 
 
-function saveCareers() {
+function saveCareers(){
 
     localStorage.setItem(
         "careerModeHubCareers",
         JSON.stringify(careers)
     );
-
 }
 
 
-/* =========================================================
-   CURRENT CAREER
-========================================================= */
-
-function getCurrentCareer() {
+function getCurrentCareer(){
 
     return careers.find(
-        career =>
-            career.id === currentCareerId
+        c=>c.id===currentCareerId
     );
-
 }
 
 
@@ -1064,123 +1111,75 @@ function getCurrentCareer() {
    NAVIGATION
 ========================================================= */
 
-function showPage(page) {
+function showPage(page){
 
-    if (
-        page !== "dashboard" &&
-        !currentCareerId
-    ) {
+    if(page!=="dashboard" && !currentCareerId){
 
         renderDashboard();
-
         return;
 
     }
 
+    document.querySelectorAll(".nav-btn").forEach(btn=>{
 
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(button => {
+        btn.classList.remove("active");
 
-            button.classList.remove("active");
+        if(btn.dataset.page===page)
+            btn.classList.add("active");
 
-            if (
-                button.dataset.page === page
-            ) {
+    });
 
-                button.classList.add("active");
-
-            }
-
-        });
-
-
-    if (page === "dashboard") {
-
+    if(page==="dashboard")
         renderDashboard();
 
-    }
-
-    else if (page === "mycareer") {
-
+    else if(page==="mycareer")
         renderCareerHome();
 
-    }
+    else if(page==="calendar")
+        renderCalendar();
 
-    else if (page === "matches") {
-
+    else if(page==="matches")
         renderMatches();
 
-    }
-
-    else if (page === "players") {
-
+    else if(page==="players")
         renderPlayers();
 
-    }
-
-    else {
-
+    else
         renderPlaceholder(
             pageTitle(page),
             "This section will be built next."
         );
-
-    }
-
 }
 
 
-function pageTitle(page) {
+function pageTitle(page){
 
-    const titles = {
-
-        squad: "Squad",
-        youth: "Youth Academy",
-        transfers: "Transfers",
-        competitions: "Competitions",
-        league: "League Centre",
-        past: "Past Seasons",
-        trophies: "Trophy Cabinet",
-        national: "National Team"
-
+    const titles={
+        squad:"Squad",
+        youth:"Youth Academy",
+        transfers:"Transfers",
+        competitions:"Competitions",
+        league:"League Centre",
+        past:"Past Seasons",
+        trophies:"Trophy Cabinet",
+        national:"National Team"
     };
 
-    return titles[page] || page;
-
+    return titles[page]||page;
 }
 
 
-/* =========================================================
-   NAVIGATION STATE
-========================================================= */
+function updateNavigation(){
 
-function updateNavigation() {
+    document.querySelectorAll("#careerNavigation .nav-btn")
+    .forEach(btn=>{
 
-    document
-        .querySelectorAll(
-            "#careerNavigation .nav-btn"
-        )
-        .forEach(button => {
+        if(currentCareerId)
+            btn.classList.remove("disabled");
+        else
+            btn.classList.add("disabled");
 
-            if (currentCareerId) {
-
-                button.classList.remove(
-                    "disabled"
-                );
-
-            }
-
-            else {
-
-                button.classList.add(
-                    "disabled"
-                );
-
-            }
-
-        });
-
+    });
 }
 
 
@@ -1188,190 +1187,135 @@ function updateNavigation() {
    DASHBOARD
 ========================================================= */
 
-function renderDashboard() {
+function renderDashboard(){
 
-    currentCareerId = null;
+    currentCareerId=null;
 
     updateNavigation();
 
+    document.getElementById("pageContent").innerHTML=`
 
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
+<div class="topbar">
 
-        <div class="topbar">
+<div>
+<div class="page-title">Dashboard</div>
+<div class="page-subtitle">
+Choose a career mode or create a new one.
+</div>
+</div>
 
-            <div>
+<button class="primary-btn" onclick="startNewCareer()">
++ New Career
+</button>
 
-                <div class="page-title">
-                    Dashboard
-                </div>
+</div>
 
-                <div class="page-subtitle">
-                    Choose a career mode or create a new one.
-                </div>
+<div style="margin-bottom:22px">
+<div class="panel-title">Your Careers</div>
+<div class="panel-subtitle">
+Run multiple career modes at the same time.
+</div>
+</div>
 
-            </div>
+${
+careers.length===0
 
+?
 
-            <button
-                class="primary-btn"
-                onclick="startNewCareer()"
-            >
-                + New Career
-            </button>
+`
 
-        </div>
+<div class="empty-state">
 
+<h2>No careers yet</h2>
 
-        <div style="margin-bottom:22px">
+<p>
+Create your first Career Mode save to get started.
+</p>
 
-            <div class="panel-title">
-                Your Careers
-            </div>
+<button class="primary-btn" onclick="startNewCareer()">
+Create Career
+</button>
 
-            <div class="panel-subtitle">
-                Run multiple career modes at the same time.
-            </div>
+</div>
 
-        </div>
+`
 
+:
 
-        ${
-            careers.length === 0
+`
 
-            ?
+<div class="careers-grid">
+${careers.map(createCareerCard).join("")}
+</div>
 
-            `
-
-            <div class="empty-state">
-
-                <h2>
-                    No careers yet
-                </h2>
-
-                <p>
-                    Create your first Career Mode save to get started.
-                </p>
-
-                <button
-                    class="primary-btn"
-                    onclick="startNewCareer()"
-                >
-                    Create Career
-                </button>
-
-            </div>
-
-            `
-
-            :
-
-            `
-
-            <div class="careers-grid">
-
-                ${careers
-                    .map(createCareerCard)
-                    .join("")}
-
-            </div>
-
-            `
-
-        }
-
-    `;
+`
 
 }
 
+`;
+}
 
-function createCareerCard(career) {
+
+function createCareerCard(career){
 
     return `
 
-        <div class="career-card">
+<div class="career-card">
 
-            <div class="career-name">
-                ${escapeHTML(career.managerName)}
-            </div>
+<div class="career-name">
+${escapeHTML(career.managerName)}
+</div>
 
-            <div class="career-club">
-                ${escapeHTML(career.clubName)}
-            </div>
+<div class="career-club">
+${escapeHTML(career.clubName)}
+</div>
 
-            <div class="career-league">
-                ${escapeHTML(career.league)}
-            </div>
+<div class="career-league">
+${escapeHTML(career.league)}
+</div>
 
+<div class="career-season">
+<span>Current Year</span>
+<span class="season-value">
+${escapeHTML(career.currentSeason)}
+</span>
+</div>
 
-            <div class="career-season">
+<div class="career-season">
+<span>Matches</span>
+<span class="season-value">
+${career.matches.length}
+</span>
+</div>
 
-                <span>
-                    Current Year
-                </span>
+<div class="career-season">
+<span>Calendar</span>
+<span class="season-value">
+${career.calendar.length}
+</span>
+</div>
 
-                <span class="season-value">
-                    ${escapeHTML(career.currentSeason)}
-                </span>
+<div class="career-actions">
 
-            </div>
+<button
+class="primary-btn"
+onclick="enterCareer('${escapeJS(career.id)}')"
+>
+Enter Career
+</button>
 
+<button
+class="delete-btn"
+onclick="deleteCareer('${escapeJS(career.id)}',event)"
+>
+Delete
+</button>
 
-            <div class="career-season">
+</div>
 
-                <span>
-                    Matches
-                </span>
+</div>
 
-                <span class="season-value">
-                    ${career.matches.length}
-                </span>
-
-            </div>
-
-
-            <div class="career-season">
-
-                <span>
-                    National Team
-                </span>
-
-                <span class="season-value">
-                    ${
-                        career.nationalTeam
-                        ? escapeHTML(
-                            career.nationalTeam
-                        )
-                        : "None"
-                    }
-                </span>
-
-            </div>
-
-
-            <div class="career-actions">
-
-                <button
-                    class="primary-btn"
-                    onclick="enterCareer('${escapeJS(career.id)}')"
-                >
-                    Enter Career
-                </button>
-
-                <button
-                    class="delete-btn"
-                    onclick="deleteCareer('${escapeJS(career.id)}',event)"
-                >
-                    Delete
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
+`;
 }
 
 
@@ -1379,812 +1323,561 @@ function createCareerCard(career) {
    CAREER SETUP
 ========================================================= */
 
-function startNewCareer() {
+function startNewCareer(){
 
-    setupClubType = "original";
-
-    selectedLeague = "";
-
-    selectedClub = "";
-
-    selectedCountry = "";
-
-    selectedContinent = "";
+    setupClubType="original";
+    selectedLeague="";
+    selectedClub="";
+    selectedCountry="";
+    selectedContinent="";
 
     renderCareerSetup();
-
 }
 
 
-function renderCareerSetup() {
+function renderCareerSetup(){
 
-    currentCareerId = null;
+    currentCareerId=null;
 
     updateNavigation();
 
+    document.getElementById("pageContent").innerHTML=`
 
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
+<div class="topbar">
 
-        <div class="topbar">
+<div>
+<div class="page-title">Create Career</div>
+<div class="page-subtitle">
+Set up your new Career Mode save.
+</div>
+</div>
 
-            <div>
+</div>
 
-                <div class="page-title">
-                    Create Career
-                </div>
+<div class="setup-wrapper">
 
-                <div class="page-subtitle">
-                    Set up your new Career Mode save.
-                </div>
+<div class="setup-panel">
 
-            </div>
+<div class="setup-section">
 
-        </div>
+<label class="setup-label">
+Manager Name
+</label>
 
+<input
+id="managerName"
+class="form-input"
+placeholder="Enter manager name"
+>
 
-        <div class="setup-wrapper">
+</div>
 
-            <div class="setup-panel">
 
+<div class="setup-section">
 
-                <div class="setup-section">
+<label class="setup-label">
+Club
+</label>
 
-                    <label class="setup-label">
-                        Manager Name
-                    </label>
+<div class="type-buttons">
 
-                    <input
-                        id="managerName"
-                        class="form-input"
-                        placeholder="Enter manager name"
-                    >
+<button
+id="originalClubButton"
+class="type-btn selected"
+onclick="selectClubType('original')"
+>
 
-                </div>
+<strong>Original Club</strong>
 
+<span>
+Manage an existing FC 27 club.
+</span>
 
-                <div class="setup-section">
+</button>
 
-                    <label class="setup-label">
-                        Club
-                    </label>
+<button
+id="createClubButton"
+class="type-btn"
+onclick="selectClubType('create')"
+>
 
-                    <div class="type-buttons">
+<strong>Create a Club</strong>
 
-                        <button
-                            id="originalClubButton"
-                            class="type-btn selected"
-                            onclick="selectClubType('original')"
-                        >
+<span>
+Create your own custom club.
+</span>
 
-                            <strong>
-                                Original Club
-                            </strong>
+</button>
 
-                            <span>
-                                Manage an existing FC 27 club.
-                            </span>
+</div>
 
-                        </button>
+</div>
 
 
-                        <button
-                            id="createClubButton"
-                            class="type-btn"
-                            onclick="selectClubType('create')"
-                        >
+<div class="setup-section">
 
-                            <strong>
-                                Create a Club
-                            </strong>
+<label class="setup-label">
+League
+</label>
 
-                            <span>
-                                Create your own custom club.
-                            </span>
+<div class="search-select">
 
-                        </button>
+<input
+id="leagueSearch"
+class="search-input"
+placeholder="Search FC 27 leagues..."
+autocomplete="off"
+oninput="searchLeague(this.value)"
+onclick="openLeagueResults()"
+>
 
-                    </div>
+<div id="leagueResults" class="search-results"></div>
 
-                </div>
+</div>
 
+</div>
 
-                <div class="setup-section">
 
-                    <label class="setup-label">
-                        League
-                    </label>
+<div id="clubSection" class="setup-section">
 
-                    <div class="search-select">
+<label class="setup-label">
+Club
+</label>
 
-                        <input
-                            id="leagueSearch"
-                            class="search-input"
-                            placeholder="Search FC 27 leagues..."
-                            autocomplete="off"
-                            oninput="searchLeague(this.value)"
-                            onclick="openLeagueResults()"
-                        >
+<div class="search-select">
 
-                        <div
-                            id="leagueResults"
-                            class="search-results"
-                        ></div>
+<input
+id="clubSearch"
+class="search-input"
+placeholder="Select a league first..."
+autocomplete="off"
+disabled
+oninput="searchClub(this.value)"
+onclick="openClubResults()"
+>
 
-                    </div>
+<div id="clubResults" class="search-results"></div>
 
-                </div>
+</div>
 
+</div>
 
-                <div
-                    id="clubSection"
-                    class="setup-section"
-                >
 
-                    <label class="setup-label">
-                        Club
-                    </label>
+<div id="customClubSection"
+class="setup-section"
+style="display:none">
 
-                    <div class="search-select">
+<label class="setup-label">
+Custom Club Name
+</label>
 
-                        <input
-                            id="clubSearch"
-                            class="search-input"
-                            placeholder="Select a league first..."
-                            autocomplete="off"
-                            disabled
-                            oninput="searchClub(this.value)"
-                            onclick="openClubResults()"
-                        >
+<input
+id="customClubName"
+class="form-input"
+placeholder="Enter your club name"
+>
 
-                        <div
-                            id="clubResults"
-                            class="search-results"
-                        ></div>
+</div>
 
-                    </div>
 
-                </div>
+<div class="setup-section">
 
+<label class="setup-label">
+Starting Season
+</label>
 
-                <div
-                    id="customClubSection"
-                    class="setup-section"
-                    style="display:none"
-                >
+<input
+class="form-input"
+value="2026/27"
+disabled
+>
 
-                    <label class="setup-label">
-                        Custom Club Name
-                    </label>
+</div>
 
-                    <input
-                        id="customClubName"
-                        class="form-input"
-                        placeholder="Enter your club name"
-                    >
 
-                </div>
+<div class="setup-section">
 
+<label class="setup-label">
+National Team
+</label>
 
-                <div class="setup-section">
+<select
+id="nationalTeamChoice"
+class="form-select"
+onchange="toggleNationalTeam(this.value)"
+>
 
-                    <label class="setup-label">
-                        Starting Season
-                    </label>
+<option value="none">
+No National Team
+</option>
 
-                    <input
-                        class="form-input"
-                        value="2026/27"
-                        disabled
-                    >
+<option value="add">
+Add National Team
+</option>
 
-                </div>
+</select>
 
+</div>
 
-                <div class="setup-section">
 
-                    <label class="setup-label">
-                        National Team
-                    </label>
+<div
+id="continentSection"
+class="setup-section"
+style="display:none"
+>
 
-                    <select
-                        id="nationalTeamChoice"
-                        class="form-select"
-                        onchange="toggleNationalTeam(this.value)"
-                    >
+<label class="setup-label">
+Continent
+</label>
 
-                        <option value="none">
-                            No National Team
-                        </option>
+<select
+id="continentSelect"
+class="form-select"
+onchange="selectContinent(this.value)"
+>
 
-                        <option value="add">
-                            Add National Team
-                        </option>
+<option value="">
+Select continent
+</option>
 
-                    </select>
+<option value="Europe">Europe</option>
+<option value="Asia">Asia</option>
+<option value="Africa">Africa</option>
+<option value="NorthAmerica">North America</option>
+<option value="SouthAmerica">South America</option>
+<option value="Oceania">Oceania</option>
 
-                </div>
+</select>
 
+</div>
 
-                <div
-                    id="continentSection"
-                    class="setup-section"
-                    style="display:none"
-                >
 
-                    <label class="setup-label">
-                        Continent
-                    </label>
+<div
+id="countrySection"
+class="setup-section"
+style="display:none"
+>
 
-                    <select
-                        id="continentSelect"
-                        class="form-select"
-                        onchange="selectContinent(this.value)"
-                    >
+<label class="setup-label">
+Country
+</label>
 
-                        <option value="">
-                            Select continent
-                        </option>
+<div class="search-select">
 
-                        <option value="Europe">
-                            Europe
-                        </option>
+<input
+id="countrySearch"
+class="search-input"
+placeholder="Select a continent first..."
+disabled
+autocomplete="off"
+oninput="searchCountry(this.value)"
+onclick="openCountryResults()"
+>
 
-                        <option value="Asia">
-                            Asia
-                        </option>
+<div id="countryResults" class="search-results"></div>
 
-                        <option value="Africa">
-                            Africa
-                        </option>
+</div>
 
-                        <option value="NorthAmerica">
-                            North America
-                        </option>
+</div>
 
-                        <option value="SouthAmerica">
-                            South America
-                        </option>
 
-                        <option value="Oceania">
-                            Oceania
-                        </option>
+<div style="
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-top:25px;
+">
 
-                    </select>
+<button
+class="secondary-btn"
+onclick="showPage('dashboard')"
+>
+Cancel
+</button>
 
-                </div>
+<button
+class="primary-btn"
+onclick="createCareer()"
+>
+Start Career
+</button>
 
+</div>
 
-                <div
-                    id="countrySection"
-                    class="setup-section"
-                    style="display:none"
-                >
-
-                    <label class="setup-label">
-                        Country
-                    </label>
-
-                    <div class="search-select">
-
-                        <input
-                            id="countrySearch"
-                            class="search-input"
-                            placeholder="Select a continent first..."
-                            disabled
-                            autocomplete="off"
-                            oninput="searchCountry(this.value)"
-                            onclick="openCountryResults()"
-                        >
-
-                        <div
-                            id="countryResults"
-                            class="search-results"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="setup-actions">
-
-                    <button
-                        class="secondary-btn"
-                        onclick="showPage('dashboard')"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        class="primary-btn"
-                        onclick="createCareer()"
-                    >
-                        Start Career
-                    </button>
-
-                </div>
-
-
-            </div>
-
-        </div>
-
-    `;
-
+</div>
+</div>
+`;
 }
 
 
-/* =========================================================
-   CLUB TYPE
-========================================================= */
+function selectClubType(type){
 
-function selectClubType(type) {
+    setupClubType=type;
 
-    setupClubType = type;
+    const original=document.getElementById("originalClubButton");
+    const create=document.getElementById("createClubButton");
 
+    const clubSection=document.getElementById("clubSection");
+    const custom=document.getElementById("customClubSection");
 
-    const original =
-        document.getElementById(
-            "originalClubButton"
-        );
-
-    const create =
-        document.getElementById(
-            "createClubButton"
-        );
-
-    const clubSection =
-        document.getElementById(
-            "clubSection"
-        );
-
-    const customSection =
-        document.getElementById(
-            "customClubSection"
-        );
-
-
-    if (type === "original") {
+    if(type==="original"){
 
         original.classList.add("selected");
-
         create.classList.remove("selected");
 
-        clubSection.style.display = "block";
+        clubSection.style.display="block";
+        custom.style.display="none";
 
-        customSection.style.display = "none";
-
-    }
-
-    else {
+    }else{
 
         original.classList.remove("selected");
-
         create.classList.add("selected");
 
-        clubSection.style.display = "none";
-
-        customSection.style.display = "block";
-
+        clubSection.style.display="none";
+        custom.style.display="block";
     }
-
 }
 
 
 /* =========================================================
-   LEAGUE SEARCH
+   LEAGUE / CLUB SEARCH
 ========================================================= */
 
-function openLeagueResults() {
+function openLeagueResults(){
 
-    searchLeague(
-        document.getElementById(
-            "leagueSearch"
-        ).value
-    );
-
+    const input=document.getElementById("leagueSearch");
+    if(input) searchLeague(input.value);
 }
 
 
-function searchLeague(query) {
+function searchLeague(query){
 
-    const results =
-        document.getElementById(
-            "leagueResults"
-        );
+    const results=document.getElementById("leagueResults");
+    if(!results)return;
 
-    if (!results) return;
+    const q=(query||"").toLowerCase();
 
+    const matches=fc27Leagues
+        .filter(x=>x.toLowerCase().includes(q))
+        .slice(0,100);
 
-    const q =
-        query
-            .trim()
-            .toLowerCase();
+    results.innerHTML=matches.length
+    ?
+    matches.map(x=>`
 
+<div
+class="search-option"
+onclick="chooseLeague('${escapeJS(x)}')"
+>
+${escapeHTML(x)}
+</div>
 
-    const matches =
-        fc27Leagues
-            .filter(
-                league =>
-                    league
-                        .toLowerCase()
-                        .includes(q)
-            )
-            .slice(0,80);
-
-
-    results.innerHTML =
-        matches.length
-
-        ?
-
-        matches
-            .map(
-                league => `
-
-                    <div
-                        class="search-option"
-                        onclick="chooseLeague('${escapeJS(league)}')"
-                    >
-                        ${escapeHTML(league)}
-                    </div>
-
-                `
-            )
-            .join("")
-
-        :
-
-        `
-            <div class="search-option">
-                No FC 27 leagues found.
-            </div>
-        `;
-
+`).join("")
+    :
+    `<div class="search-option">No leagues found.</div>`;
 
     results.classList.add("open");
-
 }
 
 
-function chooseLeague(league) {
+function chooseLeague(league){
 
-    selectedLeague = league;
+    selectedLeague=league;
+    selectedClub="";
 
-    selectedClub = "";
+    document.getElementById("leagueSearch").value=league;
 
+    document.getElementById("leagueResults")
+        .classList.remove("open");
 
-    document.getElementById(
-        "leagueSearch"
-    ).value = league;
+    const club=document.getElementById("clubSearch");
 
-
-    document.getElementById(
-        "leagueResults"
-    ).classList.remove("open");
-
-
-    const clubInput =
-        document.getElementById(
-            "clubSearch"
-        );
-
-
-    clubInput.disabled = false;
-
-    clubInput.value = "";
-
-    clubInput.placeholder =
-        "Search clubs in this league...";
-
+    club.disabled=false;
+    club.value="";
+    club.placeholder="Search clubs in this league...";
 }
 
 
-/* =========================================================
-   CLUB SEARCH
-========================================================= */
+function openClubResults(){
 
-function openClubResults() {
+    if(!selectedLeague)return;
 
-    if (!selectedLeague) return;
-
-    searchClub(
-        document.getElementById(
-            "clubSearch"
-        ).value
-    );
-
+    const input=document.getElementById("clubSearch");
+    searchClub(input.value);
 }
 
 
-function searchClub(query) {
+function searchClub(query){
 
-    if (!selectedLeague) return;
+    if(!selectedLeague)return;
 
+    const results=document.getElementById("clubResults");
 
-    const results =
-        document.getElementById(
-            "clubResults"
-        );
+    const clubs=fc27ClubsByLeague[selectedLeague]||[];
 
+    const q=(query||"").toLowerCase();
 
-    const clubs =
-        fc27ClubsByLeague[
-            selectedLeague
-        ] || [];
+    const matches=clubs
+        .filter(x=>x.toLowerCase().includes(q))
+        .slice(0,100);
 
+    results.innerHTML=matches.length
+    ?
+    matches.map(x=>`
 
-    const q =
-        query
-            .trim()
-            .toLowerCase();
+<div
+class="search-option"
+onclick="chooseClub('${escapeJS(x)}')"
+>
+${escapeHTML(x)}
+</div>
 
-
-    const matches =
-        clubs
-            .filter(
-                club =>
-                    club
-                        .toLowerCase()
-                        .includes(q)
-            )
-            .slice(0,100);
-
-
-    results.innerHTML =
-        matches.length
-
-        ?
-
-        matches
-            .map(
-                club => `
-
-                    <div
-                        class="search-option"
-                        onclick="chooseClub('${escapeJS(club)}')"
-                    >
-                        ${escapeHTML(club)}
-                    </div>
-
-                `
-            )
-            .join("")
-
-        :
-
-        `
-            <div class="search-option">
-                No clubs found.
-            </div>
-        `;
-
+`).join("")
+    :
+    `<div class="search-option">No clubs found.</div>`;
 
     results.classList.add("open");
-
 }
 
 
-function chooseClub(club) {
+function chooseClub(club){
 
-    selectedClub = club;
+    selectedClub=club;
 
+    document.getElementById("clubSearch").value=club;
 
-    document.getElementById(
-        "clubSearch"
-    ).value = club;
-
-
-    document.getElementById(
-        "clubResults"
-    ).classList.remove("open");
-
+    document.getElementById("clubResults")
+        .classList.remove("open");
 }
 
 
 /* =========================================================
-   NATIONAL TEAM
+   NATIONAL TEAMS
 ========================================================= */
 
-const countriesByContinent = {
+const countriesByContinent={
 
-    Europe: [
-        "Albania","Andorra","Austria","Belgium",
-        "Bosnia and Herzegovina","Bulgaria","Croatia",
-        "Cyprus","Czech Republic","Denmark","England",
-        "Finland","France","Germany","Greece","Hungary",
-        "Iceland","Ireland","Italy","Kosovo","Netherlands",
-        "Northern Ireland","Norway","Poland","Portugal",
-        "Republic of Ireland","Romania","Scotland","Serbia",
-        "Slovakia","Slovenia","Spain","Sweden","Switzerland",
-        "Turkey","Ukraine","Wales"
-    ],
+Europe:[
+"Albania","Andorra","Austria","Belgium",
+"Bosnia and Herzegovina","Bulgaria","Croatia",
+"Cyprus","Czech Republic","Denmark","England",
+"Finland","France","Germany","Greece","Hungary",
+"Iceland","Ireland","Italy","Kosovo","Netherlands",
+"Northern Ireland","Norway","Poland","Portugal",
+"Republic of Ireland","Romania","Scotland","Serbia",
+"Slovakia","Slovenia","Spain","Sweden","Switzerland",
+"Turkey","Ukraine","Wales"
+],
 
-    Asia: [
-        "China PR","India","Indonesia","Iran","Iraq",
-        "Japan","Korea Republic","Malaysia",
-        "Saudi Arabia","Thailand","United Arab Emirates"
-    ],
+Asia:[
+"China PR","India","Indonesia","Iran","Iraq",
+"Japan","Korea Republic","Malaysia",
+"Saudi Arabia","Thailand","United Arab Emirates"
+],
 
-    Africa: [
-        "Algeria","Cameroon","Egypt","Ghana","Ivory Coast",
-        "Mali","Morocco","Nigeria","Senegal","South Africa",
-        "Tunisia"
-    ],
+Africa:[
+"Algeria","Cameroon","Egypt","Ghana","Ivory Coast",
+"Mali","Morocco","Nigeria","Senegal","South Africa",
+"Tunisia"
+],
 
-    NorthAmerica: [
-        "Canada","Costa Rica","Honduras","Jamaica",
-        "Mexico","Panama","United States"
-    ],
+NorthAmerica:[
+"Canada","Costa Rica","Honduras","Jamaica",
+"Mexico","Panama","United States"
+],
 
-    SouthAmerica: [
-        "Argentina","Bolivia","Brazil","Chile","Colombia",
-        "Ecuador","Paraguay","Peru","Uruguay","Venezuela"
-    ],
+SouthAmerica:[
+"Argentina","Bolivia","Brazil","Chile","Colombia",
+"Ecuador","Paraguay","Peru","Uruguay","Venezuela"
+],
 
-    Oceania: [
-        "Australia","New Zealand"
-    ]
+Oceania:[
+"Australia","New Zealand"
+]
 
 };
 
 
-function toggleNationalTeam(value) {
+function toggleNationalTeam(value){
 
-    const continent =
-        document.getElementById(
-            "continentSection"
-        );
+    const continent=document.getElementById("continentSection");
+    const country=document.getElementById("countrySection");
 
-    const country =
-        document.getElementById(
-            "countrySection"
-        );
-
-
-    if (value === "add") {
-
-        continent.style.display = "block";
-
+    if(value==="add"){
+        continent.style.display="block";
+    }else{
+        continent.style.display="none";
+        country.style.display="none";
+        selectedContinent="";
+        selectedCountry="";
     }
-
-    else {
-
-        continent.style.display = "none";
-
-        country.style.display = "none";
-
-        selectedContinent = "";
-
-        selectedCountry = "";
-
-    }
-
 }
 
 
-function selectContinent(value) {
+function selectContinent(value){
 
-    selectedContinent = value;
+    selectedContinent=value;
+    selectedCountry="";
 
-    selectedCountry = "";
+    const section=document.getElementById("countrySection");
+    const input=document.getElementById("countrySearch");
 
-
-    const section =
-        document.getElementById(
-            "countrySection"
-        );
-
-    const input =
-        document.getElementById(
-            "countrySearch"
-        );
-
-
-    if (!value) {
-
-        section.style.display = "none";
-
+    if(!value){
+        section.style.display="none";
         return;
-
     }
 
-
-    section.style.display = "block";
-
-    input.disabled = false;
-
-    input.value = "";
-
-    input.placeholder =
-        "Search country...";
-
+    section.style.display="block";
+    input.disabled=false;
+    input.value="";
 }
 
 
-function openCountryResults() {
+function openCountryResults(){
 
-    if (!selectedContinent) return;
+    if(!selectedContinent)return;
 
     searchCountry(
-        document.getElementById(
-            "countrySearch"
-        ).value
+        document.getElementById("countrySearch").value
+    );
+}
+
+
+function searchCountry(query){
+
+    const results=document.getElementById("countryResults");
+
+    const countries=countriesByContinent[selectedContinent]||[];
+
+    const q=(query||"").toLowerCase();
+
+    const matches=countries.filter(
+        x=>x.toLowerCase().includes(q)
     );
 
-}
+    results.innerHTML=matches.map(x=>`
 
+<div
+class="search-option"
+onclick="chooseCountry('${escapeJS(x)}')"
+>
+${escapeHTML(x)}
+</div>
 
-function searchCountry(query) {
-
-    if (!selectedContinent) return;
-
-
-    const results =
-        document.getElementById(
-            "countryResults"
-        );
-
-
-    const countries =
-        countriesByContinent[
-            selectedContinent
-        ] || [];
-
-
-    const q =
-        query
-            .trim()
-            .toLowerCase();
-
-
-    const matches =
-        countries.filter(
-            country =>
-                country
-                    .toLowerCase()
-                    .includes(q)
-        );
-
-
-    results.innerHTML =
-        matches
-            .map(
-                country => `
-
-                    <div
-                        class="search-option"
-                        onclick="chooseCountry('${escapeJS(country)}')"
-                    >
-                        ${escapeHTML(country)}
-                    </div>
-
-                `
-            )
-            .join("");
-
+`).join("");
 
     results.classList.add("open");
-
 }
 
 
-function chooseCountry(country) {
+function chooseCountry(country){
 
-    selectedCountry = country;
+    selectedCountry=country;
 
+    document.getElementById("countrySearch").value=country;
 
-    document.getElementById(
-        "countrySearch"
-    ).value = country;
-
-
-    document.getElementById(
-        "countryResults"
-    ).classList.remove("open");
-
+    document.getElementById("countryResults")
+        .classList.remove("open");
 }
 
 
@@ -2192,153 +1885,97 @@ function chooseCountry(country) {
    CREATE CAREER
 ========================================================= */
 
-function createCareer() {
+function createCareer(){
 
-    const manager =
-        document.getElementById(
-            "managerName"
-        ).value.trim();
+    const manager=document.getElementById("managerName").value.trim();
 
-
-    if (!manager) {
-
-        alert(
-            "Please enter a manager name."
-        );
-
+    if(!manager){
+        alert("Please enter a manager name.");
         return;
-
     }
 
-
-    if (!selectedLeague) {
-
-        alert(
-            "Please select a league."
-        );
-
+    if(!selectedLeague){
+        alert("Please select a league.");
         return;
-
     }
 
+    let club="";
 
-    let club = "";
+    if(setupClubType==="original"){
 
-
-    if (setupClubType === "original") {
-
-        if (!selectedClub) {
-
-            alert(
-                "Please select a club."
-            );
-
+        if(!selectedClub){
+            alert("Please select a club.");
             return;
-
         }
 
-        club = selectedClub;
+        club=selectedClub;
 
-    }
+    }else{
 
-    else {
+        club=document.getElementById("customClubName").value.trim();
 
-        club =
-            document.getElementById(
-                "customClubName"
-            ).value.trim();
-
-
-        if (!club) {
-
-            alert(
-                "Please enter your custom club name."
-            );
-
+        if(!club){
+            alert("Please enter your custom club name.");
             return;
-
         }
-
     }
 
+    const nationalChoice=
+        document.getElementById("nationalTeamChoice").value;
 
-    const nationalChoice =
-        document.getElementById(
-            "nationalTeamChoice"
-        ).value;
-
-
-    if (
-        nationalChoice === "add" &&
-        !selectedCountry
-    ) {
-
-        alert(
-            "Please select a national team."
-        );
-
+    if(nationalChoice==="add"&&!selectedCountry){
+        alert("Please select a national team.");
         return;
-
     }
 
+    const career={
 
-    const career = {
+        id:createId(),
 
-        id:
-            Date.now().toString() +
-            Math.random()
-                .toString(36)
-                .substring(2),
+        managerName:manager,
 
-        managerName:
-            manager,
+        clubType:setupClubType,
 
-        clubType:
-            setupClubType,
+        clubName:club,
 
-        clubName:
-            club,
+        league:selectedLeague,
 
-        league:
-            selectedLeague,
+        currentSeason:"2026/27",
 
-        currentSeason:
-            "2026/27",
-
-        seasonNumber:
-            1,
+        seasonNumber:1,
 
         nationalTeam:
-            nationalChoice === "add"
-            ? selectedCountry
-            : null,
+            nationalChoice==="add"
+            ?selectedCountry
+            :null,
 
         continent:
-            nationalChoice === "add"
-            ? selectedContinent
-            : null,
+            nationalChoice==="add"
+            ?selectedContinent
+            :null,
 
-        leagueHistory: [
-            {
-                season: "2026/27",
-                league: selectedLeague
-            }
-        ],
+        matches:[],
+        calendar:[],
+        transfers:[],
+        trophies:[],
+        squad:[],
+        youthAcademy:[],
 
-        seasonHistory: [],
+        seasons:[{
 
-        matches: [],
+            season:"2026/27",
 
-        transfers: [],
+            league:selectedLeague,
 
-        trophies: [],
+            leagueTeams:[],
 
-        squad: [],
+            competitions:[],
 
-        youthAcademy: []
+            calendarUploaded:false
+
+        }]
 
     };
-
 
     careers.push(career);
 
@@ -2346,6 +1983,14 @@ function createCareer() {
 
     enterCareer(career.id);
 
+    /*
+     * Immediately ask which teams are in the league.
+     */
+
+    setTimeout(
+        ()=>openSeasonSetup(true),
+        100
+    );
 }
 
 
@@ -2353,14 +1998,13 @@ function createCareer() {
    ENTER CAREER
 ========================================================= */
 
-function enterCareer(id) {
+function enterCareer(id){
 
-    currentCareerId = id;
+    currentCareerId=id;
 
     updateNavigation();
 
     renderCareerHome();
-
 }
 
 
@@ -2368,127 +2012,138 @@ function enterCareer(id) {
    CAREER HOME
 ========================================================= */
 
-function renderCareerHome() {
+function renderCareerHome(){
 
-    const career =
-        getCurrentCareer();
+    const career=getCurrentCareer();
 
-
-    if (!career) {
-
+    if(!career){
         renderDashboard();
-
         return;
-
     }
 
+    document.getElementById("pageContent").innerHTML=`
 
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
+${careerBanner(career)}
 
-        ${careerBanner(career)}
+<div class="topbar">
 
+<div>
+<div class="page-title">My Career</div>
+<div class="page-subtitle">
+${escapeHTML(career.clubName)}
+•
+${escapeHTML(career.currentSeason)}
+</div>
+</div>
 
-        <div class="topbar">
+<div style="display:flex;gap:8px">
 
-            <div>
+<button
+class="secondary-btn"
+onclick="openSeasonSetup(false)"
+>
+Season Setup
+</button>
 
-                <div class="page-title">
-                    My Career
-                </div>
+<button
+class="primary-btn"
+onclick="openCalendarUpload()"
+>
+Upload Calendar
+</button>
 
-                <div class="page-subtitle">
-                    ${escapeHTML(career.clubName)}
-                    •
-                    ${escapeHTML(career.currentSeason)}
-                </div>
+</div>
 
-            </div>
-
-        </div>
-
-
-        <div class="match-summary-grid">
-
-            <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Season
-                </div>
-
-                <div class="match-stat-number">
-                    ${escapeHTML(career.currentSeason)}
-                </div>
-
-            </div>
+</div>
 
 
-            <div class="match-stat">
+<div class="match-summary-grid">
 
-                <div class="match-stat-label">
-                    League
-                </div>
+<div class="match-stat">
+<div class="match-stat-label">Season</div>
+<div class="match-stat-number">
+${escapeHTML(career.currentSeason)}
+</div>
+</div>
 
-                <div class="match-stat-number"
-                     style="font-size:15px">
-                    ${escapeHTML(career.league)}
-                </div>
+<div class="match-stat">
+<div class="match-stat-label">League</div>
+<div class="match-stat-number" style="font-size:15px">
+${escapeHTML(career.league)}
+</div>
+</div>
 
-            </div>
+<div class="match-stat">
+<div class="match-stat-label">Matches</div>
+<div class="match-stat-number">
+${career.matches.length}
+</div>
+</div>
 
+<div class="match-stat">
+<div class="match-stat-label">Calendar</div>
+<div class="match-stat-number">
+${career.calendar.length}
+</div>
+</div>
 
-            <div class="match-stat">
+<div class="match-stat">
+<div class="match-stat-label">Favourites</div>
+<div class="match-stat-number">
+${career.calendar.filter(x=>x.favorite).length}
+</div>
+</div>
 
-                <div class="match-stat-label">
-                    Matches
-                </div>
-
-                <div class="match-stat-number">
-                    ${career.matches.length}
-                </div>
-
-            </div>
-
-
-            <div class="match-stat">
-
-                <div class="match-stat-label">
-                    Trophies
-                </div>
-
-                <div class="match-stat-number">
-                    ${career.trophies.length}
-                </div>
-
-            </div>
+</div>
 
 
-            <div class="match-stat">
+<div class="panel">
 
-                <div class="match-stat-label">
-                    National Team
-                </div>
+<div class="panel-title">
+Current Season
+</div>
 
-                <div class="match-stat-number"
-                     style="font-size:15px">
+<div class="panel-subtitle">
+${escapeHTML(career.currentSeason)} competition setup
+</div>
 
-                    ${
-                        career.nationalTeam
-                        ? escapeHTML(
-                            career.nationalTeam
-                        )
-                        : "None"
-                    }
+${seasonSummaryHTML(career)}
 
-                </div>
+</div>
+`;
+}
 
-            </div>
 
-        </div>
+function seasonSummaryHTML(career){
 
-    `;
+    const season=getSeason(career);
 
+    if(!season)
+        return `<div class="info-box">No season setup found.</div>`;
+
+    return `
+
+<div class="info-box">
+
+<strong style="color:white">
+League teams:
+</strong>
+
+${season.leagueTeams.length||0}
+
+<br><br>
+
+<strong style="color:white">
+Competitions:
+</strong>
+
+${season.competitions.length
+?season.competitions.join(", ")
+:"None added yet"}
+
+</div>
+
+`;
 }
 
 
@@ -2496,60 +2151,494 @@ function renderCareerHome() {
    CAREER BANNER
 ========================================================= */
 
-function careerBanner(career) {
+function careerBanner(career){
 
     return `
 
-        <div class="career-banner">
+<div class="career-banner">
 
-            <div class="career-banner-row">
+<div class="career-banner-row">
 
-                <div>
+<div>
 
-                    <div class="current-career-label">
-                        Current Career
-                    </div>
+<div class="current-career-label">
+Current Career
+</div>
 
-                    <div class="current-career-name">
-                        ${escapeHTML(career.clubName)}
-                    </div>
+<div class="current-career-name">
+${escapeHTML(career.clubName)}
+</div>
 
-                    <div class="current-career-info">
+<div class="current-career-info">
 
-                        ${escapeHTML(
-                            career.managerName
-                        )}
+${escapeHTML(career.managerName)}
+&nbsp; • &nbsp;
+${escapeHTML(career.league)}
+&nbsp; • &nbsp;
+${escapeHTML(career.currentSeason)}
 
-                        &nbsp; • &nbsp;
+</div>
 
-                        ${escapeHTML(
-                            career.league
-                        )}
+</div>
 
-                        &nbsp; • &nbsp;
+<button
+class="back-dashboard"
+onclick="showPage('dashboard')"
+>
+← All Careers
+</button>
 
-                        ${escapeHTML(
-                            career.currentSeason
-                        )}
+</div>
 
-                    </div>
+</div>
 
-                </div>
+`;
+}
 
 
-                <button
-                    class="back-dashboard"
-                    onclick="showPage('dashboard')"
-                >
-                    ← All Careers
-                </button>
+/* =========================================================
+   SEASON SETUP
+========================================================= */
 
-            </div>
+function getSeason(career){
 
-        </div>
+    if(!career)return null;
 
-    `;
+    if(!Array.isArray(career.seasons))
+        career.seasons=[];
 
+    let season=career.seasons.find(
+        x=>x.season===career.currentSeason
+    );
+
+    if(!season){
+
+        season={
+            season:career.currentSeason,
+            league:career.league,
+            leagueTeams:[],
+            competitions:[],
+            calendarUploaded:false
+        };
+
+        career.seasons.push(season);
+    }
+
+    if(!Array.isArray(season.leagueTeams))
+        season.leagueTeams=[];
+
+    if(!Array.isArray(season.competitions))
+        season.competitions=[];
+
+    return season;
+}
+
+
+function openSeasonSetup(firstTime){
+
+    const career=getCurrentCareer();
+
+    if(!career)return;
+
+    const season=getSeason(career);
+
+    selectedSeasonTeams=[...season.leagueTeams];
+
+    document.getElementById("modalContainer").innerHTML=`
+
+<div class="modal-overlay" onclick="closeModalOutside(event)">
+
+<div class="modal" onclick="event.stopPropagation()">
+
+<div class="modal-header">
+
+<div>
+
+<div class="modal-title">
+${firstTime?"Set Up Your Season":"Season Setup"}
+</div>
+
+<div class="panel-subtitle" style="margin:5px 0 0">
+${escapeHTML(career.currentSeason)}
+•
+${escapeHTML(career.league)}
+</div>
+
+</div>
+
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
+
+</div>
+
+
+<div class="info-box" style="margin-bottom:20px">
+
+At the beginning of each season, enter all the teams
+that are in your league. This controls which opponents
+can appear when you enter league matches.
+
+<br><br>
+
+For example, in a Manchester United Premier League
+career, if Leicester are not in your 2026/27 league,
+Leicester will not appear as a Premier League opponent.
+
+</div>
+
+
+<label class="setup-label">
+Add League Team
+</label>
+
+<div class="search-select">
+
+<input
+id="seasonTeamSearch"
+class="search-input"
+placeholder="Search teams..."
+autocomplete="off"
+oninput="searchSeasonTeam(this.value)"
+onclick="searchSeasonTeam(this.value)"
+>
+
+<div
+id="seasonTeamResults"
+class="search-results"
+></div>
+
+</div>
+
+
+<div
+id="selectedSeasonTeams"
+style="
+display:flex;
+flex-direction:column;
+gap:8px;
+margin-top:15px
+"
+></div>
+
+
+<div class="modal-actions">
+
+<button
+class="secondary-btn"
+onclick="closeModal()"
+>
+Cancel
+</button>
+
+<button
+class="primary-btn"
+onclick="saveSeasonTeams()"
+>
+Save League Teams
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+    renderSelectedSeasonTeams();
+}
+
+
+function searchSeasonTeam(query){
+
+    const career=getCurrentCareer();
+    if(!career)return;
+
+    const results=document.getElementById("seasonTeamResults");
+
+    const clubs=fc27ClubsByLeague[career.league]||[];
+
+    const q=(query||"").toLowerCase();
+
+    const matches=clubs
+        .filter(
+            club=>
+                club.toLowerCase().includes(q)
+                &&
+                !selectedSeasonTeams.includes(club)
+        )
+        .slice(0,100);
+
+    results.innerHTML=matches.length
+    ?
+    matches.map(club=>`
+
+<div
+class="search-option"
+onclick="addSeasonTeam('${escapeJS(club)}')"
+>
+${escapeHTML(club)}
+</div>
+
+`).join("")
+    :
+    `<div class="search-option">No teams found.</div>`;
+
+    results.classList.add("open");
+}
+
+
+function addSeasonTeam(team){
+
+    if(!selectedSeasonTeams.includes(team))
+        selectedSeasonTeams.push(team);
+
+    renderSelectedSeasonTeams();
+
+    document.getElementById("seasonTeamSearch").value="";
+
+    document.getElementById("seasonTeamResults")
+        .classList.remove("open");
+}
+
+
+function removeSeasonTeam(team){
+
+    selectedSeasonTeams=
+        selectedSeasonTeams.filter(
+            x=>x!==team
+        );
+
+    renderSelectedSeasonTeams();
+}
+
+
+function renderSelectedSeasonTeams(){
+
+    const container=
+        document.getElementById("selectedSeasonTeams");
+
+    if(!container)return;
+
+    container.innerHTML=
+        selectedSeasonTeams.length
+        ?
+        selectedSeasonTeams.map(team=>`
+
+<div class="selected-team">
+
+<span>
+${escapeHTML(team)}
+</span>
+
+<button
+onclick="removeSeasonTeam('${escapeJS(team)}')"
+>
+×
+</button>
+
+</div>
+
+`).join("")
+        :
+        `<div class="info-box">
+        No teams selected yet.
+        </div>`;
+}
+
+
+function saveSeasonTeams(){
+
+    const career=getCurrentCareer();
+
+    if(!career)return;
+
+    const season=getSeason(career);
+
+    season.leagueTeams=[...selectedSeasonTeams];
+
+    saveCareers();
+
+    closeModal();
+
+    renderCareerHome();
+}
+
+
+/* =========================================================
+   COMPETITIONS
+========================================================= */
+
+const competitions=[
+
+"Premier League",
+"FA Cup",
+"Carabao Cup",
+"UEFA Champions League",
+"UEFA Europa League",
+"UEFA Conference League",
+"La Liga",
+"Bundesliga",
+"Serie A",
+"Ligue 1",
+"International Friendly",
+"UEFA Nations League",
+"World Cup",
+"European Championship",
+"Other"
+
+];
+
+
+function getCompetitionTeams(competition){
+
+    const career=getCurrentCareer();
+
+    if(!career)return[];
+
+    const season=getSeason(career);
+
+    if(
+        competition==="Premier League"
+        ||
+        competition===career.league
+    ){
+
+        return season.leagueTeams||[];
+    }
+
+    /*
+     * English domestic cups:
+     * use the full FC27 database of English clubs.
+     */
+
+    if(
+        competition==="FA Cup"
+        ||
+        competition==="Carabao Cup"
+    ){
+
+        return getEnglishClubs();
+    }
+
+    /*
+     * International competitions.
+     */
+
+    if(
+        competition==="International Friendly"
+        ||
+        competition==="UEFA Nations League"
+        ||
+        competition==="World Cup"
+        ||
+        competition==="European Championship"
+    ){
+
+        return countriesByContinent.Europe
+            .concat(
+                countriesByContinent.SouthAmerica,
+                countriesByContinent.NorthAmerica,
+                countriesByContinent.Africa,
+                countriesByContinent.Asia,
+                countriesByContinent.Oceania
+            )
+            .filter(
+                (x,i,a)=>a.indexOf(x)===i
+            );
+    }
+
+    /*
+     * European competitions:
+     * use all clubs from the database.
+     */
+
+    if(
+        competition==="UEFA Champions League"
+        ||
+        competition==="UEFA Europa League"
+        ||
+        competition==="UEFA Conference League"
+    ){
+
+        return getAllClubs();
+    }
+
+    /*
+     * Major domestic leagues.
+     */
+
+    if(
+        [
+            "La Liga",
+            "Bundesliga",
+            "Serie A",
+            "Ligue 1"
+        ].includes(competition)
+    ){
+
+        const possibleLeague={
+            "La Liga":"La Liga",
+            "Bundesliga":"Bundesliga",
+            "Serie A":"Serie A",
+            "Ligue 1":"Ligue 1"
+        }[competition];
+
+        return fc27ClubsByLeague[possibleLeague]||[];
+    }
+
+    return getAllClubs();
+}
+
+
+function getAllClubs(){
+
+    const clubs=new Set();
+
+    allPlayers.forEach(
+        player=>{
+            if(player.club)
+                clubs.add(player.club);
+        }
+    );
+
+    return Array.from(clubs).sort();
+}
+
+
+function getEnglishClubs(){
+
+    const clubs=new Set();
+
+    allPlayers.forEach(player=>{
+
+        const league=(player.league||"").toLowerCase();
+
+        if(
+            league.includes("premier")
+            ||
+            league.includes("championship")
+            ||
+            league.includes("league one")
+            ||
+            league.includes("league two")
+            ||
+            league.includes("national")
+            ||
+            league.includes("england")
+        ){
+
+            if(player.club)
+                clubs.add(player.club);
+        }
+
+    });
+
+    return Array.from(clubs).sort();
 }
 
 
@@ -2557,183 +2646,119 @@ function careerBanner(career) {
    MATCHES
 ========================================================= */
 
-function renderMatches() {
+function renderMatches(){
 
-    const career =
-        getCurrentCareer();
+    const career=getCurrentCareer();
 
-
-    if (!career) {
-
+    if(!career){
         renderDashboard();
-
         return;
-
     }
 
+    const matches=[...career.matches]
+        .sort(
+            (a,b)=>
+                new Date(b.date)-new Date(a.date)
+        );
 
-    const matches =
-        [...career.matches]
-            .sort(
-                (a,b) =>
-                    new Date(b.date) -
-                    new Date(a.date)
-            );
+    const wins=matches.filter(x=>x.result==="W").length;
+    const draws=matches.filter(x=>x.result==="D").length;
+    const losses=matches.filter(x=>x.result==="L").length;
+    const clean=matches.filter(x=>x.cleanSheet).length;
 
+    document.getElementById("pageContent").innerHTML=`
 
-    const wins =
-        matches.filter(
-            match =>
-                match.result === "W"
-        ).length;
+${careerBanner(career)}
 
+<div class="topbar">
 
-    const draws =
-        matches.filter(
-            match =>
-                match.result === "D"
-        ).length;
+<div>
+<div class="page-title">Matches</div>
+<div class="page-subtitle">
+Record matches manually or use Match Facts.
+</div>
+</div>
 
+<button
+class="primary-btn"
+onclick="openMatchMethod()"
+>
++ Add Match
+</button>
 
-    const losses =
-        matches.filter(
-            match =>
-                match.result === "L"
-        ).length;
-
-
-    const cleanSheets =
-        matches.filter(
-            match =>
-                match.cleanSheet
-        ).length;
+</div>
 
 
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
+<div class="match-summary-grid">
 
-        ${careerBanner(career)}
+<div class="match-stat">
+<div class="match-stat-label">Played</div>
+<div class="match-stat-number">${matches.length}</div>
+</div>
 
+<div class="match-stat">
+<div class="match-stat-label">Wins</div>
+<div class="match-stat-number">${wins}</div>
+</div>
 
-        <div class="topbar">
+<div class="match-stat">
+<div class="match-stat-label">Draws</div>
+<div class="match-stat-number">${draws}</div>
+</div>
 
-            <div>
+<div class="match-stat">
+<div class="match-stat-label">Losses</div>
+<div class="match-stat-number">${losses}</div>
+</div>
 
-                <div class="page-title">
-                    Matches
-                </div>
+<div class="match-stat">
+<div class="match-stat-label">Clean Sheets</div>
+<div class="match-stat-number">${clean}</div>
+</div>
 
-                <div class="page-subtitle">
-                    Record your matches manually or use Match Facts AI.
-                </div>
-
-            </div>
-
-
-            <button
-                class="primary-btn"
-                onclick="openMatchMethod()"
-            >
-                + Add Match
-            </button>
-
-        </div>
+</div>
 
 
-        <div class="match-summary-grid">
+<div class="panel">
 
-            <div class="match-stat">
-                <div class="match-stat-label">Played</div>
-                <div class="match-stat-number">${matches.length}</div>
-            </div>
+<div class="panel-title">Match History</div>
 
-            <div class="match-stat">
-                <div class="match-stat-label">Wins</div>
-                <div class="match-stat-number">${wins}</div>
-            </div>
+<div class="panel-subtitle">
+Your competition and opponent are selected when the match is entered.
+</div>
 
-            <div class="match-stat">
-                <div class="match-stat-label">Draws</div>
-                <div class="match-stat-number">${draws}</div>
-            </div>
+${
+matches.length
+?
+`
+<div class="match-list">
+${matches.map(createMatchRow).join("")}
+</div>
+`
+:
+`
+<div class="empty-state">
 
-            <div class="match-stat">
-                <div class="match-stat-label">Losses</div>
-                <div class="match-stat-number">${losses}</div>
-            </div>
+<h2>No matches yet</h2>
 
-            <div class="match-stat">
-                <div class="match-stat-label">Clean Sheets</div>
-                <div class="match-stat-number">${cleanSheets}</div>
-            </div>
+<p>
+Add your first match.
+</p>
 
-        </div>
+<button
+class="primary-btn"
+onclick="openMatchMethod()"
+>
++ Add Match
+</button>
 
+</div>
+`
+}
 
-        <div class="panel">
+</div>
 
-            <div class="panel-title">
-                Match History
-            </div>
-
-            <div class="panel-subtitle">
-                All matches belong to this career save.
-            </div>
-
-
-            ${
-                matches.length === 0
-
-                ?
-
-                `
-
-                <div class="empty-state">
-
-                    <h2>
-                        No matches yet
-                    </h2>
-
-                    <p>
-                        Add a match manually or upload Match Facts screenshots.
-                    </p>
-
-                    <button
-                        class="primary-btn"
-                        onclick="openMatchMethod()"
-                    >
-                        + Add Match
-                    </button>
-
-                </div>
-
-                `
-
-                :
-
-                `
-
-                <div class="match-list">
-
-                    ${
-                        matches
-                            .map(
-                                createMatchRow
-                            )
-                            .join("")
-                    }
-
-                </div>
-
-                `
-
-            }
-
-        </div>
-
-    `;
-
+`;
 }
 
 
@@ -2741,96 +2766,81 @@ function renderMatches() {
    MATCH METHOD
 ========================================================= */
 
-function openMatchMethod() {
+function openMatchMethod(){
 
-    document.getElementById(
-        "modalContainer"
-    ).innerHTML = `
+    document.getElementById("modalContainer").innerHTML=`
 
-        <div
-            class="modal-overlay"
-            onclick="closeModalOutside(event)"
-        >
+<div class="modal-overlay" onclick="closeModalOutside(event)">
 
-            <div
-                class="modal"
-                onclick="event.stopPropagation()"
-            >
+<div class="modal" onclick="event.stopPropagation()">
 
-                <div class="modal-header">
+<div class="modal-header">
 
-                    <div class="modal-title">
-                        Add Match
-                    </div>
+<div class="modal-title">
+Add Match
+</div>
 
-                    <button
-                        class="close-btn"
-                        onclick="closeModal()"
-                    >
-                        ×
-                    </button>
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
 
-                </div>
+</div>
 
 
-                <div class="panel-subtitle">
-                    Choose how you want to record this match.
-                </div>
+<div class="panel-subtitle">
+Choose how you want to record the match.
+</div>
 
 
-                <div class="entry-choice-grid">
+<div class="entry-choice-grid">
+
+<button
+class="entry-choice"
+onclick="openManualMatch()"
+>
+
+<div class="entry-icon">✍️</div>
+
+<div class="entry-title">
+Manual Entry
+</div>
+
+<div class="entry-description">
+Enter the competition, opponent, score and
+optional player ratings, goals, assists and cards.
+</div>
+
+</button>
 
 
-                    <button
-                        class="entry-choice"
-                        onclick="openManualMatch()"
-                    >
+<button
+class="entry-choice"
+onclick="openAIMatchUpload()"
+>
 
-                        <div class="entry-icon">
-                            ✍️
-                        </div>
+<div class="entry-icon">📸</div>
 
-                        <div class="entry-title">
-                            Manual Entry
-                        </div>
+<div class="entry-title">
+Upload Match Facts
+</div>
 
-                        <div class="entry-description">
-                            Enter the match yourself. Player ratings,
-                            goals, assists and cards are all optional.
-                        </div>
+<div class="entry-description">
+Upload one or multiple screenshots and have AI
+extract the match information.
+</div>
 
-                    </button>
+</button>
 
+</div>
 
-                    <button
-                        class="entry-choice"
-                        onclick="openAIMatchUpload()"
-                    >
+</div>
 
-                        <div class="entry-icon">
-                            📸
-                        </div>
+</div>
 
-                        <div class="entry-title">
-                            Upload Match Facts
-                        </div>
-
-                        <div class="entry-description">
-                            Upload one or multiple EA FC Match Facts
-                            screenshots and let AI extract the match data.
-                        </div>
-
-                    </button>
-
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
+`;
 }
 
 
@@ -2838,268 +2848,315 @@ function openMatchMethod() {
    MANUAL MATCH
 ========================================================= */
 
-function openManualMatch() {
+function openManualMatch(){
 
-    manualPlayers = [];
+    manualPlayers=[];
 
-    closeModal();
+    document.getElementById("modalContainer").innerHTML=`
 
-    setTimeout(
-        () => {
+<div class="modal-overlay" onclick="closeModalOutside(event)">
 
-            document.getElementById(
-                "modalContainer"
-            ).innerHTML = `
+<div class="modal" onclick="event.stopPropagation()">
 
-                <div
-                    class="modal-overlay"
-                    onclick="closeModalOutside(event)"
-                >
+<div class="modal-header">
 
-                    <div
-                        class="modal"
-                        onclick="event.stopPropagation()"
-                    >
+<div class="modal-title">
+Manual Match Entry
+</div>
 
-                        <div class="modal-header">
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
 
-                            <div class="modal-title">
-                                Manual Match Entry
-                            </div>
+</div>
 
-                            <button
-                                class="close-btn"
-                                onclick="closeModal()"
-                            >
-                                ×
-                            </button>
 
-                        </div>
+<div class="form-grid">
 
 
-                        <div class="form-grid">
+<div class="form-group">
 
+<label>Date</label>
 
-                            <div class="form-group">
+<input
+id="matchDate"
+class="form-input"
+type="date"
+value="${todayDate()}"
+>
 
-                                <label>
-                                    Date
-                                </label>
+</div>
 
-                                <input
-                                    id="matchDate"
-                                    class="form-input"
-                                    type="date"
-                                    value="${todayDate()}"
-                                >
 
-                            </div>
+<div class="form-group">
 
+<label>Competition</label>
 
-                            <div class="form-group">
+<select
+id="matchCompetition"
+class="form-select"
+onchange="matchCompetitionChanged()"
+>
 
-                                <label>
-                                    Competition
-                                </label>
+<option value="">
+Select competition
+</option>
 
-                                <select
-                                    id="matchCompetition"
-                                    class="form-select"
-                                >
+${competitions.map(c=>`
+<option value="${escapeHTML(c)}">
+${escapeHTML(c)}
+</option>
+`).join("")}
 
-                                    <option>
-                                        League
-                                    </option>
+</select>
 
-                                    <option>
-                                        Domestic Cup
-                                    </option>
+</div>
 
-                                    <option>
-                                        Continental Competition
-                                    </option>
 
-                                    <option>
-                                        Super Cup
-                                    </option>
+<div class="form-group">
 
-                                    <option>
-                                        Friendly
-                                    </option>
+<label>Home / Away</label>
 
-                                    <option>
-                                        Other
-                                    </option>
+<select
+id="matchHomeAway"
+class="form-select"
+>
 
-                                </select>
+<option value="Home">Home</option>
+<option value="Away">Away</option>
 
-                            </div>
+</select>
 
+</div>
 
-                            <div class="form-group">
 
-                                <label>
-                                    Home / Away
-                                </label>
+<div class="form-group">
 
-                                <select
-                                    id="matchHomeAway"
-                                    class="form-select"
-                                >
+<label>Opponent</label>
 
-                                    <option value="Home">
-                                        Home
-                                    </option>
+<div class="search-select">
 
-                                    <option value="Away">
-                                        Away
-                                    </option>
+<input
+id="matchOpponent"
+class="search-input"
+placeholder="Select a competition first..."
+autocomplete="off"
+disabled
+oninput="searchMatchOpponent(this.value)"
+onclick="openMatchOpponentResults()"
+>
 
-                                </select>
+<div
+id="matchOpponentResults"
+class="search-results"
+></div>
 
-                            </div>
+</div>
 
+</div>
 
-                            <div class="form-group">
 
-                                <label>
-                                    Opponent
-                                </label>
+<div class="form-group full">
 
-                                <input
-                                    id="matchOpponent"
-                                    class="form-input"
-                                    placeholder="e.g. Manchester United"
-                                >
+<label>Score</label>
 
-                            </div>
+<div class="score-inputs">
 
+<input
+id="goalsFor"
+class="form-input"
+type="number"
+min="0"
+value="0"
+>
 
-                            <div class="form-group full">
+<span>-</span>
 
-                                <label>
-                                    Score
-                                </label>
+<input
+id="goalsAgainst"
+class="form-input"
+type="number"
+min="0"
+value="0"
+>
 
-                                <div class="score-inputs">
+</div>
 
-                                    <input
-                                        id="goalsFor"
-                                        class="form-input"
-                                        type="number"
-                                        min="0"
-                                        value="0"
-                                        placeholder="Your goals"
-                                    >
+</div>
 
-                                    <span>-</span>
+</div>
 
-                                    <input
-                                        id="goalsAgainst"
-                                        class="form-input"
-                                        type="number"
-                                        min="0"
-                                        value="0"
-                                        placeholder="Their goals"
-                                    >
 
-                                </div>
+<div style="
+margin-top:20px;
+padding-top:20px;
+border-top:1px solid #252c35
+">
 
-                            </div>
+<div class="panel-title">
+Player Performance
+</div>
 
+<div class="panel-subtitle">
+Optional. You can enter ratings for every player,
+only some players, or none.
+</div>
 
-                        </div>
 
+<div class="player-entry player-entry-header">
 
-                        <div
-                            style="
-                                margin-top:20px;
-                                padding-top:20px;
-                                border-top:1px solid #252c35
-                            "
-                        >
+<div>Player</div>
+<div>Rating</div>
+<div>Goals</div>
+<div>Assists</div>
+<div>Cards</div>
+<div></div>
 
-                            <div class="panel-title">
-                                Player Performance
-                            </div>
+</div>
 
-                            <div class="panel-subtitle">
-                                Optional. Add as many players as you want.
-                                Leave anything blank if you don't know it.
-                            </div>
 
+<div
+id="manualPlayers"
+class="player-entry-list"
+></div>
 
-                            <div
-                                class="player-entry player-entry-header"
-                            >
 
-                                <div>Player</div>
-                                <div>Rating</div>
-                                <div>Goals</div>
-                                <div>Assists</div>
-                                <div>Cards</div>
-                                <div></div>
+<button
+class="secondary-btn"
+onclick="addManualPlayer()"
+style="margin-top:14px"
+>
++ Add Player
+</button>
 
-                            </div>
+</div>
 
 
-                            <div
-                                id="manualPlayers"
-                                class="player-entry-list"
-                            ></div>
+<div class="modal-actions">
 
+<button
+class="secondary-btn"
+onclick="openMatchMethod()"
+>
+Back
+</button>
 
-                            <div class="add-player-area">
+<button
+class="primary-btn"
+onclick="saveManualMatch()"
+>
+Save Match
+</button>
 
-                                <button
-                                    class="secondary-btn"
-                                    onclick="addManualPlayer()"
-                                >
-                                    + Add Player
-                                </button>
+</div>
 
-                            </div>
+</div>
 
-                        </div>
+</div>
 
+`;
 
-                        <div class="modal-actions">
+    addManualPlayer();
+}
 
-                            <button
-                                class="secondary-btn"
-                                onclick="openMatchMethod()"
-                            >
-                                Back
-                            </button>
 
-                            <button
-                                class="primary-btn"
-                                onclick="saveManualMatch()"
-                            >
-                                Save Match
-                            </button>
+/* =========================================================
+   MATCH OPPONENT SEARCH
+========================================================= */
 
-                        </div>
+function matchCompetitionChanged(){
 
+    const competition=
+        document.getElementById("matchCompetition").value;
 
-                    </div>
+    const input=
+        document.getElementById("matchOpponent");
 
-                </div>
+    if(!competition){
 
-            `;
+        input.disabled=true;
+        input.value="";
+        input.placeholder="Select a competition first...";
+        return;
+    }
 
+    input.disabled=false;
+    input.value="";
+    input.placeholder=
+        "Search " + competition + " teams...";
+}
 
-            /*
-             * Start with an empty player list.
-             * You can add as many as you need.
-             */
 
-            addManualPlayer();
+function openMatchOpponentResults(){
 
-        },
-        10
+    const competition=
+        document.getElementById("matchCompetition").value;
+
+    if(!competition)return;
+
+    searchMatchOpponent(
+        document.getElementById("matchOpponent").value
     );
+}
 
+
+function searchMatchOpponent(query){
+
+    const competition=
+        document.getElementById("matchCompetition").value;
+
+    if(!competition)return;
+
+    const results=
+        document.getElementById("matchOpponentResults");
+
+    const teams=getCompetitionTeams(competition);
+
+    const career=getCurrentCareer();
+
+    const q=(query||"").toLowerCase();
+
+    const matches=teams
+        .filter(team=>
+            team.toLowerCase().includes(q)
+        )
+        .filter(team=>
+            !career ||
+            team.toLowerCase()!==
+            career.clubName.toLowerCase()
+        )
+        .slice(0,100);
+
+    results.innerHTML=matches.length
+    ?
+    matches.map(team=>`
+
+<div
+class="search-option"
+onclick="chooseMatchOpponent('${escapeJS(team)}')"
+>
+${escapeHTML(team)}
+</div>
+
+`).join("")
+    :
+    `<div class="search-option">
+    No eligible teams found.
+    </div>`;
+
+    results.classList.add("open");
+}
+
+
+function chooseMatchOpponent(team){
+
+    document.getElementById("matchOpponent").value=team;
+
+    document.getElementById("matchOpponentResults")
+        .classList.remove("open");
 }
 
 
@@ -3107,129 +3164,90 @@ function openManualMatch() {
    MANUAL PLAYERS
 ========================================================= */
 
-function addManualPlayer() {
+function addManualPlayer(){
 
-    const container =
-        document.getElementById(
-            "manualPlayers"
-        );
+    const container=document.getElementById("manualPlayers");
 
+    if(!container)return;
 
-    if (!container) return;
-
-
-    const id =
-        Date.now().toString() +
-        Math.random()
-            .toString(36)
-            .substring(2);
-
+    const id=createId();
 
     manualPlayers.push(id);
 
+    const row=document.createElement("div");
 
-    const row =
-        document.createElement("div");
+    row.className="player-entry";
+    row.dataset.playerId=id;
 
+    row.innerHTML=`
 
-    row.className =
-        "player-entry";
+<input
+class="form-input"
+data-field="name"
+placeholder="Player name"
+>
 
+<input
+class="form-input"
+data-field="rating"
+type="number"
+min="0"
+max="10"
+step=".1"
+placeholder="—"
+>
 
-    row.dataset.playerId =
-        id;
+<input
+class="form-input"
+data-field="goals"
+type="number"
+min="0"
+placeholder="0"
+>
 
+<input
+class="form-input"
+data-field="assists"
+type="number"
+min="0"
+placeholder="0"
+>
 
-    row.innerHTML = `
+<select
+class="form-select"
+data-field="cards"
+>
 
-        <input
-            class="form-input player-name-input"
-            data-field="name"
-            placeholder="Player name"
-        >
+<option value="">—</option>
+<option value="Yellow">Yellow</option>
+<option value="Red">Red</option>
 
-        <input
-            class="form-input"
-            data-field="rating"
-            type="number"
-            min="0"
-            max="10"
-            step="0.1"
-            placeholder="—"
-        >
+</select>
 
-        <input
-            class="form-input"
-            data-field="goals"
-            type="number"
-            min="0"
-            placeholder="0"
-        >
+<button
+class="remove-player"
+onclick="removeManualPlayer('${id}')"
+>
+×
+</button>
 
-        <input
-            class="form-input"
-            data-field="assists"
-            type="number"
-            min="0"
-            placeholder="0"
-        >
-
-        <select
-            class="form-select"
-            data-field="cards"
-        >
-
-            <option value="">
-                —
-            </option>
-
-            <option value="Yellow">
-                Yellow
-            </option>
-
-            <option value="Red">
-                Red
-            </option>
-
-        </select>
-
-
-        <button
-            class="remove-player"
-            onclick="removeManualPlayer('${id}')"
-        >
-            ×
-        </button>
-
-    `;
-
+`;
 
     container.appendChild(row);
-
 }
 
 
-function removeManualPlayer(id) {
+function removeManualPlayer(id){
 
-    manualPlayers =
-        manualPlayers.filter(
-            playerId =>
-                playerId !== id
-        );
+    manualPlayers=
+        manualPlayers.filter(x=>x!==id);
 
-
-    const row =
+    const row=
         document.querySelector(
             `[data-player-id="${id}"]`
         );
 
-
-    if (row) {
-
-        row.remove();
-
-    }
-
+    if(row)row.remove();
 }
 
 
@@ -3237,536 +3255,391 @@ function removeManualPlayer(id) {
    SAVE MANUAL MATCH
 ========================================================= */
 
-function saveManualMatch() {
+function saveManualMatch(){
 
-    const career =
-        getCurrentCareer();
+    const career=getCurrentCareer();
 
+    if(!career)return;
 
-    if (!career) return;
+    const competition=
+        document.getElementById("matchCompetition").value;
 
-
-    const opponent =
-        document.getElementById(
-            "matchOpponent"
-        ).value.trim();
-
-
-    if (!opponent) {
-
-        alert(
-            "Please enter the opponent."
-        );
-
+    if(!competition){
+        alert("Please select a competition.");
         return;
-
     }
 
+    const opponent=
+        document.getElementById("matchOpponent").value.trim();
 
-    const goalsFor =
+    if(!opponent){
+        alert("Please select an opponent.");
+        return;
+    }
+
+    const goalsFor=
         Number(
-            document.getElementById(
-                "goalsFor"
-            ).value || 0
+            document.getElementById("goalsFor").value||0
         );
 
-
-    const goalsAgainst =
+    const goalsAgainst=
         Number(
-            document.getElementById(
-                "goalsAgainst"
-            ).value || 0
+            document.getElementById("goalsAgainst").value||0
         );
 
+    let result="D";
 
-    let result;
+    if(goalsFor>goalsAgainst)
+        result="W";
 
+    if(goalsFor<goalsAgainst)
+        result="L";
 
-    if (goalsFor > goalsAgainst) {
+    const players=[];
 
-        result = "W";
+    document.querySelectorAll(
+        "#manualPlayers .player-entry"
+    ).forEach(row=>{
 
-    }
+        const name=
+            row.querySelector('[data-field="name"]').value.trim();
 
-    else if (
-        goalsFor === goalsAgainst
-    ) {
+        if(!name)return;
 
-        result = "D";
+        const rating=
+            row.querySelector('[data-field="rating"]').value;
 
-    }
+        const goals=
+            row.querySelector('[data-field="goals"]').value;
 
-    else {
+        const assists=
+            row.querySelector('[data-field="assists"]').value;
 
-        result = "L";
-
-    }
-
-
-    const playerRows =
-        document.querySelectorAll(
-            "#manualPlayers .player-entry"
-        );
-
-
-    const players = [];
-
-
-    playerRows.forEach(row => {
-
-        const name =
-            row.querySelector(
-                '[data-field="name"]'
-            ).value.trim();
-
-
-        /*
-         * Ignore completely empty rows.
-         */
-
-        if (!name) return;
-
-
-        const rating =
-            row.querySelector(
-                '[data-field="rating"]'
-            ).value;
-
-
-        const goals =
-            row.querySelector(
-                '[data-field="goals"]'
-            ).value;
-
-
-        const assists =
-            row.querySelector(
-                '[data-field="assists"]'
-            ).value;
-
-
-        const cards =
-            row.querySelector(
-                '[data-field="cards"]'
-            ).value;
-
+        const cards=
+            row.querySelector('[data-field="cards"]').value;
 
         players.push({
 
-            name: name,
+            name,
 
             rating:
-                rating === ""
-                ? null
-                : Number(rating),
+                rating===""
+                ?null
+                :Number(rating),
 
             goals:
-                goals === ""
-                ? 0
-                : Number(goals),
+                goals===""
+                ?0
+                :Number(goals),
 
             assists:
-                assists === ""
-                ? 0
-                : Number(assists),
+                assists===""
+                ?0
+                :Number(assists),
 
             cards:
-                cards || null
+                cards||null
 
         });
 
     });
 
+    career.matches.push({
 
-    const match = {
+        id:createId(),
 
-        id:
-            createId(),
-
-        season:
-            career.currentSeason,
+        season:career.currentSeason,
 
         date:
-            document.getElementById(
-                "matchDate"
-            ).value,
+            document.getElementById("matchDate").value,
 
-        competition:
-            document.getElementById(
-                "matchCompetition"
-            ).value,
+        competition,
 
         homeAway:
-            document.getElementById(
-                "matchHomeAway"
-            ).value,
+            document.getElementById("matchHomeAway").value,
 
-        opponent:
-            opponent,
+        opponent,
 
-        goalsFor:
-            goalsFor,
+        goalsFor,
 
-        goalsAgainst:
-            goalsAgainst,
+        goalsAgainst,
 
-        result:
-            result,
+        result,
 
-        cleanSheet:
-            goalsAgainst === 0,
+        cleanSheet:goalsAgainst===0,
 
-        entryMethod:
-            "manual",
+        entryMethod:"manual",
 
-        players:
-            players,
+        players
 
-        aiSource:
-            false
-
-    };
-
-
-    career.matches.push(match);
+    });
 
     saveCareers();
 
     closeModal();
 
     renderMatches();
-
 }
 
 
 /* =========================================================
-   AI UPLOAD
+   AI MATCH UPLOAD
 ========================================================= */
 
-function openAIMatchUpload() {
+function openAIMatchUpload(){
 
-    document.getElementById(
-        "modalContainer"
-    ).innerHTML = `
+    document.getElementById("modalContainer").innerHTML=`
 
-        <div
-            class="modal-overlay"
-            onclick="closeModalOutside(event)"
-        >
+<div class="modal-overlay" onclick="closeModalOutside(event)">
 
-            <div
-                class="modal"
-                onclick="event.stopPropagation()"
-            >
+<div class="modal" onclick="event.stopPropagation()">
 
-                <div class="modal-header">
+<div class="modal-header">
 
-                    <div class="modal-title">
-                        Upload Match Facts
-                    </div>
+<div class="modal-title">
+Upload Match Facts
+</div>
 
-                    <button
-                        class="close-btn"
-                        onclick="closeModal()"
-                    >
-                        ×
-                    </button>
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
 
-                </div>
+</div>
 
 
-                <div class="panel-subtitle">
+<div class="panel-subtitle">
 
-                    Upload one or multiple screenshots from
-                    EA FC Match Facts. The AI will eventually
-                    read the screenshots and build the match
-                    automatically.
+Upload one or multiple Match Facts screenshots.
 
-                </div>
+</div>
 
 
-                <label
-                    for="matchFactsFiles"
-                    class="upload-area"
-                    style="display:block;cursor:pointer"
-                >
+<label
+for="matchFactsFiles"
+class="upload-area"
+style="display:block;cursor:pointer"
+>
 
-                    <div class="upload-icon">
-                        📸
-                    </div>
+<div class="upload-icon">📸</div>
 
-                    <div class="upload-title">
-                        Select Match Facts screenshots
-                    </div>
+<div class="upload-title">
+Select Match Facts screenshots
+</div>
 
-                    <div class="upload-description">
+<div class="upload-description">
 
-                        You can select multiple screenshots at once.
-                        For example, upload the Match Facts screens
-                        containing player ratings, goals, assists
-                        and cards.
+You can upload multiple screenshots at once.
+The eventual AI system will combine them into
+one match.
 
-                    </div>
+</div>
 
-                    <span class="primary-btn">
-                        Choose Screenshots
-                    </span>
+<span class="primary-btn">
+Choose Screenshots
+</span>
 
-                    <input
-                        id="matchFactsFiles"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        style="display:none"
-                        onchange="showSelectedMatchFiles(this.files)"
-                    >
+<input
+id="matchFactsFiles"
+type="file"
+accept="image/*"
+multiple
+style="display:none"
+onchange="showSelectedMatchFiles(this.files)"
+>
 
-                </label>
+</label>
 
 
-                <div
-                    id="selectedMatchFiles"
-                    class="file-list"
-                ></div>
+<div id="selectedMatchFiles" class="file-list"></div>
 
 
-                <div
-                    class="review-box"
-                    style="margin-top:20px"
-                >
+<div class="review-box">
 
-                    <strong>
-                        AI workflow
-                    </strong>
+<strong>
+The final workflow
+</strong>
 
-                    <p
-                        style="
-                            color:#7f8996;
-                            font-size:12px;
-                            line-height:1.6;
-                            margin-bottom:0
-                        "
-                    >
+<p style="
+color:#7f8996;
+font-size:12px;
+line-height:1.6;
+">
 
-                        Screenshots → AI extraction →
-                        Review results → Edit if needed →
-                        Save Match.
+Screenshots →
+AI reads everything →
+Review extracted information →
+Correct anything →
+Save Match.
 
-                    </p>
+</p>
 
-                </div>
+</div>
 
 
-                <div class="modal-actions">
+<div class="modal-actions">
 
-                    <button
-                        class="secondary-btn"
-                        onclick="openMatchMethod()"
-                    >
-                        Back
-                    </button>
+<button
+class="secondary-btn"
+onclick="openMatchMethod()"
+>
+Back
+</button>
 
-                    <button
-                        id="analyseButton"
-                        class="primary-btn"
-                        onclick="startAIAnalysis()"
-                        disabled
-                    >
-                        Analyse Screenshots
-                    </button>
+<button
+id="analyseButton"
+class="primary-btn"
+disabled
+onclick="startAIAnalysis()"
+>
+Analyse Screenshots
+</button>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
-        </div>
+</div>
 
-    `;
-
+`;
 }
 
 
-function showSelectedMatchFiles(files) {
+function showSelectedMatchFiles(files){
 
-    const container =
-        document.getElementById(
-            "selectedMatchFiles"
-        );
+    const container=
+        document.getElementById("selectedMatchFiles");
 
+    const button=
+        document.getElementById("analyseButton");
 
-    const analyseButton =
-        document.getElementById(
-            "analyseButton"
-        );
+    if(!files||!files.length){
 
-
-    if (!files || files.length === 0) {
-
-        container.innerHTML = "";
-
-        analyseButton.disabled = true;
-
+        container.innerHTML="";
+        button.disabled=true;
         return;
-
     }
 
+    container.innerHTML="";
 
-    container.innerHTML = "";
+    Array.from(files).forEach((file,i)=>{
 
+        const div=document.createElement("div");
 
-    Array.from(files).forEach(
-        (file,index) => {
+        div.className="file-item";
 
-            const div =
-                document.createElement(
-                    "div"
-                );
+        div.textContent=
+            `Screenshot ${i+1}: ${file.name}`;
 
+        container.appendChild(div);
+    });
 
-            div.className =
-                "file-item";
-
-
-            div.innerHTML =
-                `
-                    Screenshot ${index + 1}:
-                    ${escapeHTML(file.name)}
-                `;
-
-
-            container.appendChild(div);
-
-        }
-    );
-
-
-    analyseButton.disabled = false;
-
+    button.disabled=false;
 }
 
 
-/* =========================================================
-   AI ANALYSIS PLACEHOLDER
-========================================================= */
-
-function startAIAnalysis() {
-
-    const files =
-        document.getElementById(
-            "matchFactsFiles"
-        ).files;
-
-
-    if (!files || files.length === 0) {
-
-        return;
-
-    }
-
+function startAIAnalysis(){
 
     /*
-     * IMPORTANT:
-     *
-     * This is intentionally NOT fake AI.
-     *
-     * The next technical step is connecting this
-     * upload to an AI vision API/backend.
-     *
-     * Once connected, the returned information will
-     * be passed into openAIReview().
+     * Intentionally not pretending to have AI.
+     * This is where the secure AI vision backend will connect.
      */
 
+    const files=
+        document.getElementById("matchFactsFiles").files;
 
-    document.getElementById(
-        "modalContainer"
-    ).innerHTML = `
+    if(!files.length)return;
 
-        <div
-            class="modal-overlay"
-        >
+    document.getElementById("modalContainer").innerHTML=`
 
-            <div class="modal">
+<div class="modal-overlay">
 
-                <div class="modal-header">
+<div class="modal">
 
-                    <div class="modal-title">
-                        Match Facts AI
-                    </div>
+<div class="modal-header">
 
-                </div>
+<div class="modal-title">
+Match Facts AI
+</div>
 
+</div>
 
-                <div class="review-box">
+<div class="review-box">
 
-                    <div
-                        style="
-                            font-size:22px;
-                            margin-bottom:12px
-                        "
-                    >
-                        📸
-                    </div>
+<div style="font-size:28px;margin-bottom:10px">
+📸
+</div>
 
-                    <strong>
-                        Screenshots received
-                    </strong>
+<strong>
+${files.length} screenshot${files.length===1?"":"s"} received
+</strong>
 
-                    <p
-                        style="
-                            color:#7f8996;
-                            line-height:1.7;
-                            font-size:13px
-                        "
-                    >
+<p style="
+color:#7f8996;
+line-height:1.7;
+font-size:13px
+">
 
-                        ${files.length}
-                        screenshot${files.length === 1 ? "" : "s"}
-                        selected.
+The upload system is ready.
 
-                        <br><br>
+The next connection will send these screenshots
+to vision AI, which will extract:
 
-                        The next step is to connect these
-                        screenshots to the AI vision system so
-                        it can automatically identify the match,
-                        score, players, ratings, goals, assists
-                        and cards.
+<br><br>
 
-                    </p>
+• Competition<br>
+• Opponent<br>
+• Score<br>
+• Every player<br>
+• Player ratings<br>
+• Goals<br>
+• Assists<br>
+• Yellow cards<br>
+• Red cards<br>
+• Minutes<br>
+• Goalkeeper statistics where shown
 
-                    <div class="review-warning">
+<br><br>
 
-                        AI results will always be shown for
-                        review before they are saved.
+The results will then appear on a review screen
+before anything is saved.
 
-                    </div>
+</p>
 
-                </div>
+<div class="review-warning">
 
+Nothing is automatically saved until you review
+the AI results.
 
-                <div class="modal-actions">
+</div>
 
-                    <button
-                        class="secondary-btn"
-                        onclick="openAIMatchUpload()"
-                    >
-                        Back
-                    </button>
+</div>
 
-                    <button
-                        class="primary-btn"
-                        onclick="openManualMatch()"
-                    >
-                        Enter Manually Instead
-                    </button>
+<div class="modal-actions">
 
-                </div>
+<button
+class="secondary-btn"
+onclick="openAIMatchUpload()"
+>
+Back
+</button>
 
-            </div>
+<button
+class="primary-btn"
+onclick="openManualMatch()"
+>
+Enter Manually
+</button>
 
-        </div>
+</div>
 
-    `;
+</div>
 
+</div>
+
+`;
 }
 
 
@@ -3774,395 +3647,854 @@ function startAIAnalysis() {
    MATCH ROW
 ========================================================= */
 
-function createMatchRow(match) {
+function createMatchRow(match){
 
-    const resultClass =
-        match.result === "W"
-        ? "result-win"
-        : match.result === "D"
-        ? "result-draw"
-        : "result-loss";
+    const cls=
+        match.result==="W"
+        ?"result-win"
+        :
+        match.result==="D"
+        ?"result-draw"
+        :
+        "result-loss";
 
-
-    const resultText =
-        match.result === "W"
-        ? "WIN"
-        : match.result === "D"
-        ? "DRAW"
-        : "LOSS";
-
-
-    const playerCount =
-        Array.isArray(match.players)
-        ? match.players.length
-        : 0;
-
+    const result=
+        match.result==="W"
+        ?"WIN"
+        :
+        match.result==="D"
+        ?"DRAW"
+        :
+        "LOSS";
 
     return `
 
-        <div class="match-row">
+<div class="match-row">
 
-            <div class="match-row-main">
+<div class="match-row-main">
 
-                <div>
+<div>
 
-                    <div class="match-date">
-                        ${escapeHTML(
-                            formatDate(match.date)
-                        )}
-                    </div>
+<div class="match-date">
+${formatDate(match.date)}
+</div>
 
-                    <div class="match-competition">
-                        ${escapeHTML(
-                            match.competition
-                        )}
-                    </div>
+<div class="match-competition">
+${escapeHTML(match.competition)}
+</div>
 
-                </div>
+</div>
 
+<div>
 
-                <div>
+<div class="match-opponent">
+${escapeHTML(match.opponent)}
+</div>
 
-                    <div class="match-opponent">
-                        ${escapeHTML(
-                            match.opponent
-                        )}
-                    </div>
+<div class="match-home-away">
+${escapeHTML(match.homeAway)}
+</div>
 
-                    <div class="match-home-away">
-                        ${escapeHTML(
-                            match.homeAway
-                        )}
-                    </div>
+</div>
 
-                </div>
+<div class="match-score">
 
+${
+match.homeAway==="Home"
+?
+`${match.goalsFor} - ${match.goalsAgainst}`
+:
+`${match.goalsAgainst} - ${match.goalsFor}`
+}
 
-                <div class="match-score">
+</div>
 
-                    ${
-                        match.homeAway === "Home"
+<div class="match-result ${cls}">
+${result}
+</div>
 
-                        ?
-
-                        `${match.goalsFor}
-                         -
-                         ${match.goalsAgainst}`
-
-                        :
-
-                        `${match.goalsAgainst}
-                         -
-                         ${match.goalsFor}`
-
-                    }
-
-                </div>
+</div>
 
 
-                <div
-                    class="match-result ${resultClass}"
-                >
-                    ${resultText}
-                </div>
+<div class="match-details">
 
-            </div>
+<span>
+Players:
+<strong style="color:white">
+${match.players?.length||0}
+</strong>
+</span>
 
+<span>
+${match.cleanSheet?"✓ Clean Sheet":""}
+</span>
 
-            <div class="match-details">
+<span>
+Entry:
+<strong style="color:white">
+${match.entryMethod==="ai"?"AI":"Manual"}
+</strong>
+</span>
 
-                <span>
-                    Players entered:
-                    <strong style="color:white">
-                        ${playerCount}
-                    </strong>
-                </span>
+<button
+class="delete-btn"
+style="margin-left:auto"
+onclick="deleteMatch('${escapeJS(match.id)}')"
+>
+Delete
+</button>
 
+</div>
 
-                <span>
-                    Goals conceded:
-                    <strong style="color:white">
-                        ${match.goalsAgainst}
-                    </strong>
-                </span>
+</div>
 
-
-                ${
-                    match.cleanSheet
-
-                    ?
-
-                    `<span style="color:#69d38b">
-                        ✓ Clean Sheet
-                    </span>`
-
-                    :
-
-                    ""
-
-                }
-
-
-                <span>
-                    Entry:
-                    <strong style="color:white">
-                        ${
-                            match.entryMethod === "ai"
-                            ? "AI"
-                            : "Manual"
-                        }
-                    </strong>
-                </span>
-
-
-                <button
-                    class="delete-btn small-btn"
-                    onclick="deleteMatch('${escapeJS(match.id)}')"
-                    style="margin-left:auto"
-                >
-                    Delete
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
+`;
 }
 
 
-/* =========================================================
-   DELETE MATCH
-========================================================= */
+function deleteMatch(id){
 
-function deleteMatch(id) {
+    const career=getCurrentCareer();
 
-    const career =
-        getCurrentCareer();
+    if(!career)return;
 
-
-    if (!career) return;
-
-
-    if (
-        !confirm(
-            "Delete this match?"
-        )
-    ) {
-
+    if(!confirm("Delete this match?"))
         return;
 
-    }
-
-
-    career.matches =
+    career.matches=
         career.matches.filter(
-            match =>
-                match.id !== id
+            x=>x.id!==id
         );
-
 
     saveCareers();
 
     renderMatches();
-
 }
 
 
 /* =========================================================
-   PLAYERS PAGE
+   CALENDAR
 ========================================================= */
 
-function renderPlayers() {
+function renderCalendar(){
 
-    const career =
-        getCurrentCareer();
+    const career=getCurrentCareer();
 
-
-    if (!career) {
-
+    if(!career){
         renderDashboard();
-
         return;
-
     }
 
-
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
-
-        ${careerBanner(career)}
-
-
-        <div class="topbar">
-
-            <div>
-
-                <div class="page-title">
-                    Players
-                </div>
-
-                <div class="page-subtitle">
-                    FC 27 men's player database.
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel">
-
-            <input
-                id="playerSearch"
-                class="search-input"
-                placeholder="Search players..."
-                oninput="searchPlayers(this.value)"
-            >
-
-
-            <div
-                id="playersList"
-                class="player-grid"
-            ></div>
-
-        </div>
-
-    `;
-
-
-    displayPlayers(
-        allPlayers.slice(0,100)
-    );
-
-}
-
-
-function searchPlayers(query) {
-
-    const q =
-        query
-            .trim()
-            .toLowerCase();
-
-
-    const results =
-        allPlayers
-            .filter(player => {
-
-                const name =
-                    `
-                    ${player.firstName || ""}
-                    ${player.lastName || ""}
-                    ${player.commonName || ""}
-                    `
-                    .toLowerCase();
-
-
-                return name.includes(q);
-
-            })
-            .slice(0,100);
-
-
-    displayPlayers(results);
-
-}
-
-
-function displayPlayers(players) {
-
-    const container =
-        document.getElementById(
-            "playersList"
+    const calendar=[...career.calendar]
+        .sort(
+            (a,b)=>
+                new Date(a.date)-new Date(b.date)
         );
 
+    document.getElementById("pageContent").innerHTML=`
 
-    if (!container) return;
+${careerBanner(career)}
+
+<div class="topbar">
+
+<div>
+<div class="page-title">Calendar</div>
+
+<div class="page-subtitle">
+Your complete ${escapeHTML(career.currentSeason)} fixture calendar.
+</div>
+</div>
+
+<div style="display:flex;gap:8px">
+
+<button
+class="secondary-btn"
+onclick="openCalendarUpload()"
+>
+📸 Upload Calendar
+</button>
+
+</div>
+
+</div>
 
 
-    container.innerHTML =
-        players.length
+<div class="panel">
 
-        ?
+<div class="calendar-toolbar">
 
-        players
-            .map(
-                player => `
+<div>
+<div class="panel-title">
+${calendar.length} scheduled matches
+</div>
 
-                    <div class="player-card">
+<div class="panel-subtitle" style="margin-bottom:0">
+Click a match for details. ⭐ favourite important fixtures.
+</div>
+</div>
 
-                        <div class="player-name">
+</div>
 
-                            ${escapeHTML(
-                                player.commonName ||
-                                `${player.firstName || ""}
-                                 ${player.lastName || ""}`.trim()
-                            )}
 
-                        </div>
+${
+calendar.length
+?
+`
+<div class="calendar-list">
+${calendar.map(createCalendarMatch).join("")}
+</div>
+`
+:
+`
+<div class="calendar-empty">
 
-                        <div class="player-club">
+<h2 style="color:white">
+No calendar yet
+</h2>
 
-                            ${escapeHTML(
-                                player.club ||
-                                "Free Agent"
-                            )}
+<p>
+Upload screenshots of your season calendar.
+</p>
 
-                        </div>
+<button
+class="primary-btn"
+onclick="openCalendarUpload()"
+>
+Upload Calendar Screenshots
+</button>
 
-                        <div
-                            style="
-                                display:flex;
-                                gap:15px;
-                                margin-top:12px;
-                                color:#8d97a3;
-                                font-size:12px
-                            "
-                        >
+</div>
+`
+}
 
-                            <span>
-                                <strong style="color:white">
-                                    ${escapeHTML(
-                                        player.overallRating ||
-                                        "—"
-                                    )}
-                                </strong>
-                                OVR
-                            </span>
+</div>
 
-                            <span>
-                                ${escapeHTML(
-                                    player.position ||
-                                    "—"
-                                )}
-                            </span>
+`;
+}
 
-                            <span>
-                                ${escapeHTML(
-                                    player.nationality ||
-                                    "—"
-                                )}
-                            </span>
 
-                        </div>
+function competitionTheme(competition){
 
-                    </div>
+    const c=(competition||"").toLowerCase();
 
-                `
-            )
-            .join("")
+    if(c.includes("premier"))
+        return "theme-premier";
 
-        :
+    if(c.includes("fa cup"))
+        return "theme-fa";
 
-        `
-            <div style="color:#7f8996">
-                No players found.
-            </div>
-        `;
+    if(c.includes("carabao"))
+        return "theme-carabao";
 
+    if(c.includes("champions"))
+        return "theme-champions";
+
+    if(c.includes("europa"))
+        return "theme-europa";
+
+    if(c.includes("conference"))
+        return "theme-conference";
+
+    if(c.includes("la liga"))
+        return "theme-la-liga";
+
+    if(c.includes("bundesliga"))
+        return "theme-bundesliga";
+
+    if(c.includes("serie"))
+        return "theme-seriea";
+
+    if(c.includes("ligue"))
+        return "theme-ligue1";
+
+    if(c.includes("friendly"))
+        return "theme-friendly";
+
+    if(c.includes("world cup"))
+        return "theme-worldcup";
+
+    if(
+        c.includes("international")
+        ||
+        c.includes("nations")
+        ||
+        c.includes("european championship")
+    )
+        return "theme-international";
+
+    return "theme-friendly";
+}
+
+
+function createCalendarMatch(match){
+
+    const theme=
+        competitionTheme(match.competition);
+
+    return `
+
+<div
+class="calendar-match ${theme} ${match.favorite?"favorite":""}"
+onclick="openCalendarMatch('${escapeJS(match.id)}')"
+>
+
+<div class="calendar-top">
+
+<div class="calendar-date">
+${formatDate(match.date)}
+</div>
+
+<div class="calendar-competition">
+${escapeHTML(match.competition)}
+</div>
+
+<button
+class="favorite-btn ${match.favorite?"active":""}"
+onclick="toggleFavorite('${escapeJS(match.id)}',event)"
+title="Favourite"
+>
+${match.favorite?"★":"☆"}
+</button>
+
+</div>
+
+
+<div class="calendar-opponent">
+${escapeHTML(match.opponent)}
+</div>
+
+<div class="calendar-meta">
+
+${escapeHTML(match.homeAway||"")}
+
+${
+match.round
+?
+` • ${escapeHTML(match.round)}`
+:""
+}
+
+</div>
+
+</div>
+
+`;
+}
+
+
+function toggleFavorite(id,event){
+
+    event.stopPropagation();
+
+    const career=getCurrentCareer();
+
+    if(!career)return;
+
+    const match=career.calendar.find(
+        x=>x.id===id
+    );
+
+    if(!match)return;
+
+    match.favorite=!match.favorite;
+
+    saveCareers();
+
+    renderCalendar();
+}
+
+
+function openCalendarMatch(id){
+
+    const career=getCurrentCareer();
+
+    if(!career)return;
+
+    const match=career.calendar.find(
+        x=>x.id===id
+    );
+
+    if(!match)return;
+
+    document.getElementById("modalContainer").innerHTML=`
+
+<div class="modal-overlay" onclick="closeModalOutside(event)">
+
+<div class="modal" onclick="event.stopPropagation()">
+
+<div class="modal-header">
+
+<div class="modal-title">
+Match Details
+</div>
+
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
+
+</div>
+
+
+<div
+class="calendar-match ${competitionTheme(match.competition)}"
+style="cursor:default"
+>
+
+<div class="calendar-top">
+
+<div class="calendar-date">
+${formatDate(match.date)}
+</div>
+
+<div class="calendar-competition">
+${escapeHTML(match.competition)}
+</div>
+
+</div>
+
+<div class="calendar-opponent">
+${escapeHTML(match.opponent)}
+</div>
+
+<div class="calendar-meta">
+${escapeHTML(match.homeAway||"")}
+${match.round?` • ${escapeHTML(match.round)}`:""}
+</div>
+
+</div>
+
+
+<div style="
+display:flex;
+gap:10px;
+margin-top:20px;
+justify-content:flex-end
+">
+
+<button
+class="secondary-btn"
+onclick="toggleFavoriteFromModal('${escapeJS(match.id)}')"
+>
+${match.favorite?"★ Unfavourite":"☆ Favourite Match"}
+</button>
+
+<button
+class="primary-btn"
+onclick="closeModal()"
+>
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+}
+
+
+function toggleFavoriteFromModal(id){
+
+    const career=getCurrentCareer();
+
+    const match=career.calendar.find(
+        x=>x.id===id
+    );
+
+    if(match)
+        match.favorite=!match.favorite;
+
+    saveCareers();
+
+    closeModal();
+
+    renderCalendar();
+}
+
+
+/* =========================================================
+   CALENDAR UPLOAD
+========================================================= */
+
+function openCalendarUpload(){
+
+    document.getElementById("modalContainer").innerHTML=`
+
+<div class="modal-overlay" onclick="closeModalOutside(event)">
+
+<div class="modal" onclick="event.stopPropagation()">
+
+<div class="modal-header">
+
+<div class="modal-title">
+Upload Season Calendar
+</div>
+
+<button
+class="close-btn"
+onclick="closeModal()"
+>
+×
+</button>
+
+</div>
+
+
+<div class="panel-subtitle">
+
+Upload screenshots of your full FC season calendar.
+You can upload multiple screenshots.
+
+</div>
+
+
+<label
+for="calendarFiles"
+class="upload-area"
+style="display:block;cursor:pointer"
+>
+
+<div class="upload-icon">
+🗓️
+</div>
+
+<div class="upload-title">
+Select calendar screenshots
+</div>
+
+<div class="upload-description">
+
+Upload all pages/screenshots of the calendar.
+The AI system will eventually turn them into
+individual fixtures automatically.
+
+</div>
+
+<span class="primary-btn">
+Choose Calendar Screenshots
+</span>
+
+<input
+id="calendarFiles"
+type="file"
+accept="image/*"
+multiple
+style="display:none"
+onchange="showCalendarFiles(this.files)"
+>
+
+</label>
+
+
+<div id="calendarFileList" class="file-list"></div>
+
+
+<div class="review-box">
+
+<strong>
+What the AI will create
+</strong>
+
+<p style="
+color:#7f8996;
+font-size:12px;
+line-height:1.7
+">
+
+Each fixture will become its own calendar entry
+with:
+
+<br><br>
+
+• Date<br>
+• Competition<br>
+• Opponent<br>
+• Home/Away<br>
+• Round where visible
+
+<br><br>
+
+You will then be able to favourite important matches.
+
+</p>
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+class="secondary-btn"
+onclick="closeModal()"
+>
+Cancel
+</button>
+
+<button
+id="calendarAnalyseButton"
+class="primary-btn"
+disabled
+onclick="startCalendarAI()"
+>
+Analyse Calendar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+}
+
+
+function showCalendarFiles(files){
+
+    calendarUploadFiles=
+        Array.from(files||[]);
+
+    const container=
+        document.getElementById("calendarFileList");
+
+    const button=
+        document.getElementById("calendarAnalyseButton");
+
+    container.innerHTML="";
+
+    calendarUploadFiles.forEach(
+        (file,i)=>{
+
+            const div=document.createElement("div");
+
+            div.className="file-item";
+
+            div.textContent=
+                `Calendar screenshot ${i+1}: ${file.name}`;
+
+            container.appendChild(div);
+        }
+    );
+
+    button.disabled=
+        calendarUploadFiles.length===0;
+}
+
+
+function startCalendarAI(){
+
+    if(!calendarUploadFiles.length)
+        return;
+
+    document.getElementById("modalContainer").innerHTML=`
+
+<div class="modal-overlay">
+
+<div class="modal">
+
+<div class="modal-header">
+
+<div class="modal-title">
+Calendar AI
+</div>
+
+</div>
+
+
+<div class="review-box">
+
+<div style="font-size:28px;margin-bottom:10px">
+🗓️
+</div>
+
+<strong>
+${calendarUploadFiles.length}
+calendar screenshot${calendarUploadFiles.length===1?"":"s"}
+received
+</strong>
+
+<p style="
+color:#7f8996;
+line-height:1.7;
+font-size:13px
+">
+
+The calendar upload system is ready.
+
+The next AI connection will read each screenshot
+and create every fixture automatically.
+
+You will then be able to review the extracted
+fixtures before saving them to the Calendar tab.
+
+</p>
+
+<div class="review-warning">
+
+The calendar will never be saved automatically
+without a review stage.
+
+</div>
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+class="secondary-btn"
+onclick="openCalendarUpload()"
+>
+Back
+</button>
+
+<button
+class="primary-btn"
+onclick="closeModal()"
+>
+Done
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+}
+
+
+/* =========================================================
+   PLAYERS
+========================================================= */
+
+function renderPlayers(){
+
+    const career=getCurrentCareer();
+
+    if(!career){
+        renderDashboard();
+        return;
+    }
+
+    document.getElementById("pageContent").innerHTML=`
+
+${careerBanner(career)}
+
+<div class="topbar">
+
+<div>
+<div class="page-title">Players</div>
+<div class="page-subtitle">
+FC 27 men's player database.
+</div>
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<input
+id="playerSearch"
+class="search-input"
+placeholder="Search players..."
+oninput="searchPlayers(this.value)"
+>
+
+<div
+id="playersList"
+class="player-grid"
+></div>
+
+</div>
+
+`;
+
+    displayPlayers(allPlayers.slice(0,100));
+}
+
+
+function searchPlayers(query){
+
+    const q=(query||"").toLowerCase();
+
+    const results=allPlayers
+        .filter(player=>{
+
+            const name=`
+                ${player.firstName||""}
+                ${player.lastName||""}
+                ${player.commonName||""}
+            `.toLowerCase();
+
+            return name.includes(q);
+        })
+        .slice(0,100);
+
+    displayPlayers(results);
+}
+
+
+function displayPlayers(players){
+
+    const container=document.getElementById("playersList");
+
+    if(!container)return;
+
+    container.innerHTML=players.length
+    ?
+    players.map(player=>`
+
+<div class="player-card">
+
+<div class="player-name">
+${escapeHTML(
+player.commonName||
+`${player.firstName||""} ${player.lastName||""}`.trim()
+)}
+</div>
+
+<div class="player-club">
+${escapeHTML(player.club||"Free Agent")}
+</div>
+
+<div style="
+display:flex;
+gap:15px;
+margin-top:12px;
+color:#8d97a3;
+font-size:12px
+">
+
+<span>
+<strong style="color:white">
+${escapeHTML(player.overallRating||"—")}
+</strong>
+OVR
+</span>
+
+<span>
+${escapeHTML(player.position||"—")}
+</span>
+
+<span>
+${escapeHTML(player.nationality||"—")}
+</span>
+
+</div>
+
+</div>
+
+`).join("")
+    :
+    `<div style="color:#7f8996">No players found.</div>`;
 }
 
 
@@ -4170,71 +4502,56 @@ function displayPlayers(players) {
    PLACEHOLDER
 ========================================================= */
 
-function renderPlaceholder(
-    title,
-    description
-) {
+function renderPlaceholder(title,description){
 
-    const career =
-        getCurrentCareer();
+    const career=getCurrentCareer();
 
-
-    if (!career) {
-
+    if(!career){
         renderDashboard();
-
         return;
-
     }
 
+    document.getElementById("pageContent").innerHTML=`
 
-    document.getElementById(
-        "pageContent"
-    ).innerHTML = `
+${careerBanner(career)}
 
-        ${careerBanner(career)}
+<div class="topbar">
 
+<div>
+<div class="page-title">${escapeHTML(title)}</div>
+<div class="page-subtitle">
+${escapeHTML(description)}
+</div>
+</div>
 
-        <div class="topbar">
-
-            <div>
-
-                <div class="page-title">
-                    ${escapeHTML(title)}
-                </div>
-
-                <div class="page-subtitle">
-                    ${escapeHTML(description)}
-                </div>
-
-            </div>
-
-        </div>
+</div>
 
 
-        <div class="panel">
+<div class="panel">
 
-            <div class="panel-title">
-                Coming next
-            </div>
+<div class="panel-title">
+Coming next
+</div>
 
-            <div class="panel-subtitle">
-                This section is connected to this career save.
-            </div>
+<div class="panel-subtitle">
+This section is connected to this career save.
+</div>
 
-            <p style="color:#7f8996;line-height:1.7">
+<p style="
+color:#7f8996;
+line-height:1.7
+">
 
-                Everything on this page will belong specifically
-                to <strong style="color:white">
-                ${escapeHTML(career.clubName)}
-                </strong>.
+Everything on this page will belong specifically
+to <strong style="color:white">
+${escapeHTML(career.clubName)}
+</strong>.
 
-            </p>
+</p>
 
-        </div>
+</div>
 
-    `;
-
+`;
 }
 
 
@@ -4242,47 +4559,25 @@ function renderPlaceholder(
    DELETE CAREER
 ========================================================= */
 
-function deleteCareer(id,event) {
+function deleteCareer(id,event){
 
-    if (event) {
-
+    if(event)
         event.stopPropagation();
 
-    }
+    const career=careers.find(c=>c.id===id);
 
+    if(!career)return;
 
-    const career =
-        careers.find(
-            c =>
-                c.id === id
-        );
-
-
-    if (!career) return;
-
-
-    if (
-        !confirm(
-            `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
-        )
-    ) {
-
+    if(!confirm(
+        `Delete the career of ${career.managerName} at ${career.clubName}?\n\nThis cannot be undone.`
+    ))
         return;
 
-    }
-
-
-    careers =
-        careers.filter(
-            c =>
-                c.id !== id
-        );
-
+    careers=careers.filter(c=>c.id!==id);
 
     saveCareers();
 
     renderDashboard();
-
 }
 
 
@@ -4290,701 +4585,377 @@ function deleteCareer(id,event) {
    CSV
 ========================================================= */
 
-function parseCSV(text) {
+function parseCSV(text){
 
-    const rows = [];
+    const rows=[];
+    let row=[];
+    let value="";
+    let insideQuotes=false;
 
-    let row = [];
+    for(let i=0;i<text.length;i++){
 
-    let value = "";
+        const char=text[i];
+        const next=text[i+1];
 
-    let insideQuotes = false;
-
-
-    for (
-        let i = 0;
-        i < text.length;
-        i++
-    ) {
-
-        const char = text[i];
-
-        const next = text[i + 1];
-
-
-        if (
-            char === '"' &&
-            insideQuotes &&
-            next === '"'
-        ) {
-
-            value += '"';
-
+        if(char==='"'&&insideQuotes&&next==='"'){
+            value+='"';
             i++;
-
             continue;
-
         }
 
-
-        if (char === '"') {
-
-            insideQuotes =
-                !insideQuotes;
-
+        if(char==='"'){
+            insideQuotes=!insideQuotes;
             continue;
-
         }
 
-
-        if (
-            char === "," &&
-            !insideQuotes
-        ) {
+        if(char===","&&!insideQuotes){
 
             row.push(value);
-
-            value = "";
-
+            value="";
             continue;
-
         }
 
-
-        if (
-            (
-                char === "\n" ||
-                char === "\r"
-            ) &&
+        if(
+            (char==="\n"||char==="\r")
+            &&
             !insideQuotes
-        ) {
+        ){
 
-            if (
-                char === "\r" &&
-                next === "\n"
-            ) {
-
+            if(char==="\r"&&next==="\n")
                 i++;
 
-            }
-
-
             row.push(value);
+            value="";
 
-            value = "";
-
-
-            if (
-                row.some(
-                    cell =>
-                        cell.trim() !== ""
-                )
-            ) {
-
+            if(row.some(x=>x.trim()!==""))
                 rows.push(row);
 
-            }
-
-
-            row = [];
+            row=[];
 
             continue;
-
         }
 
-
-        value += char;
-
+        value+=char;
     }
 
-
-    if (
-        value !== "" ||
-        row.length > 0
-    ) {
+    if(value!==""||row.length){
 
         row.push(value);
 
-        if (
-            row.some(
-                cell =>
-                    cell.trim() !== ""
-            )
-        ) {
-
+        if(row.some(x=>x.trim()!==""))
             rows.push(row);
-
-        }
-
     }
 
+    if(!rows.length)
+        return[];
 
-    if (!rows.length) {
+    const headers=rows[0].map(x=>x.trim());
 
-        return [];
+    return rows.slice(1).map(row=>{
 
-    }
+        const obj={};
 
-
-    const headers =
-        rows[0].map(
-            header =>
-                header.trim()
+        headers.forEach(
+            (header,i)=>{
+                obj[header]=
+                    row[i]!==undefined
+                    ?row[i].trim()
+                    :"";
+            }
         );
 
-
-    return rows
-        .slice(1)
-        .map(row => {
-
-            const object = {};
-
-
-            headers.forEach(
-                (header,index) => {
-
-                    object[header] =
-                        row[index] !== undefined
-                        ? row[index].trim()
-                        : "";
-
-                }
-            );
-
-
-            return object;
-
-        });
-
+        return obj;
+    });
 }
 
 
-function getPlayerValue(
-    row,
-    names
-) {
+function getPlayerValue(row,names){
 
-    for (
-        const name of names
-    ) {
+    for(const name of names){
 
-        if (
-            row[name] !== undefined &&
-            row[name] !== ""
-        ) {
-
+        if(
+            row[name]!==undefined
+            &&
+            row[name]!==""
+        )
             return row[name];
-
-        }
-
     }
-
 
     return "";
-
 }
 
 
-function calculateAge(
-    birthdate
-) {
+function calculateAge(birthdate){
 
-    if (!birthdate) return "";
+    if(!birthdate)return"";
 
+    const date=new Date(birthdate);
 
-    const date =
-        new Date(birthdate);
+    if(isNaN(date.getTime()))
+        return"";
 
+    const now=new Date();
 
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "";
-
-    }
-
-
-    const now =
-        new Date();
-
-
-    let age =
-        now.getFullYear() -
+    let age=
+        now.getFullYear()-
         date.getFullYear();
 
-
-    const month =
-        now.getMonth() -
+    const month=
+        now.getMonth()-
         date.getMonth();
 
-
-    if (
-        month < 0 ||
+    if(
+        month<0
+        ||
         (
-            month === 0 &&
-            now.getDate() <
-            date.getDate()
+            month===0
+            &&
+            now.getDate()<date.getDate()
         )
-    ) {
-
+    )
         age--;
 
-    }
-
-
     return age;
-
 }
 
 
-function convertPlayer(row) {
+function convertPlayer(row){
 
-    return {
+    return{
 
-        id:
-            getPlayerValue(
-                row,
-                ["id"]
-            ),
+        id:getPlayerValue(row,["id"]),
 
-        rank:
-            getPlayerValue(
-                row,
-                ["rank"]
-            ),
+        rank:getPlayerValue(row,["rank"]),
 
-        overallRating:
-            getPlayerValue(
-                row,
-                [
-                    "overallRating",
-                    "overall",
-                    "rating"
-                ]
-            ),
+        overallRating:getPlayerValue(
+            row,
+            ["overallRating","overall","rating"]
+        ),
 
-        firstName:
-            getPlayerValue(
-                row,
-                [
-                    "firstName",
-                    "first_name"
-                ]
-            ),
+        firstName:getPlayerValue(
+            row,
+            ["firstName","first_name"]
+        ),
 
-        lastName:
-            getPlayerValue(
-                row,
-                [
-                    "lastName",
-                    "last_name"
-                ]
-            ),
+        lastName:getPlayerValue(
+            row,
+            ["lastName","last_name"]
+        ),
 
-        commonName:
-            getPlayerValue(
-                row,
-                [
-                    "commonName",
-                    "common_name"
-                ]
-            ),
+        commonName:getPlayerValue(
+            row,
+            ["commonName","common_name"]
+        ),
 
-        birthdate:
-            getPlayerValue(
-                row,
-                ["birthdate"]
-            ),
+        birthdate:getPlayerValue(
+            row,
+            ["birthdate"]
+        ),
 
-        age:
-            calculateAge(
-                getPlayerValue(
-                    row,
-                    ["birthdate"]
-                )
-            ),
+        age:calculateAge(
+            getPlayerValue(row,["birthdate"])
+        ),
 
-        league:
-            getPlayerValue(
-                row,
-                [
-                    "leagueName",
-                    "league"
-                ]
-            ),
+        league:getPlayerValue(
+            row,
+            ["leagueName","league"]
+        ),
 
-        club:
-            getPlayerValue(
-                row,
-                [
-                    "team",
-                    "club"
-                ]
-            ),
+        club:getPlayerValue(
+            row,
+            ["team","club"]
+        ),
 
-        nationality:
-            getPlayerValue(
-                row,
-                ["nationality"]
-            ),
+        nationality:getPlayerValue(
+            row,
+            ["nationality"]
+        ),
 
-        position:
-            getPlayerValue(
-                row,
-                [
-                    "positionShort",
-                    "position"
-                ]
-            ),
+        position:getPlayerValue(
+            row,
+            ["positionShort","position"]
+        ),
 
-        preferredFoot:
-            getPlayerValue(
-                row,
-                ["preferredFoot"]
-            ),
+        preferredFoot:getPlayerValue(
+            row,
+            ["preferredFoot"]
+        ),
 
-        avatarUrl:
-            getPlayerValue(
-                row,
-                ["avatarUrl"]
-            ),
+        avatarUrl:getPlayerValue(
+            row,
+            ["avatarUrl"]
+        ),
 
-        shieldUrl:
-            getPlayerValue(
-                row,
-                ["shieldUrl"]
-            )
-
+        shieldUrl:getPlayerValue(
+            row,
+            ["shieldUrl"]
+        )
     };
-
 }
 
 
-/* =========================================================
-   BUILD FC27 LEAGUES
-========================================================= */
+function buildFC27LeagueDatabase(){
 
-function buildFC27LeagueDatabase() {
+    const leagueSet=new Set();
+    const clubsByLeague={};
 
-    const leagueSet =
-        new Set();
+    allPlayers.forEach(player=>{
 
+        const league=player.league;
+        const club=player.club;
 
-    const clubsByLeague = {};
+        if(!league)return;
 
+        leagueSet.add(league);
 
-    allPlayers.forEach(
-        player => {
+        if(!clubsByLeague[league])
+            clubsByLeague[league]=new Set();
 
-            const league =
-                player.league;
+        if(club)
+            clubsByLeague[league].add(club);
+    });
 
-            const club =
-                player.club;
+    fc27Leagues=
+        Array.from(leagueSet)
+        .sort((a,b)=>a.localeCompare(b));
 
+    fc27ClubsByLeague={};
 
-            if (!league) return;
+    Object.keys(clubsByLeague).forEach(
+        league=>{
 
-
-            leagueSet.add(
-                league
-            );
-
-
-            if (
-                !clubsByLeague[league]
-            ) {
-
-                clubsByLeague[league] =
-                    new Set();
-
-            }
-
-
-            if (club) {
-
-                clubsByLeague[
-                    league
-                ].add(club);
-
-            }
-
-        }
-    );
-
-
-    fc27Leagues =
-        Array.from(
-            leagueSet
-        ).sort(
-            (a,b) =>
-                a.localeCompare(b)
-        );
-
-
-    fc27ClubsByLeague = {};
-
-
-    Object.keys(
-        clubsByLeague
-    ).forEach(
-        league => {
-
-            fc27ClubsByLeague[
-                league
-            ] =
+            fc27ClubsByLeague[league]=
                 Array.from(
-                    clubsByLeague[
-                        league
-                    ]
+                    clubsByLeague[league]
                 ).sort(
-                    (a,b) =>
-                        a.localeCompare(b)
+                    (a,b)=>a.localeCompare(b)
                 );
-
         }
     );
-
 }
 
 
-/* =========================================================
-   LOAD DATABASE
-========================================================= */
+async function loadDatabase(){
 
-async function loadDatabase() {
+    try{
 
-    try {
-
-        const response =
+        const response=
             await fetch(
-                "data/players.csv?cache=" +
-                Date.now()
+                "data/players.csv?cache="+Date.now()
             );
 
+        if(!response.ok)
+            throw new Error("CSV failed");
 
-        if (!response.ok) {
+        const text=await response.text();
 
-            throw new Error(
-                "Could not load players.csv"
-            );
+        const rows=parseCSV(text);
 
-        }
-
-
-        const text =
-            await response.text();
-
-
-        const rows =
-            parseCSV(text);
-
-
-        allPlayers =
-            rows.map(
-                convertPlayer
-            );
-
+        allPlayers=rows.map(convertPlayer);
 
         buildFC27LeagueDatabase();
 
-
         console.log(
-            "Players loaded:",
+            "FC27 players loaded:",
             allPlayers.length
         );
 
-
-    }
-
-    catch(error) {
+    }catch(error){
 
         console.error(
-            "Database error:",
+            "Player database error:",
             error
         );
-
     }
-
 }
 
 
 /* =========================================================
-   PROMOTION / RELEGATION FOUNDATION
+   MODAL / HELPERS
 ========================================================= */
 
-function updateCareerLeague(
-    careerId,
-    newLeague,
-    newSeason
-) {
+function closeModal(){
 
-    const career =
-        careers.find(
-            c =>
-                c.id === careerId
-        );
-
-
-    if (!career) return;
-
-
-    career.leagueHistory.push({
-
-        season:
-            newSeason,
-
-        league:
-            newLeague
-
-    });
-
-
-    career.league =
-        newLeague;
-
-
-    career.currentSeason =
-        newSeason;
-
-
-    career.seasonNumber =
-        (career.seasonNumber || 1) + 1;
-
-
-    saveCareers();
-
-
-    if (
-        currentCareerId === careerId
-    ) {
-
-        renderCareerHome();
-
-    }
-
+    document.getElementById("modalContainer").innerHTML="";
 }
 
 
-/* =========================================================
-   HELPERS
-========================================================= */
+function closeModalOutside(event){
 
-function createId() {
-
-    return (
-        Date.now().toString() +
-        Math.random()
-            .toString(36)
-            .substring(2)
-    );
-
+    if(event.target===event.currentTarget)
+        closeModal();
 }
 
 
-function todayDate() {
+function createId(){
+
+    return Date.now().toString()+
+        Math.random().toString(36).substring(2);
+}
+
+
+function todayDate(){
 
     return new Date()
         .toISOString()
         .split("T")[0];
-
 }
 
 
-function formatDate(dateString) {
+function formatDate(dateString){
 
-    if (!dateString) return "—";
+    if(!dateString)return"—";
 
+    const date=new Date(
+        dateString+"T00:00:00"
+    );
 
-    const date =
-        new Date(
-            dateString +
-            "T00:00:00"
-        );
-
-
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-
+    if(isNaN(date.getTime()))
         return dateString;
-
-    }
-
 
     return date.toLocaleDateString(
         "en-AU",
         {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
+            day:"numeric",
+            month:"short",
+            year:"numeric"
         }
     );
-
 }
 
 
-function escapeHTML(value) {
+function escapeHTML(value){
 
-    return String(
-        value ?? ""
-    )
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
+    return String(value??"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
 
-function escapeJS(value) {
+function escapeJS(value){
 
-    return String(
-        value ?? ""
-    )
-    .replace(/\\/g,"\\\\")
-    .replace(/'/g,"\\'")
-    .replace(/\n/g,"\\n")
-    .replace(/\r/g,"\\r");
-
+    return String(value??"")
+        .replace(/\\/g,"\\\\")
+        .replace(/'/g,"\\'")
+        .replace(/\n/g,"\\n")
+        .replace(/\r/g,"\\r");
 }
 
 
-/* =========================================================
-   CLOSE DROPDOWNS
-========================================================= */
+document.addEventListener("click",function(event){
 
-document.addEventListener(
-    "click",
-    function(event) {
+    if(!event.target.closest(".search-select")){
 
-        if (
-            !event.target.closest(
-                ".search-select"
-            )
-        ) {
-
-            document
-                .querySelectorAll(
-                    ".search-results"
-                )
-                .forEach(
-                    result =>
-                        result.classList.remove(
-                            "open"
-                        )
-                );
-
-        }
-
+        document
+            .querySelectorAll(".search-results")
+            .forEach(
+                x=>x.classList.remove("open")
+            );
     }
-);
+});
 
 
 /* =========================================================
