@@ -494,7 +494,10 @@ button{cursor:pointer}
     flex-direction:column;
     gap:10px;
     margin-top:15px;
+    overflow-x:auto;
 }
+.player-entry{min-width:760px}
+.player-entry-header{min-width:760px}
 
 .player-entry{
     background:#171d25;
@@ -1301,6 +1304,7 @@ ${career.calendar.length}
 <div class="career-actions">
 
 <button
+type="button"
 class="primary-btn"
 onclick="enterCareer('${escapeJS(career.id)}')"
 >
@@ -1592,6 +1596,7 @@ margin-top:25px;
 ">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="showPage('dashboard')"
 >
@@ -1599,6 +1604,7 @@ Cancel
 </button>
 
 <button
+type="button"
 class="primary-btn"
 onclick="createCareer()"
 >
@@ -2042,6 +2048,7 @@ ${escapeHTML(career.currentSeason)}
 <div style="display:flex;gap:8px">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="openSeasonSetup(false)"
 >
@@ -2049,6 +2056,7 @@ Season Setup
 </button>
 
 <button
+type="button"
 class="primary-btn"
 onclick="openCalendarUpload()"
 >
@@ -2270,6 +2278,7 @@ ${escapeHTML(career.league)}
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -2331,6 +2340,7 @@ margin-top:15px
 <div class="modal-actions">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="closeModal()"
 >
@@ -2338,6 +2348,7 @@ Cancel
 </button>
 
 <button
+type="button"
 class="primary-btn"
 onclick="saveSeasonTeams()"
 >
@@ -2683,6 +2694,7 @@ Record matches manually or use Match Facts.
 </div>
 
 <button
+type="button"
 class="primary-btn"
 onclick="openMatchMethod()"
 >
@@ -2749,6 +2761,7 @@ Add your first match.
 </p>
 
 <button
+type="button"
 class="primary-btn"
 onclick="openMatchMethod()"
 >
@@ -2784,6 +2797,7 @@ Add Match
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -2868,6 +2882,7 @@ Manual Match Entry
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -3009,15 +3024,8 @@ only some players, or none.
 </div>
 
 
-<div class="player-entry player-entry-header">
-
-<div>Player</div>
-<div>Rating</div>
-<div>Goals</div>
-<div>Assists</div>
-<div>Cards</div>
-<div></div>
-
+<div class="player-entry player-entry-header" style="grid-template-columns:minmax(130px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px">
+<div>Player</div><div>Rating</div><div>Goals</div><div>Assists</div><div>Minutes</div><div>Saves</div><div>Yellow</div><div>Red</div><div></div>
 </div>
 
 
@@ -3028,6 +3036,7 @@ class="player-entry-list"
 
 
 <button
+type="button"
 class="secondary-btn"
 onclick="addManualPlayer()"
 style="margin-top:14px"
@@ -3041,6 +3050,7 @@ style="margin-top:14px"
 <div class="modal-actions">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="openMatchMethod()"
 >
@@ -3048,6 +3058,7 @@ Back
 </button>
 
 <button
+type="button"
 class="primary-btn"
 onclick="saveManualMatch()"
 >
@@ -3168,74 +3179,30 @@ function chooseMatchOpponent(team){
 ========================================================= */
 
 function addManualPlayer(){
-
     const container=document.getElementById("manualPlayers");
-
     if(!container)return;
-
     const id=createId();
-
     manualPlayers.push(id);
-
+    const career=getCurrentCareer();
+    const squadNames=(career?.squad||[]).map(p=>typeof p==="string"?p:(p.name||p.playerName||"")).filter(Boolean);
+    const databaseNames=allPlayers.map(p=>p.commonName||[p.firstName,p.lastName].filter(Boolean).join(" ")).filter(Boolean);
+    const names=Array.from(new Set([...squadNames,...databaseNames])).sort((a,b)=>a.localeCompare(b));
     const row=document.createElement("div");
-
     row.className="player-entry";
     row.dataset.playerId=id;
-
+    row.style.gridTemplateColumns="minmax(130px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px";
     row.innerHTML=`
-
-<input
-class="form-input"
-data-field="name"
-placeholder="Player name"
->
-
-<input
-class="form-input"
-data-field="rating"
-type="number"
-min="0"
-max="10"
-step=".1"
-placeholder="—"
->
-
-<input
-class="form-input"
-data-field="goals"
-type="number"
-min="0"
-placeholder="0"
->
-
-<input
-class="form-input"
-data-field="assists"
-type="number"
-min="0"
-placeholder="0"
->
-
-<select
-class="form-select"
-data-field="cards"
->
-
-<option value="">—</option>
-<option value="Yellow">Yellow</option>
-<option value="Red">Red</option>
-
-</select>
-
-<button
-class="remove-player"
-onclick="removeManualPlayer('${id}')"
->
-×
-</button>
-
-`;
-
+      <input class="form-input" data-field="name" list="manualPlayerOptions" placeholder="Search player" autocomplete="off" aria-label="Player name">
+      <datalist id="manualPlayerOptions">${names.map(name=>`<option value="${escapeHTML(name)}"></option>`).join("")}</datalist>
+      <input class="form-input" data-field="rating" type="number" min="0" max="10" step=".1" placeholder="—" aria-label="Rating">
+      <input class="form-input" data-field="goals" type="number" min="0" placeholder="0" aria-label="Goals">
+      <input class="form-input" data-field="assists" type="number" min="0" placeholder="0" aria-label="Assists">
+      <input class="form-input" data-field="minutes" type="number" min="0" max="130" placeholder="—" aria-label="Minutes">
+      <input class="form-input" data-field="saves" type="number" min="0" placeholder="—" aria-label="Saves">
+      <input class="form-input" data-field="yellowCards" type="number" min="0" placeholder="0" aria-label="Yellow cards">
+      <input class="form-input" data-field="redCards" type="number" min="0" placeholder="0" aria-label="Red cards">
+      <button class="remove-player" type="button" onclick="removeManualPlayer('${id}')">×</button>
+    `;
     container.appendChild(row);
 }
 
@@ -3300,51 +3267,22 @@ function saveManualMatch(){
 
     const players=[];
 
-    document.querySelectorAll(
-        "#manualPlayers .player-entry"
-    ).forEach(row=>{
-
-        const name=
-            row.querySelector('[data-field="name"]').value.trim();
-
+    document.querySelectorAll("#manualPlayers .player-entry").forEach(row=>{
+        const get=field=>row.querySelector('[data-field="'+field+'"]')?.value??"";
+        const name=get("name").trim();
         if(!name)return;
-
-        const rating=
-            row.querySelector('[data-field="rating"]').value;
-
-        const goals=
-            row.querySelector('[data-field="goals"]').value;
-
-        const assists=
-            row.querySelector('[data-field="assists"]').value;
-
-        const cards=
-            row.querySelector('[data-field="cards"]').value;
-
+        const number=value=>value===""?null:Number(value);
         players.push({
-
             name,
-
-            rating:
-                rating===""
-                ?null
-                :Number(rating),
-
-            goals:
-                goals===""
-                ?0
-                :Number(goals),
-
-            assists:
-                assists===""
-                ?0
-                :Number(assists),
-
-            cards:
-                cards||null
-
+            rating:number(get("rating")),
+            goals:number(get("goals"))??0,
+            assists:number(get("assists"))??0,
+            minutes:number(get("minutes")),
+            saves:number(get("saves")),
+            yellowCards:number(get("yellowCards"))??0,
+            redCards:number(get("redCards"))??0,
+            cards:(Number(get("redCards"))>0?"Red":Number(get("yellowCards"))>0?"Yellow":null)
         });
-
     });
 
     career.matches.push({
@@ -3404,6 +3342,7 @@ Upload Match Facts
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -3485,6 +3424,7 @@ Save Match.
 <div class="modal-actions">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="openMatchMethod()"
 >
@@ -3646,7 +3586,7 @@ function renderAIReviewPlayers(){
     if(!container)return;
     const players=window.__careerAIReviewPlayers||[];
     container.innerHTML=players.map((p,i)=>`
-      <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(130px,1.4fr) repeat(6,minmax(58px,.65fr)) 34px">
+      <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(130px,1.4fr) repeat(7,minmax(58px,.65fr)) 34px">
         <input class="form-input" data-ai-field="name" value="${escapeHTML(p.name)}" placeholder="Player name" aria-label="Player name">
         <input class="form-input" data-ai-field="rating" type="number" min="0" max="10" step=".1" value="${p.rating==null?"":escapeHTML(p.rating)}" placeholder="Rating" aria-label="Rating">
         <input class="form-input" data-ai-field="goals" type="number" min="0" value="${p.goals==null?"":escapeHTML(p.goals)}" placeholder="G" aria-label="Goals">
@@ -3654,6 +3594,7 @@ function renderAIReviewPlayers(){
         <input class="form-input" data-ai-field="minutes" type="number" min="0" max="130" value="${p.minutes==null?"":escapeHTML(p.minutes)}" placeholder="Min" aria-label="Minutes">
         <input class="form-input" data-ai-field="yellowCards" type="number" min="0" value="${p.yellowCards==null?"":escapeHTML(p.yellowCards)}" placeholder="YC" aria-label="Yellow cards">
         <input class="form-input" data-ai-field="redCards" type="number" min="0" value="${p.redCards==null?"":escapeHTML(p.redCards)}" placeholder="RC" aria-label="Red cards">
+        <input class="form-input" data-ai-field="saves" type="number" min="0" value="${p.saves==null?"":escapeHTML(p.saves)}" placeholder="Saves" aria-label="Saves">
         <button class="remove-player" type="button" onclick="removeAIReviewPlayer(${i})">×</button>
       </div>`).join("")||'<div class="info-box">No players were detected. Use Add Player to enter them manually.</div>';
 }
@@ -3685,7 +3626,7 @@ function saveAIReviewPlayerInputs(){
             minutes:num(get("minutes")),
             yellowCards:num(get("yellowCards"))??0,
             redCards:num(get("redCards"))??0,
-            saves:null
+            saves:num(get("saves"))
         });
     });
     return players;
@@ -3886,6 +3827,7 @@ Your complete ${escapeHTML(career.currentSeason)} fixture calendar.
 <div style="display:flex;gap:8px">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="openCalendarUpload()"
 >
@@ -3935,6 +3877,7 @@ Upload screenshots of your season calendar.
 </p>
 
 <button
+type="button"
 class="primary-btn"
 onclick="openCalendarUpload()"
 >
@@ -4107,6 +4050,7 @@ Match Details
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -4153,6 +4097,7 @@ justify-content:flex-end
 ">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="toggleFavoriteFromModal('${escapeJS(match.id)}')"
 >
@@ -4160,6 +4105,7 @@ ${match.favorite?"★ Unfavourite":"☆ Favourite Match"}
 </button>
 
 <button
+type="button"
 class="primary-btn"
 onclick="closeModal()"
 >
@@ -4214,6 +4160,7 @@ Upload Season Calendar
 </div>
 
 <button
+type="button"
 class="close-btn"
 onclick="closeModal()"
 >
@@ -4307,6 +4254,7 @@ You will then be able to favourite important matches.
 <div class="modal-actions">
 
 <button
+type="button"
 class="secondary-btn"
 onclick="closeModal()"
 >
