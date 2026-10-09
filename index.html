@@ -1038,6 +1038,9 @@ let manualPlayers=[];
 let selectedSeasonTeams=[];
 
 let calendarUploadFiles=[];
+let matchUploadFiles=[];
+let aiReviewData=null;
+let aiReviewFiles=[];
 
 
 /* =========================================================
@@ -3508,139 +3511,214 @@ Analyse Screenshots
 
 
 function showSelectedMatchFiles(files){
-
-    const container=
-        document.getElementById("selectedMatchFiles");
-
-    const button=
-        document.getElementById("analyseButton");
-
-    if(!files||!files.length){
-
-        container.innerHTML="";
-        button.disabled=true;
-        return;
-    }
-
+    matchUploadFiles=Array.from(files||[]);
+    const container=document.getElementById("selectedMatchFiles");
+    const button=document.getElementById("analyseButton");
+    if(!container||!button)return;
     container.innerHTML="";
-
-    Array.from(files).forEach((file,i)=>{
-
+    matchUploadFiles.forEach((file,i)=>{
         const div=document.createElement("div");
-
         div.className="file-item";
-
-        div.textContent=
-            `Screenshot ${i+1}: ${file.name}`;
-
+        div.textContent=`Screenshot ${i+1}: ${file.name}`;
         container.appendChild(div);
     });
-
-    button.disabled=false;
+    button.disabled=matchUploadFiles.length===0;
 }
 
+async function startAIAnalysis(){
+    const files=matchUploadFiles.length
+        ? matchUploadFiles
+        : Array.from(document.getElementById("matchFactsFiles")?.files||[]);
+    if(!files.length){
+        alert("Choose at least one Match Facts screenshot.");
+        return;
+    }
+    const button=document.getElementById("analyseButton");
+    if(button){button.disabled=true;button.textContent="Analysing…";}
+    try{
+        const data=await analyseCareerScreenshots("match",files);
+        aiReviewData=data;
+        aiReviewFiles=files.map(f=>f.name);
+        openAIMatchReview(data,aiReviewFiles);
+    }catch(error){
+        showAIError("Match Facts analysis failed",error.message,"match");
+    }finally{
+        const b=document.getElementById("analyseButton");
+        if(b){b.disabled=false;b.textContent="Analyse Screenshots";}
+    }
+}
 
-function startAIAnalysis(){
-
-    /*
-     * Intentionally not pretending to have AI.
-     * This is where the secure AI vision backend will connect.
-     */
-
-    const files=
-        document.getElementById("matchFactsFiles").files;
-
-    if(!files.length)return;
-
+function showAIError(title,message,task){
     document.getElementById("modalContainer").innerHTML=`
-
-<div class="modal-overlay">
-
-<div class="modal">
-
-<div class="modal-header">
-
-<div class="modal-title">
-Match Facts AI
-</div>
-
-</div>
-
-<div class="review-box">
-
-<div style="font-size:28px;margin-bottom:10px">
-📸
-</div>
-
-<strong>
-${files.length} screenshot${files.length===1?"":"s"} received
-</strong>
-
-<p style="
-color:#7f8996;
-line-height:1.7;
-font-size:13px
-">
-
-The upload system is ready.
-
-The next connection will send these screenshots
-to vision AI, which will extract:
-
-<br><br>
-
-• Competition<br>
-• Opponent<br>
-• Score<br>
-• Every player<br>
-• Player ratings<br>
-• Goals<br>
-• Assists<br>
-• Yellow cards<br>
-• Red cards<br>
-• Minutes<br>
-• Goalkeeper statistics where shown
-
-<br><br>
-
-The results will then appear on a review screen
-before anything is saved.
-
-</p>
-
-<div class="review-warning">
-
-Nothing is automatically saved until you review
-the AI results.
-
-</div>
-
-</div>
-
-<div class="modal-actions">
-
-<button
-class="secondary-btn"
-onclick="openAIMatchUpload()"
->
-Back
-</button>
-
-<button
-class="primary-btn"
-onclick="openManualMatch()"
->
-Enter Manually
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">${escapeHTML(title)}</div>
+          <button class="close-btn" type="button" onclick="closeModal()">×</button>
+        </div>
+        <div class="review-warning">${escapeHTML(message||"Something went wrong. Please try again.")}</div>
+        <p style="color:#8993a0;font-size:13px;line-height:1.6">
+          Nothing has been saved. Check your internet connection and try again.
+          If the error mentions a model or free endpoint, the free model may be temporarily unavailable.
+        </p>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" onclick="closeModal()">Close</button>
+          <button class="primary-btn" type="button" onclick="${task==="calendar"?"openCalendarUpload()":"openAIMatchUpload()"}">Back to Upload</button>
+        </div>
+      </div>
+    </div>`;
 }
+
+function openAIMatchReview(data,filenames){
+    const career=getCurrentCareer();
+    if(!career){showAIError("Review unavailable","Open a career before analysing screenshots.","match");return;}
+    const d=data||{};
+    const players=Array.isArray(d.players)?d.players:[];
+    let homeTeam=d.homeTeam||"";
+    let awayTeam=d.awayTeam||"";
+    let opponent=d.opponent||"";
+    let homeAway=d.homeAway||"Home";
+    if(!opponent){
+        if(homeTeam&&homeTeam.toLowerCase()===career.clubName.toLowerCase()){opponent=awayTeam;homeAway="Home";}
+        else if(awayTeam&&awayTeam.toLowerCase()===career.clubName.toLowerCase()){opponent=homeTeam;homeAway="Away";}
+        else opponent=awayTeam||homeTeam||"";
+    }
+    if(d.homeAway==="Away"||d.homeAway==="Home")homeAway=d.homeAway;
+    let goalsFor=d.goalsFor;
+    let goalsAgainst=d.goalsAgainst;
+    if(goalsFor==null&&d.homeScore!=null&&d.awayScore!=null){
+        if(homeTeam&&homeTeam.toLowerCase()===career.clubName.toLowerCase()){
+            goalsFor=d.homeScore;goalsAgainst=d.awayScore;homeAway="Home";
+        }else if(awayTeam&&awayTeam.toLowerCase()===career.clubName.toLowerCase()){
+            goalsFor=d.awayScore;goalsAgainst=d.homeScore;homeAway="Away";
+        }else{
+            goalsFor=homeAway==="Away"?d.awayScore:d.homeScore;
+            goalsAgainst=homeAway==="Away"?d.homeScore:d.awayScore;
+        }
+    }
+    window.__careerAIReviewPlayers=players.map(p=>({
+        name:p.name||"",
+        rating:p.rating??null,
+        goals:p.goals??0,
+        assists:p.assists??0,
+        minutes:p.minutes??null,
+        yellowCards:p.yellowCards??(p.cards==="Yellow"?1:0),
+        redCards:p.redCards??(p.cards==="Red"?1:0),
+        saves:p.saves??null,
+        team:p.team||""
+    }));
+    document.getElementById("modalContainer").innerHTML=`
+    <div class="modal-overlay" onclick="closeModalOutside(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Review AI Match Facts</div>
+            <div class="panel-subtitle" style="margin:5px 0 0">Check and correct everything before saving.</div>
+          </div>
+          <button class="close-btn" type="button" onclick="closeModal()">×</button>
+        </div>
+        <div class="review-warning">AI can misread small text. Verify the score, competition and every player statistic. Nothing is saved until you click Save Match.</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Date</label><input id="aiMatchDate" class="form-input" type="date" value="${escapeHTML(d.date||todayDate())}"></div>
+          <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(d.competition||career.league||"")}" list="aiCompetitionOptions"><datalist id="aiCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
+          <div class="form-group"><label>Home / Away</label><select id="aiMatchHomeAway" class="form-select"><option value="Home" ${homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${homeAway==="Away"?"selected":""}>Away</option></select></div>
+          <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Opponent name"></div>
+          <div class="form-group full"><label>Score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
+        </div>
+        <div style="margin-top:18px;padding-top:18px;border-top:1px solid #252c35">
+          <div class="panel-title">Extracted Players (${players.length})</div>
+          <div class="panel-subtitle">Ratings and statistics can be left blank or corrected. You can also add missing players.</div>
+          <div id="aiReviewPlayerRows" class="player-entry-list"></div>
+          <button class="secondary-btn" type="button" onclick="addAIReviewPlayer()">+ Add Player</button>
+        </div>
+        <div class="panel-subtitle" style="margin-top:14px">Screenshots: ${(filenames||[]).map(escapeHTML).join(", ")||"—"}</div>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" onclick="openAIMatchUpload()">Back</button>
+          <button class="primary-btn" type="button" onclick="saveAIMatchReview()">Save Match</button>
+        </div>
+      </div>
+    </div>`;
+    renderAIReviewPlayers();
+}
+
+function renderAIReviewPlayers(){
+    const container=document.getElementById("aiReviewPlayerRows");
+    if(!container)return;
+    const players=window.__careerAIReviewPlayers||[];
+    container.innerHTML=players.map((p,i)=>`
+      <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(130px,1.4fr) repeat(6,minmax(58px,.65fr)) 34px">
+        <input class="form-input" data-ai-field="name" value="${escapeHTML(p.name)}" placeholder="Player name" aria-label="Player name">
+        <input class="form-input" data-ai-field="rating" type="number" min="0" max="10" step=".1" value="${p.rating==null?"":escapeHTML(p.rating)}" placeholder="Rating" aria-label="Rating">
+        <input class="form-input" data-ai-field="goals" type="number" min="0" value="${p.goals==null?"":escapeHTML(p.goals)}" placeholder="G" aria-label="Goals">
+        <input class="form-input" data-ai-field="assists" type="number" min="0" value="${p.assists==null?"":escapeHTML(p.assists)}" placeholder="A" aria-label="Assists">
+        <input class="form-input" data-ai-field="minutes" type="number" min="0" max="130" value="${p.minutes==null?"":escapeHTML(p.minutes)}" placeholder="Min" aria-label="Minutes">
+        <input class="form-input" data-ai-field="yellowCards" type="number" min="0" value="${p.yellowCards==null?"":escapeHTML(p.yellowCards)}" placeholder="YC" aria-label="Yellow cards">
+        <input class="form-input" data-ai-field="redCards" type="number" min="0" value="${p.redCards==null?"":escapeHTML(p.redCards)}" placeholder="RC" aria-label="Red cards">
+        <button class="remove-player" type="button" onclick="removeAIReviewPlayer(${i})">×</button>
+      </div>`).join("")||'<div class="info-box">No players were detected. Use Add Player to enter them manually.</div>';
+}
+
+function addAIReviewPlayer(){
+    if(!Array.isArray(window.__careerAIReviewPlayers))window.__careerAIReviewPlayers=[];
+    window.__careerAIReviewPlayers.push({name:"",rating:null,goals:0,assists:0,minutes:null,yellowCards:0,redCards:0,saves:null});
+    renderAIReviewPlayers();
+}
+
+function removeAIReviewPlayer(index){
+    (window.__careerAIReviewPlayers||[]).splice(index,1);
+    renderAIReviewPlayers();
+}
+
+function saveAIReviewPlayerInputs(){
+    const rows=document.querySelectorAll("#aiReviewPlayerRows [data-ai-player]");
+    const players=[];
+    rows.forEach(row=>{
+        const get=field=>row.querySelector('[data-ai-field="'+field+'"]')?.value??"";
+        const name=get("name").trim();
+        if(!name)return;
+        const num=(v)=>v===""?null:Number(v);
+        players.push({
+            name,
+            rating:num(get("rating")),
+            goals:num(get("goals"))??0,
+            assists:num(get("assists"))??0,
+            minutes:num(get("minutes")),
+            yellowCards:num(get("yellowCards"))??0,
+            redCards:num(get("redCards"))??0,
+            saves:null
+        });
+    });
+    return players;
+}
+
+function saveAIMatchReview(){
+    const career=getCurrentCareer();
+    if(!career)return;
+    const competition=document.getElementById("aiMatchCompetition").value.trim();
+    const opponent=document.getElementById("aiMatchOpponent").value.trim();
+    if(!competition||!opponent){alert("Please enter a competition and opponent.");return;}
+    const goalsFor=document.getElementById("aiGoalsFor").value;
+    const goalsAgainst=document.getElementById("aiGoalsAgainst").value;
+    if(goalsFor===""||goalsAgainst===""){alert("Please check and enter the score.");return;}
+    const gf=Number(goalsFor),ga=Number(goalsAgainst);
+    const players=saveAIReviewPlayerInputs();
+    career.matches.push({
+        id:createId(),season:career.currentSeason,
+        date:document.getElementById("aiMatchDate").value,
+        competition,
+        homeAway:document.getElementById("aiMatchHomeAway").value,
+        opponent,goalsFor:gf,goalsAgainst:ga,
+        result:gf>ga?"W":gf<ga?"L":"D",
+        cleanSheet:ga===0,entryMethod:"ai",
+        screenshots:aiReviewFiles.slice(),
+        players
+    });
+    saveCareers();
+    matchUploadFiles=[];
+    closeModal();
+    renderMatches();
+}
+
 
 
 /* =========================================================
@@ -4286,88 +4364,129 @@ function showCalendarFiles(files){
 }
 
 
-function startCalendarAI(){
-
-    if(!calendarUploadFiles.length)
+async function startCalendarAI(){
+    if(!calendarUploadFiles.length){
+        alert("Choose calendar screenshots first.");
         return;
-
-    document.getElementById("modalContainer").innerHTML=`
-
-<div class="modal-overlay">
-
-<div class="modal">
-
-<div class="modal-header">
-
-<div class="modal-title">
-Calendar AI
-</div>
-
-</div>
-
-
-<div class="review-box">
-
-<div style="font-size:28px;margin-bottom:10px">
-🗓️
-</div>
-
-<strong>
-${calendarUploadFiles.length}
-calendar screenshot${calendarUploadFiles.length===1?"":"s"}
-received
-</strong>
-
-<p style="
-color:#7f8996;
-line-height:1.7;
-font-size:13px
-">
-
-The calendar upload system is ready.
-
-The next AI connection will read each screenshot
-and create every fixture automatically.
-
-You will then be able to review the extracted
-fixtures before saving them to the Calendar tab.
-
-</p>
-
-<div class="review-warning">
-
-The calendar will never be saved automatically
-without a review stage.
-
-</div>
-
-</div>
-
-
-<div class="modal-actions">
-
-<button
-class="secondary-btn"
-onclick="openCalendarUpload()"
->
-Back
-</button>
-
-<button
-class="primary-btn"
-onclick="closeModal()"
->
-Done
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
+    }
+    const button=document.getElementById("calendarAnalyseButton");
+    if(button){button.disabled=true;button.textContent="Analysing…";}
+    try{
+        const data=await analyseCareerScreenshots("calendar",calendarUploadFiles);
+        aiReviewData=data;
+        aiReviewFiles=calendarUploadFiles.map(f=>f.name);
+        openAICalendarReview(data,aiReviewFiles);
+    }catch(error){
+        showAIError("Calendar analysis failed",error.message,"calendar");
+    }finally{
+        const b=document.getElementById("calendarAnalyseButton");
+        if(b){b.disabled=false;b.textContent="Analyse Calendar";}
+    }
 }
+
+function openAICalendarReview(data,filenames){
+    const events=Array.isArray(data?.events)?data.events:[];
+    window.__careerAICalendarReview=events.map(e=>({
+        date:e.date||"",
+        competition:e.competition||"",
+        opponent:e.opponent||e.awayTeam||e.homeTeam||"",
+        homeAway:e.homeAway||"",
+        round:e.round||"",
+        notes:e.notes||""
+    }));
+    document.getElementById("modalContainer").innerHTML=`
+    <div class="modal-overlay" onclick="closeModalOutside(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Review Calendar Fixtures</div>
+            <div class="panel-subtitle" style="margin:5px 0 0">${events.length} fixture(s) detected. Edit anything that looks wrong.</div>
+          </div>
+          <button class="close-btn" type="button" onclick="closeModal()">×</button>
+        </div>
+        <div class="review-warning">Check every date and competition before saving. Duplicate fixtures can be removed. Nothing is saved until you click Save Fixtures.</div>
+        <div id="aiCalendarReviewRows" class="player-entry-list"></div>
+        <button class="secondary-btn" type="button" onclick="addAICalendarEvent()" style="margin-top:12px">+ Add Fixture</button>
+        <div class="panel-subtitle" style="margin-top:14px">Screenshots: ${(filenames||[]).map(escapeHTML).join(", ")||"—"}</div>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" onclick="openCalendarUpload()">Back</button>
+          <button class="primary-btn" type="button" onclick="saveAICalendarReview()">Save Fixtures</button>
+        </div>
+      </div>
+    </div>`;
+    renderAICalendarReview();
+}
+
+function renderAICalendarReview(){
+    const container=document.getElementById("aiCalendarReviewRows");
+    if(!container)return;
+    const events=window.__careerAICalendarReview||[];
+    container.innerHTML=events.map((e,i)=>`
+      <div data-ai-calendar="${i}" class="review-box" style="margin-top:0">
+        <div class="form-grid">
+          <div class="form-group"><label>Date</label><input class="form-input" data-event-field="date" type="date" value="${escapeHTML(e.date)}"></div>
+          <div class="form-group"><label>Competition</label><input class="form-input" data-event-field="competition" value="${escapeHTML(e.competition)}" list="calendarCompetitionOptions" placeholder="Competition"><datalist id="calendarCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
+          <div class="form-group"><label>Opponent</label><input class="form-input" data-event-field="opponent" value="${escapeHTML(e.opponent)}" placeholder="Opponent"></div>
+          <div class="form-group"><label>Home / Away</label><select class="form-select" data-event-field="homeAway"><option value="" ${!e.homeAway?"selected":""}>Unknown</option><option value="Home" ${e.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${e.homeAway==="Away"?"selected":""}>Away</option></select></div>
+          <div class="form-group"><label>Round (optional)</label><input class="form-input" data-event-field="round" value="${escapeHTML(e.round)}" placeholder="e.g. Matchday 3"></div>
+          <div class="form-group"><label>Notes (optional)</label><input class="form-input" data-event-field="notes" value="${escapeHTML(e.notes)}" placeholder="Additional details"></div>
+        </div>
+        <button class="delete-btn" type="button" onclick="removeAICalendarEvent(${i})">Remove fixture</button>
+      </div>`).join("")||'<div class="info-box">No fixtures were detected. Add them manually below or try clearer screenshots.</div>';
+}
+
+function addAICalendarEvent(){
+    if(!Array.isArray(window.__careerAICalendarReview))window.__careerAICalendarReview=[];
+    window.__careerAICalendarReview.push({date:"",competition:"",opponent:"",homeAway:"",round:"",notes:""});
+    renderAICalendarReview();
+}
+
+function removeAICalendarEvent(index){
+    (window.__careerAICalendarReview||[]).splice(index,1);
+    renderAICalendarReview();
+}
+
+function saveAICalendarReview(){
+    const career=getCurrentCareer();
+    if(!career)return;
+    const rows=document.querySelectorAll("#aiCalendarReviewRows [data-ai-calendar]");
+    const extracted=[];
+    rows.forEach(row=>{
+        const get=field=>row.querySelector('[data-event-field="'+field+'"]')?.value.trim()||"";
+        const event={date:get("date"),competition:get("competition"),opponent:get("opponent"),homeAway:get("homeAway"),round:get("round"),notes:get("notes")};
+        if(event.date&&event.competition&&event.opponent)extracted.push(event);
+    });
+    if(!extracted.length){
+        alert("Add at least one fixture with a date, competition and opponent.");
+        return;
+    }
+    if(!Array.isArray(career.calendar))career.calendar=[];
+    const existing=new Set(career.calendar.map(e=>[e.date,e.competition,e.opponent].join("|").toLowerCase()));
+    let added=0;
+    extracted.forEach(event=>{
+        const key=[event.date,event.competition,event.opponent].join("|").toLowerCase();
+        if(existing.has(key))return;
+        existing.add(key);
+        career.calendar.push({
+            id:createId(),season:career.currentSeason,
+            date:event.date,competition:event.competition,
+            opponent:event.opponent,homeAway:event.homeAway,
+            round:event.round,notes:event.notes,
+            favorite:false,source:"ai",
+            screenshots:aiReviewFiles.slice()
+        });
+        added++;
+    });
+    const season=getSeason(career);
+    if(season)season.calendarUploaded=true;
+    saveCareers();
+    calendarUploadFiles=[];
+    closeModal();
+    renderCalendar();
+    if(added===0)alert("No new fixtures were added because all reviewed fixtures were already in your calendar.");
+    else if(added<extracted.length)alert(`Saved ${added} new fixtures. Duplicate fixtures were skipped.`);
+}
+
 
 
 /* =========================================================
@@ -4871,6 +4990,60 @@ async function loadDatabase(){
 
 
 /* =========================================================
+   SECURE AI CONNECTION
+========================================================= */
+
+// Public Worker URL only. The OpenRouter API key stays in Cloudflare.
+const CAREER_AI_URL = "https://career-mode-ai.rowanpetersen209.workers.dev/";
+
+function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=()=>reject(new Error("Could not read screenshot."));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function analyseCareerScreenshots(task,files){
+    if(!["match","calendar","league"].includes(task))
+        throw new Error("Unknown AI task.");
+    if(!files||files.length<1||files.length>6)
+        throw new Error("Choose between 1 and 6 screenshots at a time.");
+    const images=[];
+    let total=0;
+    for(const file of Array.from(files)){
+        if(!["image/png","image/jpeg","image/webp"].includes(file.type))
+            throw new Error("Use PNG, JPEG or WebP screenshots.");
+        if(file.size>8*1024*1024)
+            throw new Error("A screenshot is over 8 MB. Please resize it.");
+        const data=await fileToDataURL(file);
+        total+=data.length;
+        if(total>12_000_000)
+            throw new Error("These screenshots are too large together. Upload fewer screenshots at a time.");
+        images.push(data);
+    }
+    let response;
+    try{
+        response=await fetch(CAREER_AI_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({task,images})
+        });
+    }catch(e){
+        throw new Error("Could not reach the Cloudflare Worker. Check its URL and deployment.");
+    }
+    let result;
+    try{result=await response.json();}
+    catch(e){throw new Error("The AI server returned an unreadable response.");}
+    if(!response.ok||!result.ok)
+        throw new Error(result.error||("AI request failed ("+response.status+")."));
+    if(!result.data||typeof result.data!=="object")
+        throw new Error("AI returned no usable extracted data.");
+    return result.data;
+}
+
+/* =========================================================
    MODAL / HELPERS
 ========================================================= */
 
@@ -4972,52 +5145,3 @@ loadDatabase();
 
 </body>
 </html>
-
-const CAREER_AI_URL =
-  "https://career-mode-ai.rowanpetersen209.workers.dev/";
-
-function fileToDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Could not read screenshot"));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function analyseCareerScreenshots(task, files) {
-  if (!["match", "calendar", "league"].includes(task)) {
-    throw new Error("Unknown analysis type");
-  }
-
-  if (!files || files.length < 1 || files.length > 6) {
-    throw new Error("Choose between 1 and 6 screenshots");
-  }
-
-  const images = await Promise.all(
-    Array.from(files, file => {
-      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-        throw new Error("Use PNG, JPEG or WebP screenshots");
-      }
-      if (file.size > 3_500_000) {
-        throw new Error("A screenshot is too large. Please resize it.");
-      }
-      return fileToDataURL(file);
-    })
-  );
-
-  const response = await fetch(CAREER_AI_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ task, images })
-  });
-
-  const result = await response.json();
-
-  if (!response.ok || !result.ok) {
-    throw new Error(result.error || "Screenshot analysis failed");
-  }
-
-  return result.data;
-}
-      
