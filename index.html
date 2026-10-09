@@ -2487,6 +2487,17 @@ function saveSeasonTeams(){
    COMPETITIONS
 ========================================================= */
 
+function getCalendarTeamOptions(currentValue=""){
+    const teams=new Set();
+    Object.values(fc27ClubsByLeague||{}).forEach(clubs=>{
+        (clubs||[]).forEach(club=>{if(club)teams.add(club);});
+    });
+    // Keep any already-saved opponent available even if it is missing from the database.
+    if(currentValue)teams.add(currentValue);
+    return Array.from(teams).sort((a,b)=>a.localeCompare(b));
+}
+
+
 function getCalendarCompetitionOptions(currentValue=""){
     const options=new Set([
         ...fc27Leagues,
@@ -4184,7 +4195,7 @@ function openManualCalendarEntry(eventId){
         <div class="form-grid">
           <div class="form-group"><label for="manualCalendarDate">Date *</label><input id="manualCalendarDate" class="form-input" type="date" value="${escapeHTML(item.date)}" required></div>
           <div class="form-group"><label for="manualCalendarCompetition">Competition *</label><select id="manualCalendarCompetition" class="form-select" required>${getCalendarCompetitionOptions(item.competition).map(c=>`<option value="${escapeHTML(c)}" ${c===item.competition?"selected":""}>${escapeHTML(c)}</option>`).join("")}</select></div>
-          <div class="form-group"><label for="manualCalendarOpponent">Opponent *</label><input id="manualCalendarOpponent" class="form-input" value="${escapeHTML(item.opponent)}" placeholder="e.g. Lincoln City" required></div>
+          <div class="form-group"><label for="manualCalendarOpponent">Opponent *</label><select id="manualCalendarOpponent" class="form-select" required><option value="">Choose a team…</option>${getCalendarTeamOptions(item.opponent).map(t=>`<option value="${escapeHTML(t)}" ${t===item.opponent?"selected":""}>${escapeHTML(t)}</option>`).join("")}</select></div>
           <div class="form-group"><label for="manualCalendarHomeAway">Home / Away</label><select id="manualCalendarHomeAway" class="form-select"><option value="" ${!item.homeAway?"selected":""}>Unknown</option><option value="Home" ${item.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${item.homeAway==="Away"?"selected":""}>Away</option><option value="Neutral" ${item.homeAway==="Neutral"?"selected":""}>Neutral</option></select></div>
           <div class="form-group"><label for="manualCalendarRound">Round (optional)</label><input id="manualCalendarRound" class="form-input" value="${escapeHTML(item.round)}" placeholder="e.g. Round 12"></div>
           <div class="form-group"><label for="manualCalendarNotes">Notes (optional)</label><input id="manualCalendarNotes" class="form-input" value="${escapeHTML(item.notes)}" placeholder="Optional notes"></div>
@@ -4446,7 +4457,7 @@ function renderAICalendarReview(){
         <div class="form-grid">
           <div class="form-group"><label>Date</label><input class="form-input" data-event-field="date" type="date" value="${escapeHTML(e.date)}"></div>
           <div class="form-group"><label>Competition</label><select class="form-select" data-event-field="competition">${getCalendarCompetitionOptions(e.competition).map(c=>`<option value="${escapeHTML(c)}" ${c===e.competition?"selected":""}>${escapeHTML(c)}</option>`).join("")}</select></div>
-          <div class="form-group"><label>Opponent</label><input class="form-input" data-event-field="opponent" value="${escapeHTML(e.opponent)}" placeholder="Opponent"></div>
+          <div class="form-group"><label>Opponent</label><select class="form-select" data-event-field="opponent"><option value="">Choose a team…</option>${getCalendarTeamOptions(e.opponent).map(t=>`<option value="${escapeHTML(t)}" ${t===e.opponent?"selected":""}>${escapeHTML(t)}</option>`).join("")}</select></div>
           <div class="form-group"><label>Home / Away</label><select class="form-select" data-event-field="homeAway"><option value="" ${!e.homeAway?"selected":""}>Unknown</option><option value="Home" ${e.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${e.homeAway==="Away"?"selected":""}>Away</option></select></div>
           <div class="form-group"><label>Round (optional)</label><input class="form-input" data-event-field="round" value="${escapeHTML(e.round)}" placeholder="e.g. Matchday 3"></div>
           <div class="form-group"><label>Notes (optional)</label><input class="form-input" data-event-field="notes" value="${escapeHTML(e.notes)}" placeholder="Additional details"></div>
