@@ -3829,6 +3829,14 @@ Your complete ${escapeHTML(career.currentSeason)} fixture calendar.
 <button
 type="button"
 class="secondary-btn"
+onclick="openManualCalendarEntry()"
+>
+＋ Add Fixture
+</button>
+
+<button
+type="button"
+class="secondary-btn"
 onclick="openCalendarUpload()"
 >
 📸 Upload Calendar
@@ -4144,6 +4152,54 @@ function toggleFavoriteFromModal(id){
 /* =========================================================
    CALENDAR UPLOAD
 ========================================================= */
+
+function openManualCalendarEntry(eventId){
+    const career=getCurrentCareer();
+    if(!career)return;
+    const existing=eventId?(career.calendar||[]).find(e=>e.id===eventId):null;
+    const item=existing||{date:"",competition:"",opponent:"",homeAway:"",round:"",notes:""};
+    document.getElementById("modalContainer").innerHTML=`
+    <div class="modal-overlay" onclick="closeModalOutside(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title">${existing?"Edit Calendar Fixture":"Add Calendar Fixture"}</div>
+          <button type="button" class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label for="manualCalendarDate">Date *</label><input id="manualCalendarDate" class="form-input" type="date" value="${escapeHTML(item.date)}" required></div>
+          <div class="form-group"><label for="manualCalendarCompetition">Competition *</label><input id="manualCalendarCompetition" class="form-input" list="manualCalendarCompetitionOptions" value="${escapeHTML(item.competition)}" placeholder="e.g. Premier League" required><datalist id="manualCalendarCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
+          <div class="form-group"><label for="manualCalendarOpponent">Opponent *</label><input id="manualCalendarOpponent" class="form-input" value="${escapeHTML(item.opponent)}" placeholder="e.g. Lincoln City" required></div>
+          <div class="form-group"><label for="manualCalendarHomeAway">Home / Away</label><select id="manualCalendarHomeAway" class="form-select"><option value="" ${!item.homeAway?"selected":""}>Unknown</option><option value="Home" ${item.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${item.homeAway==="Away"?"selected":""}>Away</option><option value="Neutral" ${item.homeAway==="Neutral"?"selected":""}>Neutral</option></select></div>
+          <div class="form-group"><label for="manualCalendarRound">Round (optional)</label><input id="manualCalendarRound" class="form-input" value="${escapeHTML(item.round)}" placeholder="e.g. Round 12"></div>
+          <div class="form-group"><label for="manualCalendarNotes">Notes (optional)</label><input id="manualCalendarNotes" class="form-input" value="${escapeHTML(item.notes)}" placeholder="Optional notes"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" onclick="closeModal()">Cancel</button>
+          <button type="button" class="primary-btn" onclick="saveManualCalendarEntry('${existing?escapeJS(existing.id):""}')">${existing?"Save Changes":"Add Fixture"}</button>
+        </div>
+      </div>
+    </div>`;
+}
+function saveManualCalendarEntry(eventId){
+    const career=getCurrentCareer();
+    if(!career)return;
+    const value=id=>document.getElementById(id)?.value.trim()||"";
+    const date=value("manualCalendarDate"),competition=value("manualCalendarCompetition"),opponent=value("manualCalendarOpponent");
+    if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}
+    if(!Array.isArray(career.calendar))career.calendar=[];
+    const duplicate=career.calendar.find(e=>e.id!==eventId&&e.date===date&&(e.opponent||"").toLowerCase()===opponent.toLowerCase()&&(e.competition||"").toLowerCase()===competition.toLowerCase());
+    if(duplicate){alert("That fixture is already in your calendar.");return;}
+    const event={date,competition,opponent,homeAway:value("manualCalendarHomeAway"),round:value("manualCalendarRound"),notes:value("manualCalendarNotes")};
+    if(eventId){
+        const index=career.calendar.findIndex(e=>e.id===eventId);
+        if(index>=0)career.calendar[index]={...career.calendar[index],...event,source:"manual"};
+    }else{
+        career.calendar.push({id:createId(),season:career.currentSeason,...event,favorite:false,source:"manual"});
+    }
+    saveCareers();
+    closeModal();
+    renderCalendar();
+}
 
 function openCalendarUpload(){
 
