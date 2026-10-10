@@ -3713,6 +3713,7 @@ function renderAIReviewPlayers(){
         <input class="form-input" data-ai-field="saves" type="number" min="0" value="${p.saves==null?"":escapeHTML(p.saves)}" placeholder="Saves" aria-label="Saves">
         <button class="remove-player" type="button" onclick="removeAIReviewPlayer(${i})">×</button>
       </div>`).join("")||'<div class="info-box">No players matched the screenshot to your squad. Use Add Player from Squad to choose players manually.</div>';
+    syncAIMatchScorersToGoalColumns();
 }
 
 
