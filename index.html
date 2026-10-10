@@ -2153,6 +2153,24 @@ function openLeagueResultModal(){
 function saveLeagueResult(){
  var c=getCurrentCareer();if(!c)return;var s=getSeason(c),a=document.getElementById("lrA").value,b=document.getElementById("lrB").value,x=document.getElementById("lrGA").value,y=document.getElementById("lrGB").value;if(a===b||x===""||y===""){alert("Choose two different teams and enter both scores.");return;}s.leagueResults.push({season:c.currentSeason,league:c.league,teamA:a,teamB:b,goalsA:Number(x),goalsB:Number(y)});saveCareers();closeModal();renderLeagueCentre();
 }
+function normalizeTrophyCompetitionName(value){
+ var n=String(value||"").trim();
+ var key=n.toLowerCase().replace(/[^a-z0-9]+/g,"");
+ var aliases={
+  "laligaeasports":"LaLiga",
+  "laliga":"LaLiga",
+  "laligaea":"LaLiga",
+  "laligaea sports":"LaLiga",
+  "laliga2":"LaLiga 2",
+  "spanishfirstdivision":"LaLiga",
+  "spanishseconddivision":"LaLiga 2",
+  "premierleague":"Premier League",
+  "uefachampionsleague":"UEFA Champions League",
+  "fifaworldcup":"World Cup",
+  "worldcup":"World Cup"
+ };
+ return aliases[key]||n;
+}
 function trophyCatalogueNames(c){
  var base=[
  "Premier League","EFL Championship","EFL League One","EFL League Two","EFL Championship Play-Off Winner","EFL League One Play-Off Winner","EFL League Two Play-Off Winner","FA Cup","EFL Cup","Community Shield",
@@ -2170,16 +2188,17 @@ function trophyCatalogueNames(c){
  "Olympic Football Gold Medal","UEFA Youth League","Premier League 2","National League","EFL Trophy",
  "Women's Champions League","Women's World Cup","Women's European Championship"
  ];
- if(Array.isArray(fc27Leagues))fc27Leagues.forEach(function(x){var n=typeof x==="string"?x:(x.name||x.leagueName||x.label);if(n)base.push(n);});
- if(c.league)base.push(c.league);
- if(c.seasons)c.seasons.forEach(function(x){(x.competitions||[]).forEach(function(n){if(n)base.push(n);});});
- (c.matches||[]).forEach(function(m){if(m.competition)base.push(m.competition);});
- return [...new Set(base.map(function(x){return String(x).trim();}).filter(Boolean))].sort(function(x,y){return x.localeCompare(y);});
+ if(Array.isArray(fc27Leagues))fc27Leagues.forEach(function(x){var n=typeof x==="string"?x:(x.name||x.leagueName||x.label);if(n)base.push(normalizeTrophyCompetitionName(n));});
+ if(c.league)base.push(normalizeTrophyCompetitionName(c.league));
+ if(c.seasons)c.seasons.forEach(function(x){(x.competitions||[]).forEach(function(n){if(n)base.push(normalizeTrophyCompetitionName(n));});});
+ (c.matches||[]).forEach(function(m){if(m.competition)base.push(normalizeTrophyCompetitionName(m.competition));});
+ var seen={};
+ return base.map(normalizeTrophyCompetitionName).map(function(n){return String(n).trim();}).filter(function(n){var k=n.toLowerCase().replace(/[^a-z0-9]+/g,"");if(!n||seen[k])return false;seen[k]=true;return true;}).sort(function(x,y){return x.localeCompare(y);});
 }
 function trophyImageFor(name){
  var n=String(name||"").toLowerCase();
- if(n.includes("champions league")&&!n.includes("women"))return "https://commons.wikimedia.org/wiki/Special:FilePath/Champions_league_trophy.jpg";
- if(n==="world cup"||n.includes("fifa world cup"))return "https://commons.wikimedia.org/wiki/Special:FilePath/FIFA_World_Cup_Trophy_cropped.jpg";
+ if(n.includes("champions league")&&!n.includes("women"))return "https://www.pngkey.com/png/detail/311-3116758_trophy-clipart-uefa-champions-league-champions-league-cup.png";
+ if(n==="world cup"||n.includes("fifa world cup"))return "https://www.clipartmax.com/png/small/135-1350876_trophy-gallery-world-cup-trophy-silhouette.png";
  if(n.includes("european championship")||n==="euros"||n==="uefa euro")return "https://commons.wikimedia.org/wiki/Special:FilePath/Coupe_Henri_Delaunay_2017.jpg";
  if(n==="premier league")return "https://commons.wikimedia.org/wiki/Special:FilePath/Premier_league_trophy_icon.png";
  if(n==="laliga"||n==="la liga")return "https://commons.wikimedia.org/wiki/Special:FilePath/LaLiga.png";
