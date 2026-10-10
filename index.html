@@ -2140,11 +2140,57 @@ function buildLeagueTable(c){
  (season.leagueResults||[]).forEach(function(r){if(!r.season||r.season===c.currentSeason)add(r.teamA,r.teamB,r.goalsA,r.goalsB);});
  return Object.keys(rows).map(function(k){var r=rows[k];r.gd=r.gf-r.ga;return r;}).sort(function(a,b){return b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf;});
 }
-function renderLeagueCentre(){
- var c=getCurrentCareer();if(!c){renderDashboard();return;}var rs=buildLeagueTable(c),h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">League Centre</div><div class="page-subtitle">'+escapeHTML(c.league)+' · '+escapeHTML(c.currentSeason)+'</div></div><button class="secondary-btn" onclick="openSeasonSetup(false)">Edit League Teams</button></div><div class="info-box">League matches saved under '+escapeHTML(c.league)+' update your club row automatically. To complete the other rows, add their results in the League Centre.</div><div class="panel"><div class="panel-title">League Table</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:600px"><thead><tr>';
- ["Pos","Club","P","W","D","L","GF","GA","GD","Pts"].forEach(function(t){h+='<th style="padding:9px;border-bottom:1px solid #303844">'+t+'</th>';});h+='</tr></thead><tbody>';
- rs.forEach(function(r,i){h+='<tr><td style="padding:9px">'+(i+1)+'</td><td style="padding:9px">'+escapeHTML(r.team)+(r.team===c.clubName?" (Your club)":"")+'</td>'+[r.p,r.w,r.d,r.l,r.gf,r.ga,r.gd,r.pts].map(function(v){return '<td style="padding:9px;text-align:center">'+v+'</td>';}).join("")+'</tr>';});h+='</tbody></table></div><button class="primary-btn" style="margin-top:14px" onclick="openLeagueResultModal()">+ Add Other Result</button></div>';document.getElementById("pageContent").innerHTML=h;
+function normalizeImportedLeagueRows(data){
+ var source=Array.isArray(data)?data:(data.rows||data.standings||data.teams||data.table||data.leagueTable||[]);
+ if(!Array.isArray(source))return [];
+ return source.map(function(r,i){
+  var get=function(keys){for(var k of keys){if(r[k]!==undefined&&r[k]!==null&&String(r[k]).trim()!=="")return r[k];}return "";};
+  var team=String(get(["team","club","name","teamName","clubName"])).trim();if(!team)return null;
+  var place=get(["place","position","pos","rank","rankPosition"]),points=get(["points","pts","point"]),wins=get(["wins","win","w"]),draws=get(["draws","draw","d"]),losses=get(["losses","loss","l"]),gf=get(["goalsFor","goals_for","gf","scored","goalsScored"]),ga=get(["goalsAgainst","goals_against","ga","conceded","goalsConceded"]),gd=get(["goalDifference","goal_difference","gd","difference"]);
+  return {place:Number(place)||i+1,team:team,points:Number(points)||0,wins:Number(wins)||0,draws:Number(draws)||0,losses:Number(losses)||0,gf:Number(gf)||0,ga:Number(ga)||0,gd:gd===""?(Number(gf)||0)-(Number(ga)||0):Number(gd)||0};
+ }).filter(Boolean).sort(function(a,b){return a.place-b.place;});
 }
+function renderLeagueCentre(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}
+ var imported=c.leagueTableImport&&c.leagueTableImport.season===c.currentSeason?c.leagueTableImport.rows:null;
+ var computed=buildLeagueTable(c),rows=imported&&imported.length?imported:computed.map(function(r,i){return {place:i+1,team:r.team,points:r.pts,wins:r.w,draws:r.d,losses:r.l,gf:r.gf,ga:r.ga,gd:r.gd};});
+ var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">League Centre</div><div class="page-subtitle">'+escapeHTML(c.league)+' · '+escapeHTML(c.currentSeason)+'</div></div><button class="secondary-btn" onclick="openSeasonSetup(false)">Edit League Teams</button></div><div class="info-box">Upload a league table screenshot to import all teams at once, or upload a knockout bracket to save rounds and fixtures. You do not need to enter every other team match manually.</div><div class="panel"><div class="panel-title">Import table or knockout bracket</div><div class="form-grid"><div class="form-group"><label>Screenshot type</label><select id="leagueScreenshotType" class="form-select"><option value="table">League table</option><option value="bracket">Knockout bracket</option></select></div><div class="form-group"><label>Season</label><div class="form-input" style="display:flex;align-items:center">'+escapeHTML(c.currentSeason)+'</div></div><div class="form-group full"><label>Screenshot(s)</label><input id="leagueScreenshotFiles" class="form-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></div></div><button class="primary-btn" style="margin-top:12px" onclick="analyseLeagueCentreScreenshots()">Analyse Screenshot(s)</button></div>';
+ if(c.leagueBracketImport&&c.leagueBracketImport.season===c.currentSeason){
+  h+='<div class="panel"><div class="panel-title">Imported Knockout Bracket</div><div class="panel-subtitle">'+escapeHTML(c.leagueBracketImport.competition||c.league)+' · '+escapeHTML(c.currentSeason)+'</div>';
+  (c.leagueBracketImport.rounds||[]).forEach(function(round){h+='<div style="margin:12px 0"><strong>'+escapeHTML(round.name||"Round")+'</strong><div class="calendar-list">'+(round.matches||[]).map(function(m){var score=m.score||((m.homeScore!=null?m.homeScore:"")+(m.homeScore!=null||m.awayScore!=null?"–":"")+(m.awayScore!=null?m.awayScore:""));return '<div class="calendar-match"><div class="calendar-top"><span>'+escapeHTML(m.home||m.homeTeam||"Team")+'</span><strong>'+escapeHTML(score||"—")+'</strong><span>'+escapeHTML(m.away||m.awayTeam||"Team")+'</span></div></div>';}).join("")+'</div></div>';});
+  h+='<button class="secondary-btn" onclick="clearLeagueBracketImport()">Remove Imported Bracket</button></div>';
+ }
+ h+='<div class="panel"><div class="panel-title">League Table</div>'+(imported?'<div class="panel-subtitle">Imported from screenshot · upload another table to replace it.</div>':'<div class="panel-subtitle">Calculated from saved matches and other results until you import a screenshot.</div>')+'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:650px"><thead><tr>';
+ ["Place","Team","Points","Wins","Draws","Losses","Goals For","Goals Against","Goal Difference"].forEach(function(t){h+='<th style="padding:9px;border-bottom:1px solid #303844;text-align:left">'+t+'</th>';});
+ h+='</tr></thead><tbody>';
+ rows.forEach(function(r,i){h+='<tr><td style="padding:9px">'+(r.place||i+1)+'</td><td style="padding:9px">'+escapeHTML(r.team)+'</td>'+[r.points,r.wins,r.draws,r.losses,r.gf,r.ga,r.gd].map(function(v){return '<td style="padding:9px;text-align:center">'+(v??0)+'</td>';}).join("")+'</tr>';});
+ h+='</tbody></table></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="primary-btn" onclick="openLeagueResultModal()">+ Add Other Result</button>'+(imported?'<button class="secondary-btn" onclick="clearLeagueTableImport()">Clear Imported Table</button>':'')+'</div></div>';
+ document.getElementById("pageContent").innerHTML=h;
+}
+async function analyseLeagueCentreScreenshots(){
+ var files=Array.from(document.getElementById("leagueScreenshotFiles")?.files||[]),type=document.getElementById("leagueScreenshotType")?.value||"table";
+ if(!files.length){alert("Choose at least one screenshot first.");return;}
+ var c=getCurrentCareer();if(!c)return;
+ try{
+  var data=await analyseCareerScreenshots("league",files);
+  if(type==="table"){
+   var rows=normalizeImportedLeagueRows(data);
+   if(!rows.length){alert("The AI could not identify a usable table. Try a clearer screenshot or upload one screenshot at a time.");return;}
+   var preview=rows.slice(0,5).map(function(r){return r.place+". "+r.team+" — "+r.points+" pts";}).join("\n");
+   if(!confirm("I found "+rows.length+" teams. First rows:\n\n"+preview+"\n\nImport this table?"))return;
+   c.leagueTableImport={season:c.currentSeason,rows:rows,source:"screenshot",date:todayDate()};
+  }else{
+   var rounds=Array.isArray(data.rounds)?data.rounds:(Array.isArray(data.bracket)?data.bracket:[]);
+   if(!rounds.length&&Array.isArray(data.matches))rounds=[{name:data.round||"Knockout bracket",matches:data.matches}];
+   if(!rounds.length){alert("The AI could not identify bracket rounds or fixtures. Try a clearer screenshot showing the whole bracket.");return;}
+   c.leagueBracketImport={season:c.currentSeason,competition:data.competition||c.league,rounds:rounds};
+  }
+  saveCareers();renderLeagueCentre();
+ }catch(e){alert("Screenshot analysis failed: "+(e.message||"Please try again."));}
+}
+function clearLeagueTableImport(){var c=getCurrentCareer();if(!c)return;if(!confirm("Clear the imported league table?"))return;delete c.leagueTableImport;saveCareers();renderLeagueCentre();}
+function clearLeagueBracketImport(){var c=getCurrentCareer();if(!c)return;if(!confirm("Remove the imported knockout bracket?"))return;delete c.leagueBracketImport;saveCareers();renderLeagueCentre();}
+
 function openLeagueResultModal(){
  var c=getCurrentCareer();if(!c)return;var ts=(getSeason(c).leagueTeams||[]).filter(function(t){return t!==c.clubName;});if(ts.length<2){alert("Add at least two other teams in Season Setup first.");return;}
  var o=ts.map(function(t){return '<option value="'+escapeHTML(t)+'">'+escapeHTML(t)+'</option>';}).join("");
