@@ -5052,7 +5052,7 @@ function renderYouthAcademy(){
     '<form onsubmit="addYouthPlayer(event)" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:18px">'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Player name<input class="search-input" id="youthName" required maxlength="80" placeholder="Full name"></label>'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Position<select class="search-input" id="youthPosition" required><option value="">Choose position</option><option>GK</option><option>CB</option><option>LB</option><option>RB</option><option>LWB</option><option>RWB</option><option>CDM</option><option>CM</option><option>CAM</option><option>LM</option><option>RM</option><option>LW</option><option>RW</option><option>CF</option><option>ST</option></select></label>'+
-    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Country<input class="search-input" id="youthCountry" required maxlength="60" placeholder="e.g. Australia"></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Country<input class="search-input" id="youthCountry" list="youthCountryOptions" required maxlength="60" autocomplete="off" placeholder="Search or choose a country"><datalist id="youthCountryOptions">'+getCountryOptions().map(country=>'<option value="'+escapeHTML(country)+'"></option>').join("")+'</datalist></label>'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Age<input class="search-input" id="youthAge" type="number" min="1" max="99" step="1" required placeholder="e.g. 16"></label>'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Minimum potential<input class="search-input" id="youthPotentialMin" type="number" min="1" max="99" step="1" required placeholder="e.g. 63"></label>'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Maximum potential<input class="search-input" id="youthPotentialMax" type="number" min="1" max="99" step="1" required placeholder="e.g. 87"></label>'+
@@ -5088,9 +5088,23 @@ function deleteYouthPlayer(id){
 }
 
 
+function getCountryOptions(){
+ const fallback=["Afghanistan","Albania","Algeria","Argentina","Australia","Austria","Belgium","Brazil","Cameroon","Canada","Chile","China PR","Colombia","Costa Rica","Croatia","Czechia","Denmark","Ecuador","Egypt","England","Finland","France","Germany","Ghana","Greece","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Ivory Coast","Japan","Mexico","Morocco","Netherlands","New Zealand","Nigeria","Northern Ireland","Norway","Paraguay","Peru","Poland","Portugal","Qatar","Romania","Saudi Arabia","Scotland","Senegal","Serbia","Slovakia","Slovenia","South Africa","South Korea","Spain","Sweden","Switzerland","Tunisia","Türkiye","Ukraine","United States","Uruguay","Wales"];
+ const fromDatabase=(Array.isArray(allPlayers)?allPlayers:[]).map(p=>p.nationality||p.country||"").filter(Boolean);
+ return [...new Set([...fallback,...fromDatabase].map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function joinNationalTeam(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c)return;
+ const country=document.getElementById("ntJoinCountry").value.trim();
+ if(!country){alert("Choose the country that offered you the national-team job.");return;}
+ const selected=getCountryOptions().find(x=>x.toLowerCase()===country.toLowerCase());
+ if(!selected){alert("Please choose a country from the searchable list.");return;}
+ c.nationalTeam=selected;c.nationalSquad=[];c.internationalMatches=[];
+ saveCareers();renderNationalTeamHub();
+}
 function renderNationalTeamHub(){
  const c=getCurrentCareer();if(!c){renderDashboard();return;}
- if(!c.nationalTeam){document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">National Team Hub</div><div class="page-subtitle">Track international squads and matches alongside your club career.</div></div></div><div class="panel"><div class="panel-title">No National Team Selected</div><div class="panel-subtitle">You did not choose a national team when creating this career. Create a new career with a national team selected to use this hub.</div></div>';return;}
+ if(!c.nationalTeam){document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">National Team Hub</div><div class="page-subtitle">You can accept an international management offer at any point in this career.</div></div></div><div class="panel"><div class="panel-title">Accept a National Team Offer</div><div class="panel-subtitle">Choose the country that has offered you the job. You do not need to restart your club career.</div><form onsubmit="joinNationalTeam(event)" style="display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:12px;align-items:end;margin-top:16px"><label class="setup-label">National team country<input id="ntJoinCountry" class="form-input" list="ntCountryOptions" required maxlength="60" autocomplete="off" placeholder="Search or choose a country"><datalist id="ntCountryOptions">'+getCountryOptions().map(country=>'<option value="'+escapeHTML(country)+'"></option>').join("")+'</datalist></label><button class="primary-btn" type="submit">Accept Offer</button></form></div>';return;}
  if(!Array.isArray(c.nationalSquad))c.nationalSquad=[];
  if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];
  const matches=c.internationalMatches.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
