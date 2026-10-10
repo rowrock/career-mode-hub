@@ -944,6 +944,8 @@ button{cursor:pointer}
 }
 .squad-toolbar{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}.squad-toolbar-right{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.squad-toolbar-right label{display:block;font-size:11px;color:#8993a0;margin-bottom:6px;font-weight:700;text-transform:uppercase}.squad-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:18px;align-items:start}.squad-pitch-wrap{background:#11161d;border:1px solid #252c35;border-radius:13px;padding:14px}.squad-pitch{position:relative;width:100%;aspect-ratio:.78;background:linear-gradient(180deg,#17633f,#124c33);border:2px solid rgba(235,255,240,.65);border-radius:8px;overflow:hidden}.squad-pitch:before{content:"";position:absolute;left:4%;right:4%;top:4%;bottom:4%;border:1px solid rgba(255,255,255,.42)}.squad-pitch:after{content:"";position:absolute;left:4%;right:4%;top:50%;border-top:1px solid rgba(255,255,255,.42)}.pitch-circle{position:absolute;left:50%;top:50%;width:24%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.42);border-radius:50%}.pitch-box{position:absolute;left:25%;width:50%;height:12%;border:1px solid rgba(255,255,255,.42)}.pitch-box.top{top:4%;border-top:0}.pitch-box.bottom{bottom:4%;border-bottom:0}.pitch-slot{position:absolute;transform:translate(-50%,-50%);width:70px;min-height:60px;border:1px solid rgba(255,255,255,.38);border-radius:9px;background:rgba(8,24,18,.85);color:white;padding:4px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;z-index:2;text-align:center}.pitch-slot.empty{border-style:dashed}.pitch-slot .slot-role{font-size:9px;color:#c4e5d0;font-weight:800}.pitch-slot .slot-name{font-size:10px;font-weight:800;line-height:1.15;max-width:66px;overflow-wrap:anywhere}.pitch-slot .slot-rating{font-size:10px;color:#b7efc9}.squad-side{display:flex;flex-direction:column;gap:15px}.squad-player-list{display:flex;flex-direction:column;gap:7px;max-height:420px;overflow:auto}.squad-player-chip,.squad-pick-row{display:flex;align-items:center;gap:9px;background:#171d25;border:1px solid #303844;border-radius:9px;padding:9px 10px}.squad-player-chip{cursor:grab;user-select:none}.squad-player-chip .squad-player-info,.squad-pick-copy{min-width:0;flex:1}.squad-player-name{font-size:12px;font-weight:700;overflow-wrap:anywhere}.squad-player-pos,.squad-pick-row small{font-size:10px;color:#8993a0;margin-top:3px;display:block}.squad-player-rating{font-size:12px;font-weight:800;color:#8ed5ff;min-width:24px}.squad-modal-list{display:flex;flex-direction:column;gap:7px;max-height:320px;overflow:auto;margin-top:12px}.squad-pick-row strong{font-size:13px}.squad-mini-btn{border:0;background:transparent;color:#d97886;font-size:17px}.squad-empty{padding:20px 12px;border:1px dashed #303844;border-radius:9px;color:#8993a0;text-align:center;font-size:12px}.squad-roster-actions{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:1000px){.squad-layout{grid-template-columns:1fr}.squad-pitch{max-width:600px;margin:auto}}@media(max-width:600px){.pitch-slot{width:56px;min-height:54px}.pitch-slot .slot-name{font-size:9px;max-width:50px}.squad-formation-select{width:100%}}
 .slot-alt{font-size:8px;line-height:1.1;color:#ffe0a6;max-width:68px;overflow:hidden;max-height:18px}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th,.data-table td{padding:10px 12px;border-bottom:1px solid #303844;text-align:left;white-space:nowrap}.data-table th{color:#9ba6b4;font-size:10px;text-transform:uppercase}.squad-pick-row{color:inherit;text-align:left}
+
+.trophy-art{display:block;width:100%;height:142px;object-fit:contain;margin:0 auto 14px;padding:8px;box-sizing:border-box}.trophy-art-fallback{height:142px;display:flex;align-items:center;justify-content:center;font-size:76px;margin-bottom:14px;background:linear-gradient(135deg,rgba(255,200,70,.08),rgba(255,255,255,.015));border-radius:12px}.trophy-card,.trophy-catalogue-card{display:flex;flex-direction:column;align-items:stretch;gap:8px}.trophy-remove-btn{margin-top:10px}.trophy-catalogue-card .career-name,.trophy-card .career-name{min-height:2.5em}.trophy-catalogue-card .primary-btn,.trophy-catalogue-card .secondary-btn{margin-top:auto}
 </style>
 </head>
 
@@ -2151,14 +2153,76 @@ function openLeagueResultModal(){
 function saveLeagueResult(){
  var c=getCurrentCareer();if(!c)return;var s=getSeason(c),a=document.getElementById("lrA").value,b=document.getElementById("lrB").value,x=document.getElementById("lrGA").value,y=document.getElementById("lrGB").value;if(a===b||x===""||y===""){alert("Choose two different teams and enter both scores.");return;}s.leagueResults.push({season:c.currentSeason,league:c.league,teamA:a,teamB:b,goalsA:Number(x),goalsB:Number(y)});saveCareers();closeModal();renderLeagueCentre();
 }
-function renderCompetitionsHub(){
- var c=getCurrentCareer();if(!c){renderDashboard();return;}var names=[...new Set([c.league].concat(getSeason(c).competitions||[],getSeasonMatches(c).map(function(m){return m.competition;}).filter(Boolean)))],ts=c.trophies||[],h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Competitions</div><div class="page-subtitle">Confirm a trophy here and the cabinet and dashboard update automatically.</div></div></div><div class="info-box">A score alone cannot tell whether a cup final or whole competition has been won, so confirm each trophy once.</div><div class="careers-grid">';
- names.forEach(function(n){var won=ts.some(function(t){return typeof t==="object"&&t.competition===n&&t.season===c.currentSeason;});var ms=getSeasonMatches(c).filter(function(m){return m.competition===n;});h+='<div class="career-card"><div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+ms.length+' matches logged</div><div class="career-season"><span>Status</span><span class="season-value">'+(won?"Trophy won":"In progress")+'</span></div>'+(won?"":'<button class="primary-btn" onclick="recordCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>')+'</div>';});document.getElementById("pageContent").innerHTML=h+'</div>';
+function trophyCatalogueNames(c){
+ var base=[
+ "Premier League","EFL Championship","EFL League One","EFL League Two","EFL Championship Play-Off Winner","EFL League One Play-Off Winner","EFL League Two Play-Off Winner","FA Cup","EFL Cup","Community Shield",
+ "LaLiga","LaLiga 2","Copa del Rey","Spanish Super Cup",
+ "Serie A","Serie B","Coppa Italia","Italian Super Cup",
+ "Bundesliga","2. Bundesliga","DFB-Pokal","German Super Cup",
+ "Ligue 1","Ligue 2","Coupe de France","Trophée des Champions",
+ "UEFA Champions League","UEFA Europa League","UEFA Conference League","UEFA Super Cup","FIFA Club World Cup","Intercontinental Cup",
+ "World Cup","UEFA European Championship","Copa América","AFC Asian Cup","Africa Cup of Nations","CONCACAF Gold Cup","CONCACAF Nations League","UEFA Nations League",
+ "Eredivisie","Eerste Divisie","KNVB Cup","Johan Cruyff Shield",
+ "Liga Portugal","Liga Portugal 2","Taça de Portugal","Taça da Liga","Supertaça",
+ "Belgian Pro League","Belgian Cup","Scottish Premiership","Scottish Championship","Scottish Cup","Scottish League Cup",
+ "Turkish Süper Lig","Turkish Cup","Saudi Pro League","King's Cup","J1 League","K League 1","A-League Men",
+ "MLS Cup","Supporters' Shield","Canadian Championship","Copa Libertadores","Copa Sudamericana","Recopa Sudamericana",
+ "Olympic Football Gold Medal","UEFA Youth League","Premier League 2","National League","EFL Trophy",
+ "Women's Champions League","Women's World Cup","Women's European Championship"
+ ];
+ if(Array.isArray(fc27Leagues))fc27Leagues.forEach(function(x){var n=typeof x==="string"?x:(x.name||x.leagueName||x.label);if(n)base.push(n);});
+ if(c.league)base.push(c.league);
+ if(c.seasons)c.seasons.forEach(function(x){(x.competitions||[]).forEach(function(n){if(n)base.push(n);});});
+ (c.matches||[]).forEach(function(m){if(m.competition)base.push(m.competition);});
+ return [...new Set(base.map(function(x){return String(x).trim();}).filter(Boolean))].sort(function(x,y){return x.localeCompare(y);});
 }
-function recordCompetitionTrophy(n){var c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.trophies))c.trophies=[];if(c.trophies.some(function(t){return typeof t==="object"&&t.competition===n&&t.season===c.currentSeason;}))return;c.trophies.push({competition:n,season:c.currentSeason,date:todayDate()});saveCareers();renderCompetitionsHub();}
+function trophyImageFor(name){
+ var n=String(name||"").toLowerCase();
+ if(n.includes("champions league")&&!n.includes("women"))return "https://commons.wikimedia.org/wiki/Special:FilePath/Champions_league_trophy.jpg";
+ if(n==="world cup"||n.includes("fifa world cup"))return "https://commons.wikimedia.org/wiki/Special:FilePath/FIFA_World_Cup_Trophy_cropped.jpg";
+ if(n.includes("european championship")||n==="euros"||n==="uefa euro")return "https://commons.wikimedia.org/wiki/Special:FilePath/Coupe_Henri_Delaunay_2017.jpg";
+ if(n==="premier league")return "https://commons.wikimedia.org/wiki/Special:FilePath/Premier_league_trophy_icon.png";
+ if(n==="laliga"||n==="la liga")return "https://commons.wikimedia.org/wiki/Special:FilePath/LaLiga.png";
+ if(n==="serie a")return "https://commons.wikimedia.org/wiki/Special:FilePath/Coppa_Campioni_d%27Italia_%28Serie_A%29.png";
+ if(n==="bundesliga")return "https://commons.wikimedia.org/wiki/Special:FilePath/Meisterschale-10.svg";
+ if(n==="ligue 1")return "https://commons.wikimedia.org/wiki/Special:FilePath/Ligue_1_Trophy_2024.png";
+ return "";
+}
+function trophyImageMarkup(name){
+ var src=trophyImageFor(name);
+ return src?'<img class="trophy-art" src="'+src+'" alt="'+escapeHTML(name)+' trophy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="trophy-art-fallback" style="display:none">🏆</div>':'<div class="trophy-art-fallback">🏆</div>';
+}
+function renderCompetitionsHub(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}
+ var names=trophyCatalogueNames(c),ts=c.trophies||[];
+ var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Competitions & Trophies</div><div class="page-subtitle">Mark a trophy won to add it to your manager trophy cabinet. The winning team is recorded separately.</div></div></div><div class="info-box">Choose any trophy in the catalogue, including league titles, promotion play-offs, domestic cups and international competitions. You can remove an accidental win from the cabinet.</div><div class="panel"><input id="trophyCatalogueSearch" class="search-input" placeholder="Search every trophy..." oninput="filterTrophyCatalogue(this.value)"><div id="trophyCatalogueGrid" class="careers-grid"></div></div>';
+ document.getElementById("pageContent").innerHTML=h;renderTrophyCatalogueCards(names,c);
+}
+function renderTrophyCatalogueCards(names,c){
+ var box=document.getElementById("trophyCatalogueGrid");if(!box)return;
+ var q=(document.getElementById("trophyCatalogueSearch")?.value||"").toLowerCase().trim(),ts=c.trophies||[];
+ var list=names.filter(function(n){return n.toLowerCase().includes(q);});
+ box.innerHTML=list.map(function(n){var won=ts.some(function(t){return typeof t==="object"&&t.competition===n&&String(t.season||"")===String(c.currentSeason||"");});return '<div class="career-card trophy-catalogue-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+(won?'Won this season':'Available trophy')+'</div>'+(won?'<button class="secondary-btn" disabled>Already marked won</button>':'<button class="primary-btn" onclick="recordCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>')+'</div>';}).join("")||'<div class="empty-state">No trophies match your search.</div>';
+}
+function filterTrophyCatalogue(q){var c=getCurrentCareer();if(c)renderTrophyCatalogueCards(trophyCatalogueNames(c),c);}
+function recordCompetitionTrophy(n){
+ var c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.trophies))c.trophies=[];
+ var team=prompt("Which team won "+n+"?",""+(c.clubName||""));if(team===null||!team.trim())return;
+ if(c.trophies.some(function(t){return typeof t==="object"&&t.competition===n&&String(t.season||"")===String(c.currentSeason||"")&&String(t.team||t.winningTeam||c.clubName)===team.trim();})){alert("That trophy is already recorded for this team and season.");return;}
+ c.trophies.push({id:createId(),competition:n,season:c.currentSeason,date:todayDate(),team:team.trim(),manager:c.managerName||"Manager"});saveCareers();renderCompetitionsHub();
+}
+function removeCareerTrophy(index){
+ var c=getCurrentCareer();if(!c||!Array.isArray(c.trophies)||!c.trophies[index])return;
+ var t=c.trophies[index],name=typeof t==="string"?t:(t.competition||"this trophy");
+ if(!confirm("Remove "+name+" from your manager trophy cabinet?"))return;
+ c.trophies.splice(index,1);saveCareers();renderTrophyCabinet();
+}
 function renderTrophyCabinet(){
- var c=getCurrentCareer();if(!c){renderDashboard();return;}var ts=c.trophies||[],h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Trophy Cabinet</div><div class="page-subtitle">Updated from trophies confirmed in Competitions.</div></div><button class="primary-btn" onclick="showPage(\'competitions\')">Manage Competitions</button></div><div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Total Trophies</div><div class="match-stat-number">'+ts.length+'</div></div></div><div class="careers-grid">';
- ts.slice().reverse().forEach(function(t){var n=typeof t==="string"?t:(t.competition||"Trophy"),season=typeof t==="string"?"Previous save":(t.season||"Season not set");h+='<div class="career-card"><div class="career-name">🏆 '+escapeHTML(n)+'</div><div class="career-club">'+escapeHTML(c.clubName)+'</div><div class="career-season"><span>Season</span><span class="season-value">'+escapeHTML(season)+'</span></div></div>';});if(!ts.length)h+='<div class="empty-state"><h2>No trophies recorded yet</h2><p>Use Competitions to mark a league or cup as won.</p></div>';document.getElementById("pageContent").innerHTML=h+'</div>';
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}
+ var ts=c.trophies||[],h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Manager Trophy Cabinet</div><div class="page-subtitle">Every trophy won by '+escapeHTML(c.managerName||"your manager")+', including trophies won at previous clubs.</div></div><button class="primary-btn" onclick="showPage(\'competitions\')">+ Add Trophy</button></div><div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Manager Trophies</div><div class="match-stat-number">'+ts.length+'</div></div></div><div class="careers-grid trophy-cabinet-grid">';
+ ts.slice().map(function(t,index){return {t,index};}).reverse().forEach(function(item){var t=item.t,index=item.index,n=typeof t==="string"?t:(t.competition||"Trophy"),season=typeof t==="string"?"Previous save":(t.season||"Season not set"),team=typeof t==="string"?(c.clubName||"Team not recorded"):(t.team||t.winningTeam||c.clubName||"Team not recorded"),manager=typeof t==="string"?(c.managerName||"Manager"):(t.manager||c.managerName||"Manager");h+='<div class="career-card trophy-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+escapeHTML(team)+'</div><div class="career-season"><span>Manager</span><span class="season-value">'+escapeHTML(manager)+'</span></div><div class="career-season"><span>Year / Season</span><span class="season-value">'+escapeHTML(season)+'</span></div><button class="secondary-btn trophy-remove-btn" onclick="removeCareerTrophy('+index+')">Remove Trophy</button></div>';});
+ if(!ts.length)h+='<div class="empty-state"><h2>No trophies recorded yet</h2><p>Use Add Trophy to record a win for your manager.</p></div>';
+ document.getElementById("pageContent").innerHTML=h+'</div>';
 }
 function renderPastSeasons(){
  var c=getCurrentCareer();if(!c){renderDashboard();return;}var ss=(c.seasons||[]).slice();if(!ss.some(function(x){return x.season===c.currentSeason;}))ss.push({season:c.currentSeason,league:c.league});var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Past Seasons</div><div class="page-subtitle">Summaries based on saved results.</div></div></div><div class="careers-grid">';
