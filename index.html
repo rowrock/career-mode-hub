@@ -1079,6 +1079,7 @@ function loadCareers(){
 
             if(!Array.isArray(c.seasons))
                 c.seasons=[];
+            c.seasons.forEach(season=>{if(!Array.isArray(season.leagueResults))season.leagueResults=[];});
 
             if(!c.currentSeason)
                 c.currentSeason="2026/27";
@@ -1149,12 +1150,16 @@ function showPage(page){
 
     else if(page==="players")
         renderPlayers();
-
+    else if(page==="league")
+        renderLeagueCentre();
+    else if(page==="trophies")
+        renderTrophyCabinet();
+    else if(page==="competitions")
+        renderCompetitionsHub();
+    else if(page==="past")
+        renderPastSeasons();
     else
-        renderPlaceholder(
-            pageTitle(page),
-            "This section will be built next."
-        );
+        renderPlaceholder(pageTitle(page),"This section will be built next.");
 }
 
 
@@ -1194,135 +1199,18 @@ function updateNavigation(){
 ========================================================= */
 
 function renderDashboard(){
-
-    currentCareerId=null;
-
-    updateNavigation();
-
-    document.getElementById("pageContent").innerHTML=`
-
-<div class="topbar">
-
-<div>
-<div class="page-title">Dashboard</div>
-<div class="page-subtitle">
-Choose a career mode or create a new one.
-</div>
-</div>
-
-<button class="primary-btn" onclick="startNewCareer()">
-+ New Career
-</button>
-
-</div>
-
-<div style="margin-bottom:22px">
-<div class="panel-title">Your Careers</div>
-<div class="panel-subtitle">
-Run multiple career modes at the same time.
-</div>
-</div>
-
-${
-careers.length===0
-
-?
-
-`
-
-<div class="empty-state">
-
-<h2>No careers yet</h2>
-
-<p>
-Create your first Career Mode save to get started.
-</p>
-
-<button class="primary-btn" onclick="startNewCareer()">
-Create Career
-</button>
-
-</div>
-
-`
-
-:
-
-`
-
-<div class="careers-grid">
-${careers.map(createCareerCard).join("")}
-</div>
-
-`
-
+ currentCareerId=null;updateNavigation();
+ var all=careers.reduce(function(a,c){return a.concat(c.matches||[]);},[]);
+ var trophies=careers.reduce(function(n,c){return n+(c.trophies||[]).length;},0);
+ var wins=all.filter(function(m){return m.result==="W"||Number(m.goalsFor)>Number(m.goalsAgainst);}).length;
+ var html='<div class="topbar"><div><div class="page-title">Dashboard</div><div class="page-subtitle">Progress updates automatically from saved matches and trophies.</div></div><button class="primary-btn" onclick="startNewCareer()">+ New Career</button></div>';
+ html+='<div class="match-summary-grid" style="margin-bottom:24px"><div class="match-stat"><div class="match-stat-label">Careers</div><div class="match-stat-number">'+careers.length+'</div></div><div class="match-stat"><div class="match-stat-label">Matches Logged</div><div class="match-stat-number">'+all.length+'</div></div><div class="match-stat"><div class="match-stat-label">Wins</div><div class="match-stat-number">'+wins+'</div></div><div class="match-stat"><div class="match-stat-label">Trophies</div><div class="match-stat-number">'+trophies+'</div></div></div><div class="panel-title">Your Careers</div>';
+ html+=careers.length?'<div class="careers-grid">'+careers.map(createCareerCard).join("")+'</div>':'<div class="empty-state"><h2>No careers yet</h2><p>Create your first Career Mode save to get started.</p><button class="primary-btn" onclick="startNewCareer()">Create Career</button></div>';
+ document.getElementById("pageContent").innerHTML=html;
 }
-
-`;
-}
-
-
-function createCareerCard(career){
-
-    return `
-
-<div class="career-card">
-
-<div class="career-name">
-${escapeHTML(career.managerName)}
-</div>
-
-<div class="career-club">
-${escapeHTML(career.clubName)}
-</div>
-
-<div class="career-league">
-${escapeHTML(career.league)}
-</div>
-
-<div class="career-season">
-<span>Current Year</span>
-<span class="season-value">
-${escapeHTML(career.currentSeason)}
-</span>
-</div>
-
-<div class="career-season">
-<span>Matches</span>
-<span class="season-value">
-${career.matches.length}
-</span>
-</div>
-
-<div class="career-season">
-<span>Calendar</span>
-<span class="season-value">
-${career.calendar.length}
-</span>
-</div>
-
-<div class="career-actions">
-
-<button
-type="button"
-class="primary-btn"
-onclick="enterCareer('${escapeJS(career.id)}')"
->
-Enter Career
-</button>
-
-<button
-class="delete-btn"
-onclick="deleteCareer('${escapeJS(career.id)}',event)"
->
-Delete
-</button>
-
-</div>
-
-</div>
-
-`;
+function createCareerCard(c){
+ var st=getSeasonStatistics(c,c.currentSeason),n=(c.trophies||[]).length;
+ return '<div class="career-card"><div class="career-name">'+escapeHTML(c.managerName)+'</div><div class="career-club">'+escapeHTML(c.clubName)+'</div><div class="career-league">'+escapeHTML(c.league)+'</div><div class="career-season"><span>Current Season</span><span class="season-value">'+escapeHTML(c.currentSeason)+'</span></div><div class="career-season"><span>Matches</span><span class="season-value">'+st.played+'</span></div><div class="career-season"><span>Record (W-D-L)</span><span class="season-value">'+st.wins+'-'+st.draws+'-'+st.losses+'</span></div><div class="career-season"><span>Goals</span><span class="season-value">'+st.goalsFor+'–'+st.goalsAgainst+'</span></div><div class="career-season"><span>Trophies</span><span class="season-value">'+n+'</span></div><div class="career-actions"><button class="primary-btn" onclick="enterCareer(\''+escapeJS(c.id)+'\')">Enter Career</button><button class="delete-btn" onclick="deleteCareer(\''+escapeJS(c.id)+'\',event)">Delete</button></div></div>';
 }
 
 
@@ -2121,40 +2009,66 @@ ${escapeHTML(career.currentSeason)} competition setup
 ${seasonSummaryHTML(career)}
 
 </div>
+
+${seasonStatisticsHTML(career)}
 `;
 }
 
 
-function seasonSummaryHTML(career){
+function seasonSummaryHTML(c){
+ var s=getSeason(c),st=getSeasonStatistics(c,c.currentSeason);if(!s)return '<div class="info-box">No season setup found.</div>';
+ return '<div class="info-box"><strong style="color:white">League teams:</strong> '+s.leagueTeams.length+'<br><br><strong style="color:white">Competitions:</strong> '+((s.competitions||[]).join(", ")||"Automatically listed from matches")+'<br><br><strong style="color:white">Current record:</strong> '+st.wins+' wins · '+st.draws+' draws · '+st.losses+' losses · '+st.points+' points</div>';
+}
 
-    const season=getSeason(career);
-
-    if(!season)
-        return `<div class="info-box">No season setup found.</div>`;
-
-    return `
-
-<div class="info-box">
-
-<strong style="color:white">
-League teams:
-</strong>
-
-${season.leagueTeams.length||0}
-
-<br><br>
-
-<strong style="color:white">
-Competitions:
-</strong>
-
-${season.competitions.length
-?season.competitions.join(", ")
-:"None added yet"}
-
-</div>
-
-`;
+function getSeasonMatches(c,name){
+ name=name||c.currentSeason;return (c.matches||[]).filter(function(m){return !m.season||m.season===name;});
+}
+function getSeasonStatistics(c,name){
+ var ms=getSeasonMatches(c,name),x={played:ms.length,wins:0,draws:0,losses:0,goalsFor:0,goalsAgainst:0,goalDifference:0,points:0,cleanSheets:0,playerRows:[]},p={};
+ ms.forEach(function(m){var a=Number(m.goalsFor)||0,b=Number(m.goalsAgainst)||0;x.goalsFor+=a;x.goalsAgainst+=b;if(a>b){x.wins++;x.points+=3;}else if(a===b){x.draws++;x.points++;}else x.losses++;if(m.cleanSheet||b===0)x.cleanSheets++;(m.players||[]).forEach(function(q){var n=String(q.name||"").trim();if(!n)return;if(!p[n])p[n]={name:n,apps:0,goals:0,assists:0,yc:0,rc:0,saves:0,rating:0,ratingCount:0};var z=p[n];z.apps++;z.goals+=Number(q.goals)||0;z.assists+=Number(q.assists)||0;z.yc+=Number(q.yellowCards)||0;z.rc+=Number(q.redCards)||0;z.saves+=Number(q.saves)||0;if(q.rating!==null&&q.rating!==""&&Number.isFinite(Number(q.rating))){z.rating+=Number(q.rating);z.ratingCount++;}});});
+ x.goalDifference=x.goalsFor-x.goalsAgainst;x.playerRows=Object.keys(p).map(function(k){return p[k];}).sort(function(a,b){return b.goals-a.goals||b.assists-a.assists;});return x;
+}
+function seasonStatisticsHTML(c,name){
+ var x=getSeasonStatistics(c,name),html='<div class="panel" style="margin-top:20px"><div class="panel-title">'+escapeHTML(name||c.currentSeason)+' — Season Statistics</div><div class="panel-subtitle">Calculated from saved matches and refreshed when you save one.</div><div class="match-summary-grid" style="margin-top:14px">';
+ [["Played",x.played],["Wins",x.wins],["Draws",x.draws],["Losses",x.losses],["Goals For",x.goalsFor],["Goals Against",x.goalsAgainst],["Goal Difference",x.goalDifference],["Points",x.points],["Clean Sheets",x.cleanSheets]].forEach(function(v){html+='<div class="match-stat"><div class="match-stat-label">'+v[0]+'</div><div class="match-stat-number">'+v[1]+'</div></div>';});
+ html+='</div><div class="panel-title" style="margin-top:18px">Player Statistics</div>';
+ if(x.playerRows.length){html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>';["Player","Apps","Goals","Assists","Avg Rating","YC","RC","Saves"].forEach(function(h){html+='<th style="padding:9px;text-align:left;border-bottom:1px solid #303844">'+h+'</th>';});html+='</tr></thead><tbody>';x.playerRows.forEach(function(p){html+='<tr>'+[escapeHTML(p.name),p.apps,p.goals,p.assists,p.ratingCount?(p.rating/p.ratingCount).toFixed(1):"—",p.yc,p.rc,p.saves].map(function(v){return '<td style="padding:9px;border-bottom:1px solid #202731">'+v+'</td>';}).join("")+'</tr>';});html+='</tbody></table></div>';}else html+='<div class="info-box">Save player details with your matches to build player statistics.</div>';
+ return html+'</div>';
+}
+function buildLeagueTable(c){
+ var season=getSeason(c),teams=new Set([c.clubName].concat(season.leagueTeams||[])),rows={};
+ getSeasonMatches(c).forEach(function(m){if(m.competition===c.league&&m.opponent)teams.add(m.opponent);});
+ teams.forEach(function(t){rows[t]={team:t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};});
+ function add(a,b,x,y){if(!rows[a])rows[a]={team:a,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};if(!rows[b])rows[b]={team:b,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};var A=rows[a],B=rows[b];x=Number(x);y=Number(y);A.p++;B.p++;A.gf+=x;A.ga+=y;B.gf+=y;B.ga+=x;if(x>y){A.w++;A.pts+=3;B.l++;}else if(x<y){B.w++;B.pts+=3;A.l++;}else{A.d++;B.d++;A.pts++;B.pts++;}}
+ getSeasonMatches(c).filter(function(m){return m.competition===c.league&&m.opponent;}).forEach(function(m){add(c.clubName,m.opponent,m.goalsFor||0,m.goalsAgainst||0);});
+ (season.leagueResults||[]).forEach(function(r){if(!r.season||r.season===c.currentSeason)add(r.teamA,r.teamB,r.goalsA,r.goalsB);});
+ return Object.keys(rows).map(function(k){var r=rows[k];r.gd=r.gf-r.ga;return r;}).sort(function(a,b){return b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf;});
+}
+function renderLeagueCentre(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}var rs=buildLeagueTable(c),h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">League Centre</div><div class="page-subtitle">'+escapeHTML(c.league)+' · '+escapeHTML(c.currentSeason)+'</div></div><button class="secondary-btn" onclick="openSeasonSetup(false)">Edit League Teams</button></div><div class="info-box">League matches saved under '+escapeHTML(c.league)+' update your club row automatically. To complete the other rows, add their results in the League Centre.</div><div class="panel"><div class="panel-title">League Table</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:600px"><thead><tr>';
+ ["Pos","Club","P","W","D","L","GF","GA","GD","Pts"].forEach(function(t){h+='<th style="padding:9px;border-bottom:1px solid #303844">'+t+'</th>';});h+='</tr></thead><tbody>';
+ rs.forEach(function(r,i){h+='<tr><td style="padding:9px">'+(i+1)+'</td><td style="padding:9px">'+escapeHTML(r.team)+(r.team===c.clubName?" (Your club)":"")+'</td>'+[r.p,r.w,r.d,r.l,r.gf,r.ga,r.gd,r.pts].map(function(v){return '<td style="padding:9px;text-align:center">'+v+'</td>';}).join("")+'</tr>';});h+='</tbody></table></div><button class="primary-btn" style="margin-top:14px" onclick="openLeagueResultModal()">+ Add Other Result</button></div>';document.getElementById("pageContent").innerHTML=h;
+}
+function openLeagueResultModal(){
+ var c=getCurrentCareer();if(!c)return;var ts=(getSeason(c).leagueTeams||[]).filter(function(t){return t!==c.clubName;});if(ts.length<2){alert("Add at least two other teams in Season Setup first.");return;}
+ var o=ts.map(function(t){return '<option value="'+escapeHTML(t)+'">'+escapeHTML(t)+'</option>';}).join("");
+ document.getElementById("modalContainer").innerHTML='<div class="modal-overlay" onclick="closeModalOutside(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Add Other League Result</div><button class="close-btn" onclick="closeModal()">×</button></div><div class="form-grid"><div class="form-group"><label>Home team</label><select id="lrA" class="form-select">'+o+'</select></div><div class="form-group"><label>Away team</label><select id="lrB" class="form-select">'+o+'</select></div><div class="form-group"><label>Home goals</label><input id="lrGA" class="form-input" type="number" min="0" value="0"></div><div class="form-group"><label>Away goals</label><input id="lrGB" class="form-input" type="number" min="0" value="0"></div></div><div class="modal-actions"><button class="secondary-btn" onclick="closeModal()">Cancel</button><button class="primary-btn" onclick="saveLeagueResult()">Save Result</button></div></div></div>';
+}
+function saveLeagueResult(){
+ var c=getCurrentCareer();if(!c)return;var s=getSeason(c),a=document.getElementById("lrA").value,b=document.getElementById("lrB").value,x=document.getElementById("lrGA").value,y=document.getElementById("lrGB").value;if(a===b||x===""||y===""){alert("Choose two different teams and enter both scores.");return;}s.leagueResults.push({season:c.currentSeason,league:c.league,teamA:a,teamB:b,goalsA:Number(x),goalsB:Number(y)});saveCareers();closeModal();renderLeagueCentre();
+}
+function renderCompetitionsHub(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}var names=[...new Set([c.league].concat(getSeason(c).competitions||[],getSeasonMatches(c).map(function(m){return m.competition;}).filter(Boolean)))],ts=c.trophies||[],h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Competitions</div><div class="page-subtitle">Confirm a trophy here and the cabinet and dashboard update automatically.</div></div></div><div class="info-box">A score alone cannot tell whether a cup final or whole competition has been won, so confirm each trophy once.</div><div class="careers-grid">';
+ names.forEach(function(n){var won=ts.some(function(t){return typeof t==="object"&&t.competition===n&&t.season===c.currentSeason;});var ms=getSeasonMatches(c).filter(function(m){return m.competition===n;});h+='<div class="career-card"><div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+ms.length+' matches logged</div><div class="career-season"><span>Status</span><span class="season-value">'+(won?"Trophy won":"In progress")+'</span></div>'+(won?"":'<button class="primary-btn" onclick="recordCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>')+'</div>';});document.getElementById("pageContent").innerHTML=h+'</div>';
+}
+function recordCompetitionTrophy(n){var c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.trophies))c.trophies=[];if(c.trophies.some(function(t){return typeof t==="object"&&t.competition===n&&t.season===c.currentSeason;}))return;c.trophies.push({competition:n,season:c.currentSeason,date:todayDate()});saveCareers();renderCompetitionsHub();}
+function renderTrophyCabinet(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}var ts=c.trophies||[],h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Trophy Cabinet</div><div class="page-subtitle">Updated from trophies confirmed in Competitions.</div></div><button class="primary-btn" onclick="showPage(\'competitions\')">Manage Competitions</button></div><div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Total Trophies</div><div class="match-stat-number">'+ts.length+'</div></div></div><div class="careers-grid">';
+ ts.slice().reverse().forEach(function(t){var n=typeof t==="string"?t:(t.competition||"Trophy"),season=typeof t==="string"?"Previous save":(t.season||"Season not set");h+='<div class="career-card"><div class="career-name">🏆 '+escapeHTML(n)+'</div><div class="career-club">'+escapeHTML(c.clubName)+'</div><div class="career-season"><span>Season</span><span class="season-value">'+escapeHTML(season)+'</span></div></div>';});if(!ts.length)h+='<div class="empty-state"><h2>No trophies recorded yet</h2><p>Use Competitions to mark a league or cup as won.</p></div>';document.getElementById("pageContent").innerHTML=h+'</div>';
+}
+function renderPastSeasons(){
+ var c=getCurrentCareer();if(!c){renderDashboard();return;}var ss=(c.seasons||[]).slice();if(!ss.some(function(x){return x.season===c.currentSeason;}))ss.push({season:c.currentSeason,league:c.league});var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Past Seasons</div><div class="page-subtitle">Summaries based on saved results.</div></div></div><div class="careers-grid">';
+ ss.forEach(function(x){var n=x.season||c.currentSeason,st=getSeasonStatistics(c,n);h+='<div class="career-card"><div class="career-name">'+escapeHTML(n)+'</div><div class="career-season"><span>Matches</span><span class="season-value">'+st.played+'</span></div><div class="career-season"><span>Record</span><span class="season-value">'+st.wins+'-'+st.draws+'-'+st.losses+'</span></div><div class="career-season"><span>Goals</span><span class="season-value">'+st.goalsFor+'–'+st.goalsAgainst+'</span></div><div class="career-season"><span>Points</span><span class="season-value">'+st.points+'</span></div></div>';});document.getElementById("pageContent").innerHTML=h+'</div>'+seasonStatisticsHTML(c,c.currentSeason);
 }
 
 
@@ -2240,6 +2154,8 @@ function getSeason(career){
 
     if(!Array.isArray(season.competitions))
         season.competitions=[];
+    if(!Array.isArray(season.leagueResults))
+        season.leagueResults=[];
 
     return season;
 }
