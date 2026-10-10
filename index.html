@@ -1205,7 +1205,30 @@ function squadPlayerName(p){return p.commonName||[p.firstName,p.lastName].filter
 function squadPlayerId(p){return String(p.id??p.playerId??p.customId??"");}
 function squadPosition(p){let v=p.position||p.playerPosition||p.preferredPosition||p.alternatePositions||"";return Array.isArray(v)?v.join(", "):String(v||"");}
 function getCareerSquadRoster(c){if(!c)return[];let h=ensureSquadHub(c),removed=new Set(h.removedIds.map(String)),added=new Set(h.addedIds.map(String)),out=[],seen=new Set();getCareerClubRoster(c).concat((c.squad||[]).filter(p=>p&&typeof p==="object"),allPlayers.filter(p=>added.has(squadPlayerId(p))),h.customPlayers).forEach(p=>{let id=squadPlayerId(p);if(id&&!removed.has(id)&&!seen.has(id)){out.push(p);seen.add(id);}});return out;}
-function getFormationSlots(f){let a=SQUAD_FORMATIONS[f]||[4,2,3,1],d=a[0],slots=[{id:"GK",role:"GK",x:50,y:91}];function row(n,y,role,prefix){for(let i=0;i<n;i++)slots.push({id:prefix+(i+1),role:role,x:n===1?50:12+76*i/(n-1),y:y});}row(d,75,"DEF","D");if(f.indexOf("4-2-3-1")===0){row(2,62,"CDM","M");row(3,44,"CAM/W","F");row(1,24,"ST","S");}else if(f.indexOf("4-1-2-1-2")===0){row(1,63,"CDM","M");row(2,50,"CM","M");row(1,38,"CAM","M");row(2,23,"ST","F");}else if(["4-4-2 (Flat)","4-4-2 (Holding)","4-2-2-2","3-5-2","5-3-2","5-2-1-2"].includes(f)){row(4,56,"MID","M");row(2,25,"ST","F");}else if(["4-1-4-1","4-5-1","5-4-1"].includes(f)){row(5,54,"MID","M");row(1,25,"ST","S");}else if(f==="4-3-2-1"){row(3,57,"CM","M");row(2,40,"CF","F");row(1,23,"ST","S");}else if(["4-3-3 (Holding)","4-3-3 (Attack)","4-3-3 (Defend)","4-3-3 (False 9)","3-4-3 (Flat)","3-4-3 (Diamond)","5-2-3"].includes(f)){row(a[1],56,"MID","M");row(3,25,"FWD","F");}else if(f==="3-4-2-1"){row(4,57,"MID","M");row(2,40,"AM","F");row(1,23,"ST","S");}else{row(a[1],55,"MID","M");row(a[2],37,"FWD","F");row(a[3],23,"ST","S");}return slots;}
+function getFormationSlots(f){
+ let slots=[{id:"GK",role:"GK",x:50,y:91}],d=4,rows=[];
+ if(f.indexOf("3-")===0)d=3;else if(f.indexOf("5-")===0)d=5;
+ function add(n,y,role,prefix){rows.push({n:n,y:y,role:role,prefix:prefix});}
+ if(f.indexOf("4-2-3-1")===0){add(2,62,"CDM","M");add(3,44,"CAM/W","F");add(1,24,"ST","S");}
+ else if(f.indexOf("4-3-3")===0){add(3,56,"MID","M");add(3,25,"FWD","F");}
+ else if(f.indexOf("4-1-2-1-2")===0){add(1,63,"CDM","M");add(2,50,"CM","N");add(1,38,"CAM","C");add(2,23,"ST","S");}
+ else if(f.indexOf("4-4-2")===0){add(4,55,"MID","M");add(2,24,"ST","S");}
+ else if(f==="4-2-2-2"){add(2,62,"CM/CDM","M");add(2,43,"CAM","C");add(2,24,"ST","S");}
+ else if(f==="4-3-2-1"){add(3,57,"CM","M");add(2,40,"CF","F");add(1,23,"ST","S");}
+ else if(f==="4-1-4-1"){add(1,64,"CDM","M");add(4,50,"MID","N");add(1,24,"ST","S");}
+ else if(f==="4-5-1"){add(5,54,"MID","M");add(1,24,"ST","S");}
+ else if(f==="3-4-2-1"){add(4,57,"MID","M");add(2,40,"AM","F");add(1,23,"ST","S");}
+ else if(f.indexOf("3-4-3")===0){add(4,57,"MID","M");add(3,24,"FWD","F");}
+ else if(f==="3-5-2"){add(5,54,"MID","M");add(2,24,"ST","S");}
+ else if(f==="5-2-1-2"){add(2,60,"CM","M");add(1,43,"CAM","C");add(2,24,"ST","S");}
+ else if(f==="5-3-2"){add(3,55,"MID","M");add(2,24,"ST","S");}
+ else if(f==="5-4-1"){add(4,55,"MID","M");add(1,24,"ST","S");}
+ else if(f==="5-2-3"){add(2,59,"CM","M");add(3,24,"FWD","F");}
+ else {add(3,56,"MID","M");add(3,25,"FWD","F");}
+ for(let i=0;i<d;i++)slots.push({id:"D"+(i+1),role:"DEF",x:d===1?50:12+76*i/(d-1),y:75});
+ rows.forEach(r=>{for(let i=0;i<r.n;i++)slots.push({id:r.prefix+(i+1),role:r.role,x:r.n===1?50:12+76*i/(r.n-1),y:r.y});});
+ return slots;
+}
 function renderSquadHub(){let c=getCurrentCareer();if(!c){renderDashboard();return;}let h=ensureSquadHub(c),roster=getCareerSquadRoster(c),slots=getFormationSlots(h.formation),used=new Set(Object.values(h.lineup).filter(Boolean).map(String)),bench=roster.filter(p=>!used.has(squadPlayerId(p)));let pitch=slots.map(slot=>{let p=roster.find(x=>squadPlayerId(x)===String(h.lineup[slot.id]||""));return '<button type="button" class="pitch-slot '+(p?"":"empty")+'" style="left:'+slot.x+'%;top:'+slot.y+'%" onclick="selectSquadSlot(\''+slot.id+'\')" ondragover="squadDragOver(event)" ondragleave="squadDragLeave(event)" ondrop="dropSquadPlayer(event,\''+slot.id+'\')"><span class="slot-role">'+slot.role+'</span><span class="slot-name">'+escapeHTML(p?squadPlayerName(p):"Tap to add")+'</span><span class="slot-rating">'+escapeHTML(p?(p.overallRating??p.rating??"—"):"＋")+'</span></button>';}).join("");let opts=Object.keys(SQUAD_FORMATIONS).map(f=>'<option value="'+escapeHTML(f)+'" '+(f===h.formation?"selected":"")+'>'+escapeHTML(f)+'</option>').join("");document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="squad-toolbar"><div><div class="page-title">Squad Hub</div><div class="page-subtitle">Build your starting XI. Tap a position to choose a player, or drag players from the bench onto the pitch.</div></div><div class="squad-toolbar-right"><div><label for="squadFormation">Formation</label><select id="squadFormation" class="form-select squad-formation-select" onchange="changeSquadFormation(this.value)">'+opts+'</select></div><button class="primary-btn" onclick="openAddSquadPlayers()">+ Add Players</button></div></div><div class="squad-layout"><section class="squad-pitch-wrap"><div class="squad-pitch"><div class="pitch-box top"></div><div class="pitch-box bottom"></div><div class="pitch-circle"></div>'+pitch+'</div></section><aside class="squad-side"><div class="panel"><div class="panel-title">Starting XI</div><div class="panel-subtitle">'+Object.values(h.lineup).filter(Boolean).length+' positions filled · '+escapeHTML(h.formation)+'</div><div class="squad-roster-actions"><button class="secondary-btn" onclick="clearSquadLineup()">Clear Lineup</button><button class="secondary-btn" onclick="autoFillSquadLineup()">Auto-fill XI</button></div></div><div class="panel"><div class="panel-title">Bench / Available Squad</div><div class="panel-subtitle">'+bench.length+' available players</div><div class="squad-player-list">'+(bench.map(p=>renderSquadBenchPlayer(p,false)).join("")||'<div class="squad-empty">No bench players. Add players above.</div>')+'</div></div><div class="panel"><div class="panel-title">Squad List ('+roster.length+')</div><div class="panel-subtitle">Players available for this career</div><div class="squad-player-list">'+(roster.map(p=>renderSquadBenchPlayer(p,true)).join("")||'<div class="squad-empty">No players found for this club. Add your current squad.</div>')+'</div></div></aside></div>';saveCareers();}
 function renderSquadBenchPlayer(p,remove){let id=squadPlayerId(p);return '<div class="squad-player-chip" draggable="true" ondragstart="startSquadPlayerDrag(event,\''+escapeHTML(id)+'\')" ondragend="endSquadPlayerDrag(event)" ondragover="squadDragOver(event)" ondragleave="squadDragLeave(event)" ondrop="dropSquadPlayerOnBench(event,\''+escapeHTML(id)+'\')"><span class="squad-player-rating">'+escapeHTML(p.overallRating??p.rating??"—")+'</span><div class="squad-player-info"><div class="squad-player-name">'+escapeHTML(squadPlayerName(p))+'</div><div class="squad-player-pos">'+escapeHTML(squadPosition(p)||"Position not set")+(p.club?" · "+escapeHTML(p.club):"")+'</div></div>'+(remove?'<button class="squad-mini-btn" onclick="event.stopPropagation();removeSquadPlayer(\''+escapeHTML(id)+'\')" title="Remove from squad">×</button>':"")+'</div>';}
 function changeSquadFormation(f){let c=getCurrentCareer();if(!c||!SQUAD_FORMATIONS[f])return;ensureSquadHub(c).formation=f;saveCareers();renderSquadHub();}
@@ -3497,7 +3520,17 @@ function getCareerClubRoster(career){
             return club&&target&&(club===target||club.includes(target)||target.includes(club));
         });
     }
-    return roster;
+    const baseRoster=roster;
+    if(career && career.squadHub){
+        const h=career.squadHub, removed=new Set((h.removedIds||[]).map(String)), added=new Set((h.addedIds||[]).map(String));
+        const ids=new Set(baseRoster.map(p=>String(p.id??p.playerId??p.customId??"")));
+        (career.squad||[]).concat(allPlayers.filter(p=>added.has(String(p.id??p.playerId??""))),h.customPlayers||[]).forEach(p=>{
+            const id=String(p.id??p.playerId??p.customId??"");
+            if(id&&!removed.has(id)&&!ids.has(id)){baseRoster.push(p);ids.add(id);}
+        });
+        return baseRoster.filter(p=>!removed.has(String(p.id??p.playerId??p.customId??"")));
+    }
+    return baseRoster;
 }
 
 function matchRosterPlayer(name,roster){
