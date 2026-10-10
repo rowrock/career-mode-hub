@@ -2213,23 +2213,30 @@ function trophyImageMarkup(name){
 }
 function renderCompetitionsHub(){
  var c=getCurrentCareer();if(!c){renderDashboard();return;}
- var names=trophyCatalogueNames(c),ts=c.trophies||[];
- var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Competitions & Trophies</div><div class="page-subtitle">Mark a trophy won to add it to your manager trophy cabinet. The winning team is recorded separately.</div></div></div><div class="info-box">Choose any trophy in the catalogue, including league titles, promotion play-offs, domestic cups and international competitions. You can remove an accidental win from the cabinet.</div><div class="panel"><input id="trophyCatalogueSearch" class="search-input" placeholder="Search every trophy..." oninput="filterTrophyCatalogue(this.value)"><div id="trophyCatalogueGrid" class="careers-grid"></div></div>';
- document.getElementById("pageContent").innerHTML=h;renderTrophyCatalogueCards(names,c);
+ var names=trophyCatalogueNames(c),active=getParticipatingCompetitions(c);
+ var activeCards=active.map(function(n){return '<div class="career-card trophy-catalogue-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">Participating</div>'+(n===c.league?'<button class="secondary-btn" disabled>Main League</button>':'<button class="secondary-btn" onclick="leaveCompetition(\''+escapeJS(n)+'\')">Remove Competition</button>')+'</div>';}).join('');
+ var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Competitions</div><div class="page-subtitle">Join competitions you are taking part in. Only joined competitions can be used for matches or marked as won.</div></div></div><div class="panel"><div class="panel-title">Your competitions this season</div><div class="panel-subtitle">Your main league is included automatically.</div><div class="careers-grid">'+activeCards+'</div></div><div class="info-box">Join a competition below before recording matches or marking its trophy as won.</div><div class="panel"><input id="trophyCatalogueSearch" class="search-input" placeholder="Search competitions..." oninput="filterTrophyCatalogue(this.value)"><div id="trophyCatalogueGrid" class="careers-grid"></div></div>';
+ document.getElementById('pageContent').innerHTML=h;renderTrophyCatalogueCards(names,c);
 }
 function renderTrophyCatalogueCards(names,c){
- var box=document.getElementById("trophyCatalogueGrid");if(!box)return;
- var q=(document.getElementById("trophyCatalogueSearch")?.value||"").toLowerCase().trim(),ts=c.trophies||[];
+ var box=document.getElementById('trophyCatalogueGrid');if(!box)return;
+ var q=(document.getElementById('trophyCatalogueSearch')?.value||'').toLowerCase().trim();
  var list=names.filter(function(n){return n.toLowerCase().includes(q);});
- box.innerHTML=list.map(function(n){var won=ts.some(function(t){return typeof t==="object"&&t.competition===n&&String(t.season||"")===String(c.currentSeason||"");});return '<div class="career-card trophy-catalogue-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+(won?'Won this season':'Available trophy')+'</div>'+(won?'<button class="secondary-btn" disabled>Already marked won</button>':'<button class="primary-btn" onclick="recordCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>')+'</div>';}).join("")||'<div class="empty-state">No trophies match your search.</div>';
+ box.innerHTML=list.map(function(n){
+  var active=isParticipatingInCompetition(c,n);
+  var won=(c.trophies||[]).some(function(t){return typeof t==='object'&&String(t.competition||'').toLowerCase()===n.toLowerCase()&&String(t.season||'')===String(c.currentSeason||'');});
+  var action=active?(won?'<button class="secondary-btn" disabled>Already marked won</button>':'<button class="primary-btn" onclick="recordCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>'):'<button class="primary-btn" onclick="joinCompetition(\''+escapeJS(n)+'\')">Join Competition</button>';
+  return '<div class="career-card trophy-catalogue-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+(active?'Participating this season':'Not participating')+'</div>'+action+'</div>';
+ }).join('')||'<div class="empty-state">No competitions match your search.</div>';
 }
 function filterTrophyCatalogue(q){var c=getCurrentCareer();if(c)renderTrophyCatalogueCards(trophyCatalogueNames(c),c);}
 function recordCompetitionTrophy(n){
- var c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.trophies))c.trophies=[];
- var team=prompt("Which team won "+n+"?",""+(c.clubName||""));if(team===null||!team.trim())return;
- if(c.trophies.some(function(t){return typeof t==="object"&&t.competition===n&&String(t.season||"")===String(c.currentSeason||"")&&String(t.team||t.winningTeam||c.clubName)===team.trim();})){alert("That trophy is already recorded for this team and season.");return;}
- c.trophies.push({id:createId(),competition:n,season:c.currentSeason,date:todayDate(),team:team.trim(),manager:c.managerName||"Manager"});saveCareers();renderCompetitionsHub();
+ var c=getCurrentCareer();if(!c)return;if(!isParticipatingInCompetition(c,n)){alert('Join this competition before marking it as won.');return;}if(!Array.isArray(c.trophies))c.trophies=[];
+ var team=prompt('Which team won '+n+'?',c.clubName||'');if(team===null||!team.trim())return;
+ if(c.trophies.some(function(t){return typeof t==='object'&&String(t.competition||'').toLowerCase()===n.toLowerCase()&&String(t.season||'')===String(c.currentSeason||'')&&String(t.team||t.winningTeam||c.clubName)===team.trim();})){alert('That trophy is already recorded for this team and season.');return;}
+ c.trophies.push({id:createId(),competition:n,season:c.currentSeason,date:todayDate(),team:team.trim(),manager:c.managerName||'Manager'});saveCareers();renderCompetitionsHub();
 }
+
 function removeCareerTrophy(index){
  var c=getCurrentCareer();if(!c||!Array.isArray(c.trophies)||!c.trophies[index])return;
  var t=c.trophies[index],name=typeof t==="string"?t:(t.competition||"this trophy");
