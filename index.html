@@ -1166,6 +1166,8 @@ function showPage(page){
         renderCompetitionsHub();
     else if(page==="past")
         renderPastSeasons();
+    else if(page==="youth")
+        renderYouthAcademy();
     else
         renderPlaceholder(pageTitle(page),"This section will be built next.");
 }
@@ -5014,6 +5016,54 @@ ${escapeHTML(player.nationality||"—")}
 /* =========================================================
    PLACEHOLDER
 ========================================================= */
+
+function renderYouthAcademy(){
+    const c=getCurrentCareer();
+    if(!c){renderDashboard();return;}
+    if(!Array.isArray(c.youthAcademy))c.youthAcademy=[];
+    const players=c.youthAcademy.slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+    const rows=players.map(p=>'<tr><td>'+escapeHTML(p.name||"Unnamed")+'</td><td>'+escapeHTML(p.position||"—")+'</td><td>'+escapeHTML(p.country||"—")+'</td><td>'+escapeHTML(p.age??"—")+'</td><td><strong>'+escapeHTML(p.potentialMin??"—")+'–'+escapeHTML(p.potentialMax??"—")+'</strong></td><td><button class="secondary-btn" onclick="deleteYouthPlayer(\''+escapeJS(p.id)+'\')">Delete</button></td></tr>').join("");
+    document.getElementById("pageContent").innerHTML=careerBanner(c)+
+    '<div class="topbar"><div><div class="page-title">Youth Academy</div><div class="page-subtitle">Create and track your academy prospects for this career.</div></div><div class="match-stat"><div class="match-stat-label">Academy Players</div><div class="match-stat-value">'+players.length+'</div></div></div>'+
+    '<div class="panel"><div class="panel-title">Add Youth Player</div><div class="panel-subtitle">Enter the player details and an estimated potential range, for example 63–87.</div>'+
+    '<form onsubmit="addYouthPlayer(event)" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:18px">'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Player name<input class="search-input" id="youthName" required maxlength="80" placeholder="Full name"></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Position<select class="search-input" id="youthPosition" required><option value="">Choose position</option><option>GK</option><option>CB</option><option>LB</option><option>RB</option><option>LWB</option><option>RWB</option><option>CDM</option><option>CM</option><option>CAM</option><option>LM</option><option>RM</option><option>LW</option><option>RW</option><option>CF</option><option>ST</option></select></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Country<input class="search-input" id="youthCountry" required maxlength="60" placeholder="e.g. Australia"></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Age<input class="search-input" id="youthAge" type="number" min="1" max="99" step="1" required placeholder="e.g. 16"></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Minimum potential<input class="search-input" id="youthPotentialMin" type="number" min="1" max="99" step="1" required placeholder="e.g. 63"></label>'+
+    '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Maximum potential<input class="search-input" id="youthPotentialMax" type="number" min="1" max="99" step="1" required placeholder="e.g. 87"></label>'+
+    '<div style="display:flex;align-items:end"><button class="primary-btn" type="submit" style="width:100%">+ Add Youth Player</button></div></form></div>'+
+    '<div class="panel" style="margin-top:18px"><div class="panel-title">Your Youth Academy</div><div class="panel-subtitle">These players are saved to this career.</div>'+
+    (players.length?'<div style="overflow-x:auto;margin-top:14px"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Name</th><th>Position</th><th>Country</th><th>Age</th><th>Estimated Potential</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div style="padding:28px 8px;text-align:center;color:#7f8996">No youth players yet. Use the form above to create your first prospect.</div>')+
+    '</div>';
+}
+
+function addYouthPlayer(event){
+    event.preventDefault();
+    const c=getCurrentCareer();if(!c)return;
+    const name=document.getElementById("youthName").value.trim();
+    const position=document.getElementById("youthPosition").value;
+    const country=document.getElementById("youthCountry").value.trim();
+    const age=Number(document.getElementById("youthAge").value);
+    const min=Number(document.getElementById("youthPotentialMin").value);
+    const max=Number(document.getElementById("youthPotentialMax").value);
+    if(!name||!position||!country||!Number.isInteger(age)||age<1||age>99){alert("Please fill in all player details with a valid age.");return;}
+    if(!Number.isInteger(min)||!Number.isInteger(max)||min<1||max>99||max<min){alert("Potential must be between 1 and 99, and the maximum must be at least the minimum.");return;}
+    if(!Array.isArray(c.youthAcademy))c.youthAcademy=[];
+    c.youthAcademy.push({id:"youth_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),name,position,country,age,potentialMin:min,potentialMax:max,createdAt:todayDate()});
+    saveCareers();
+    renderYouthAcademy();
+}
+
+function deleteYouthPlayer(id){
+    const c=getCurrentCareer();if(!c||!Array.isArray(c.youthAcademy))return;
+    const p=c.youthAcademy.find(x=>String(x.id)===String(id));
+    if(!p||!confirm("Delete "+(p.name||"this youth player")+" from your Youth Academy?"))return;
+    c.youthAcademy=c.youthAcademy.filter(x=>String(x.id)!==String(id));
+    saveCareers();renderYouthAcademy();
+}
+
 
 function renderPlaceholder(title,description){
 
