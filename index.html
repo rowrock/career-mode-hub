@@ -2576,6 +2576,10 @@ function saveSeasonTeams(){
 }
 
 
+function getParticipatingCompetitions(c){if(!c)return [];var season=getSeason(c),values=new Set([c.league].filter(Boolean));(season.competitions||[]).forEach(function(n){if(n)values.add(n);});(c.matches||[]).forEach(function(m){if(m.season===c.currentSeason&&m.competition)values.add(m.competition);});return Array.from(values).sort(function(a,b){return a.localeCompare(b);});}
+function joinCompetition(name){var c=getCurrentCareer();if(!c||!name)return;var s=getSeason(c);if(!s.competitions.includes(name))s.competitions.push(name);saveCareers();renderCompetitionsHub();}
+function leaveCompetition(name){var c=getCurrentCareer();if(!c)return;if(name===c.league){alert('Your main league is always active.');return;}var s=getSeason(c);s.competitions=s.competitions.filter(function(n){return n!==name;});saveCareers();renderCompetitionsHub();}
+function isParticipatingInCompetition(c,name){return getParticipatingCompetitions(c).some(function(n){return String(n).toLowerCase()===String(name).toLowerCase();});}
 /* =========================================================
    COMPETITIONS
 ========================================================= */
