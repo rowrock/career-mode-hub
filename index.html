@@ -3675,7 +3675,7 @@ function openAIMatchReview(data,filenames){
           <div class="form-group"><label>Home / Away</label><select id="aiMatchHomeAway" class="form-select"><option value="Home" ${homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${homeAway==="Away"?"selected":""}>Away</option></select></div>
           <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Enter opponent if missing"></div>
           <div class="form-group full"><label>Final score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
-          <div class="form-group full"><label>Goal scorers (your team; one name per goal, or comma-separated)</label><input id="aiMatchScorers" class="form-input" value="${escapeHTML(window.__careerAIReviewScorers.join(", "))}" placeholder="e.g. Player Name, Player Name"><div class="panel-subtitle">Check the Quick Sim summary and correct this list if needed.</div></div>
+          <div class="form-group full"><label>Goal scorers (your team; one name per goal, or comma-separated)</label><input id="aiMatchScorers" class="form-input" value="${escapeHTML(window.__careerAIReviewScorers.join(", "))}" oninput="syncAIMatchScorersToGoalColumns()" placeholder="e.g. Player Name, Player Name"><div class="panel-subtitle">Check the Quick Sim summary and correct this list if needed.</div></div>
         </div>
         <div style="margin-top:18px;padding-top:18px;border-top:1px solid #252c35">
           <div class="panel-title">Your Club's Players (${mapped.length})</div>
@@ -3703,7 +3703,7 @@ function renderAIReviewPlayers(){
     }).join("");
     container.innerHTML=players.map((p,i)=>`
       <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(150px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px">
-        <div><input class="form-input" data-ai-field="name" list="aiSquadOptions" value="${escapeHTML(p.name)}" placeholder="Choose squad player" aria-label="Player name"><datalist id="aiSquadOptions">${options}</datalist></div>
+        <div><input class="form-input" data-ai-field="name" list="aiSquadOptions" value="${escapeHTML(p.name)}" onchange="syncAIMatchScorersToGoalColumns()" placeholder="Choose squad player" aria-label="Player name"><datalist id="aiSquadOptions">${options}</datalist></div>
         <input class="form-input" data-ai-field="rating" type="number" min="0" max="10" step=".1" value="${p.rating==null?"":escapeHTML(p.rating)}" placeholder="Rating" aria-label="Rating">
         <input class="form-input" data-ai-field="goals" type="number" min="0" value="${p.goals==null?"":escapeHTML(p.goals)}" placeholder="G" aria-label="Goals">
         <input class="form-input" data-ai-field="assists" type="number" min="0" value="${p.assists==null?"":escapeHTML(p.assists)}" placeholder="A" aria-label="Assists">
@@ -3713,6 +3713,33 @@ function renderAIReviewPlayers(){
         <input class="form-input" data-ai-field="saves" type="number" min="0" value="${p.saves==null?"":escapeHTML(p.saves)}" placeholder="Saves" aria-label="Saves">
         <button class="remove-player" type="button" onclick="removeAIReviewPlayer(${i})">×</button>
       </div>`).join("")||'<div class="info-box">No players matched the screenshot to your squad. Use Add Player from Squad to choose players manually.</div>';
+}
+
+
+function syncAIMatchScorersToGoalColumns(){
+    const scorerInput=document.getElementById("aiMatchScorers");
+    if(!scorerInput)return;
+    const names=scorerInput.value.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+    if(!names.length)return;
+    const roster=window.__careerAIReviewRoster||[];
+    const counts={};
+    names.forEach(name=>{
+        const player=matchRosterPlayer(name,roster);
+        if(player){
+            const official=officialPlayerName(player);
+            counts[official]=(counts[official]||0)+1;
+        }
+    });
+    document.querySelectorAll("#aiReviewPlayerRows [data-ai-player]").forEach(row=>{
+        const nameInput=row.querySelector('[data-ai-field="name"]');
+        const goalsInput=row.querySelector('[data-ai-field="goals"]');
+        if(!nameInput||!goalsInput)return;
+        const player=matchRosterPlayer(nameInput.value.trim(),roster);
+        if(player){
+            const official=officialPlayerName(player);
+            goalsInput.value=counts[official]||0;
+        }
+    });
 }
 
 function addAIReviewPlayer(){
