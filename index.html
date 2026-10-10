@@ -3381,7 +3381,7 @@ onclick="closeModal()"
 
 <div class="panel-subtitle">
 
-Upload one or multiple Match Facts screenshots.
+Upload up to 4 Match Facts screenshots at a time.
 
 </div>
 
@@ -3401,8 +3401,7 @@ Select Match Facts screenshots
 <div class="upload-description">
 
 You can upload multiple screenshots at once.
-The eventual AI system will combine them into
-one match.
+AI will combine them into one match for you to review.
 
 </div>
 
@@ -3525,8 +3524,7 @@ function showAIError(title,message,task){
         </div>
         <div class="review-warning">${escapeHTML(message||"Something went wrong. Please try again.")}</div>
         <p style="color:#8993a0;font-size:13px;line-height:1.6">
-          Nothing has been saved. Check your internet connection and try again.
-          If the error mentions a model or free endpoint, the free model may be temporarily unavailable.
+          Nothing has been saved. Check the error above. If it mentions output length, try fewer screenshots; if it mentions a free model, try again later.
         </p>
         <div class="modal-actions">
           <button class="secondary-btn" type="button" onclick="closeModal()">Close</button>
@@ -3538,42 +3536,90 @@ function showAIError(title,message,task){
 
 function openAIMatchReview(data,filenames){
     const career=getCurrentCareer();
-    if(!career){showAIError("Review unavailable","Open a career before analysing screenshots.","match");return;}
+    if(!career){
+        showAIError("Review unavailable","Open a career before analysing screenshots.","match");
+        return;
+    }
+
     const d=data||{};
     const players=Array.isArray(d.players)?d.players:[];
-    let homeTeam=d.homeTeam||"";
-    let awayTeam=d.awayTeam||"";
+    const norm=value=>String(value??"").trim().toLowerCase();
+    const club=norm(career.clubName);
+    const homeTeam=d.homeTeam||"";
+    const awayTeam=d.awayTeam||"";
+    let homeAway=String(d.homeAway||"").toLowerCase();
+
+    if(homeAway==="home")homeAway="Home";
+    else if(homeAway==="away")homeAway="Away";
+    else if(homeAway==="neutral")homeAway="Neutral";
+    else homeAway="";
+
+    if(norm(homeTeam)===club)homeAway="Home";
+    else if(norm(awayTeam)===club)homeAway="Away";
+
     let opponent=d.opponent||"";
-    let homeAway=d.homeAway||"Home";
     if(!opponent){
-        if(homeTeam&&homeTeam.toLowerCase()===career.clubName.toLowerCase()){opponent=awayTeam;homeAway="Home";}
-        else if(awayTeam&&awayTeam.toLowerCase()===career.clubName.toLowerCase()){opponent=homeTeam;homeAway="Away";}
+        if(norm(homeTeam)===club)opponent=awayTeam;
+        else if(norm(awayTeam)===club)opponent=homeTeam;
         else opponent=awayTeam||homeTeam||"";
     }
-    if(d.homeAway==="Away"||d.homeAway==="Home")homeAway=d.homeAway;
-    let goalsFor=d.goalsFor;
-    let goalsAgainst=d.goalsAgainst;
-    if(goalsFor==null&&d.homeScore!=null&&d.awayScore!=null){
-        if(homeTeam&&homeTeam.toLowerCase()===career.clubName.toLowerCase()){
-            goalsFor=d.homeScore;goalsAgainst=d.awayScore;homeAway="Home";
-        }else if(awayTeam&&awayTeam.toLowerCase()===career.clubName.toLowerCase()){
-            goalsFor=d.awayScore;goalsAgainst=d.homeScore;homeAway="Away";
+
+    let goalsFor=d.goalsFor??null;
+    let goalsAgainst=d.goalsAgainst??null;
+
+    const homeScore=d.homeScore??d.homeGoals??null;
+    const awayScore=d.awayScore??d.awayGoals??null;
+
+    if(goalsFor==null&&homeScore!=null&&awayScore!=null){
+        if(norm(homeTeam)===club||homeAway==="Home"){
+            goalsFor=homeScore;
+            goalsAgainst=awayScore;
+            homeAway="Home";
+        }else if(norm(awayTeam)===club||homeAway==="Away"){
+            goalsFor=awayScore;
+            goalsAgainst=homeScore;
+            homeAway="Away";
         }else{
-            goalsFor=homeAway==="Away"?d.awayScore:d.homeScore;
-            goalsAgainst=homeAway==="Away"?d.homeScore:d.awayScore;
+            goalsFor=homeScore;
+            goalsAgainst=awayScore;
         }
     }
+
+    if((goalsFor==null||goalsAgainst==null)&&typeof d.score==="string"){
+        const scoreMatch=d.score.match(/(\d+)\s*[-–:]\s*(\d+)/);
+        if(scoreMatch){
+            const first=Number(scoreMatch[1]);
+            const second=Number(scoreMatch[2]);
+            if(homeAway==="Away"){
+                goalsFor=second;
+                goalsAgainst=first;
+            }else{
+                goalsFor=first;
+                goalsAgainst=second;
+            }
+        }
+    }
+
+    if(homeAway!=="Home"&&homeAway!=="Away")homeAway="Home";
+
     window.__careerAIReviewPlayers=players.map(p=>({
-        name:p.name||"",
-        rating:p.rating??null,
-        goals:p.goals??0,
-        assists:p.assists??0,
-        minutes:p.minutes??null,
-        yellowCards:p.yellowCards??(p.cards==="Yellow"?1:0),
-        redCards:p.redCards??(p.cards==="Red"?1:0),
-        saves:p.saves??null,
+        name:p.name||p.playerName||p.player||p.commonName||
+            [p.firstName,p.lastName].filter(Boolean).join(" ")||"",
+        rating:p.rating??p.playerRating??p.overallRating??null,
+        goals:p.goals??p.goalsScored??0,
+        assists:p.assists??p.assistsMade??0,
+        minutes:p.minutes??p.minutesPlayed??null,
+        yellowCards:p.yellowCards??p.yellow??(p.cards==="Yellow"?1:0),
+        redCards:p.redCards??p.red??(p.cards==="Red"?1:0),
+        saves:p.saves??p.goalkeeperSaves??null,
         team:p.team||""
     }));
+
+    const validDate=/^\d{4}-\d{2}-\d{2}$/.test(String(d.date||""))
+        ?d.date:"";
+    const competition=d.competition||"";
+    const notes=Array.isArray(d.notes)?d.notes.filter(Boolean):[];
+
     document.getElementById("modalContainer").innerHTML=`
     <div class="modal-overlay" onclick="closeModalOutside(event)">
       <div class="modal" onclick="event.stopPropagation()">
@@ -3584,17 +3630,18 @@ function openAIMatchReview(data,filenames){
           </div>
           <button class="close-btn" type="button" onclick="closeModal()">×</button>
         </div>
-        <div class="review-warning">AI can misread small text. Verify the score, competition and every player statistic. Nothing is saved until you click Save Match.</div>
+        <div class="review-warning">AI can misread small text. Verify the date, score, competition, opponent and player statistics. Nothing is saved until you click Save Match.</div>
+        ${notes.length?`<div class="info-box" style="margin:12px 0"><strong>AI notes:</strong> ${notes.map(escapeHTML).join(" · ")}</div>`:""}
         <div class="form-grid">
-          <div class="form-group"><label>Date</label><input id="aiMatchDate" class="form-input" type="date" value="${escapeHTML(d.date||todayDate())}"></div>
-          <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(d.competition||career.league||"")}" list="aiCompetitionOptions"><datalist id="aiCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
+          <div class="form-group"><label>Date</label><input id="aiMatchDate" class="form-input" type="date" value="${escapeHTML(validDate)}"></div>
+          <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(competition)}" list="aiCompetitionOptions" placeholder="Choose or type competition"><datalist id="aiCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
           <div class="form-group"><label>Home / Away</label><select id="aiMatchHomeAway" class="form-select"><option value="Home" ${homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${homeAway==="Away"?"selected":""}>Away</option></select></div>
-          <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Opponent name"></div>
+          <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Enter opponent if missing"></div>
           <div class="form-group full"><label>Score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
         </div>
         <div style="margin-top:18px;padding-top:18px;border-top:1px solid #252c35">
           <div class="panel-title">Extracted Players (${players.length})</div>
-          <div class="panel-subtitle">Ratings and statistics can be left blank or corrected. You can also add missing players.</div>
+          <div class="panel-subtitle">Ratings and statistics can be corrected. Add any missing players before saving.</div>
           <div id="aiReviewPlayerRows" class="player-entry-list"></div>
           <button class="secondary-btn" type="button" onclick="addAIReviewPlayer()">+ Add Player</button>
         </div>
@@ -3607,7 +3654,6 @@ function openAIMatchReview(data,filenames){
     </div>`;
     renderAIReviewPlayers();
 }
-
 function renderAIReviewPlayers(){
     const container=document.getElementById("aiReviewPlayerRows");
     if(!container)return;
@@ -3664,6 +3710,8 @@ function saveAIMatchReview(){
     if(!career)return;
     const competition=document.getElementById("aiMatchCompetition").value.trim();
     const opponent=document.getElementById("aiMatchOpponent").value.trim();
+    const date=document.getElementById("aiMatchDate").value;
+    if(!date){alert("Please confirm the match date before saving.");return;}
     if(!competition||!opponent){alert("Please enter a competition and opponent.");return;}
     const goalsFor=document.getElementById("aiGoalsFor").value;
     const goalsAgainst=document.getElementById("aiGoalsAgainst").value;
@@ -3672,7 +3720,7 @@ function saveAIMatchReview(){
     const players=saveAIReviewPlayerInputs();
     career.matches.push({
         id:createId(),season:career.currentSeason,
-        date:document.getElementById("aiMatchDate").value,
+        date,
         competition,
         homeAway:document.getElementById("aiMatchHomeAway").value,
         opponent,goalsFor:gf,goalsAgainst:ga,
@@ -5039,8 +5087,8 @@ function fileToDataURL(file){
 async function analyseCareerScreenshots(task,files){
     if(!["match","calendar","league"].includes(task))
         throw new Error("Unknown AI task.");
-    if(!files||files.length<1||files.length>6)
-        throw new Error("Choose between 1 and 6 screenshots at a time.");
+    if(!files||files.length<1||files.length>4)
+        throw new Error("Choose between 1 and 4 screenshots at a time.");
     const images=[];
     let total=0;
     for(const file of Array.from(files)){
