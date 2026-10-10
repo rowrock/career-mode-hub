@@ -4701,6 +4701,27 @@ function updateTransferDirection(){let c=getCurrentCareer(),d=document.getElemen
 function searchTransferPlayers(q){let el=document.getElementById("transferSearchResults");if(!el)return;q=String(q||"").toLowerCase().trim();let list=allPlayers.filter(p=>[squadPlayerName(p),p.club].join(" ").toLowerCase().includes(q)).slice(0,12);el.innerHTML=list.map(p=>'<button type="button" class="squad-pick-row" style="width:100%;cursor:pointer" onclick="chooseTransferPlayer(\''+escapeHTML(squadPlayerId(p))+'\')"><span class="squad-player-rating">'+escapeHTML(p.overallRating??"—")+'</span><span class="squad-pick-copy"><strong>'+escapeHTML(squadPlayerName(p))+'</strong><small>'+escapeHTML(p.club||"")+'</small></span></button>').join("")||'<div class="squad-empty">No database matches. Enter the player name manually.</div>';}
 function chooseTransferPlayer(id){let p=allPlayers.find(x=>squadPlayerId(x)===String(id));if(!p)return;document.getElementById("transferPlayerId").value=id;document.getElementById("transferPlayerName").value=squadPlayerName(p);let d=document.getElementById("transferDirection").value;if(d==="in")document.getElementById("transferFromClub").value=p.club||"";else document.getElementById("transferToClub").value=p.club||"";document.getElementById("transferPlayerSearch").value=squadPlayerName(p);document.getElementById("transferSearchResults").innerHTML='<div class="squad-empty">Selected: '+escapeHTML(squadPlayerName(p))+'</div>';}
 
+function saveCareerTransfer(){
+ let c=getCurrentCareer();if(!c)return;let direction=document.getElementById("transferDirection").value,name=document.getElementById("transferPlayerName").value.trim(),id=document.getElementById("transferPlayerId").value;
+ if(!name){alert("Choose a database player or enter a player name.");return;}
+ let type=document.getElementById("transferType").value,from=document.getElementById("transferFromClub").value.trim(),to=document.getElementById("transferToClub").value.trim(),date=document.getElementById("transferDate").value;
+ if(direction==="in"&&!to)to=c.clubName||"";if(direction==="out"&&!from)from=c.clubName||"";
+ if(!Array.isArray(c.transfers))c.transfers=[];
+ let t={id:createId(),season:c.currentSeason,date,direction,type,playerId:id||null,playerName:name,fromClub:from,toClub:to,fee:document.getElementById("transferFee").value.trim()||"Undisclosed"};c.transfers.push(t);
+ let h=ensureSquadHub(c);
+ if(direction==="in"){
+   if(id){if(!h.addedIds.map(String).includes(String(id)))h.addedIds.push(String(id));h.removedIds=h.removedIds.filter(x=>String(x)!==String(id));}
+   else if(!h.customPlayers.some(p=>String(squadPlayerName(p)).toLowerCase()===name.toLowerCase())){let cid="custom-"+createId();h.customPlayers.push({id:cid,customId:cid,name,commonName:name,position:"",overallRating:null,club:c.clubName,custom:true});t.playerId=cid;}
+ }else{
+   if(id){if(!h.removedIds.map(String).includes(String(id)))h.removedIds.push(String(id));h.addedIds=h.addedIds.filter(x=>String(x)!==String(id));}
+   h.customPlayers=h.customPlayers.filter(p=>String(squadPlayerName(p)).toLowerCase()!==name.toLowerCase());
+   Object.keys(h.lineup).forEach(k=>{if(String(h.lineup[k])===String(id))delete h.lineup[k];});
+   Object.keys(h.alternatives||{}).forEach(k=>{h.alternatives[k]=(h.alternatives[k]||[]).filter(x=>String(x)!==String(id));});
+ }
+ saveActiveSquadLineup(c);saveCareers();closeModal();renderTransfers();
+}
+function deleteCareerTransfer(id){let c=getCurrentCareer();if(!c)return;if(!confirm("Delete this transfer record? The squad will not be changed automatically."))return;c.transfers=(c.transfers||[]).filter(t=>String(t.id)!==String(id));saveCareers();renderTransfers();}
+
 /* =========================================================
    PLAYERS
 ========================================================= */
