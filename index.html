@@ -5181,7 +5181,7 @@ async function analyseCareerScreenshots(task,files){
         response=await fetch(CAREER_AI_URL,{
             method:"POST",
             headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({task,images})
+            body:JSON.stringify({task,images,clubName:getCurrentCareer()?.clubName||""})
         });
     }catch(e){
         throw new Error("Could not reach the Cloudflare Worker. Check its URL and deployment.");
