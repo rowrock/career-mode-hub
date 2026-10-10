@@ -3534,24 +3534,56 @@ function showAIError(title,message,task){
     </div>`;
 }
 
+function getCareerClubRoster(career){
+    const clubName=String(career?.clubName||"").trim().toLowerCase();
+    if(!clubName||!Array.isArray(allPlayers))return [];
+    let roster=allPlayers.filter(p=>String(p.club||"").trim().toLowerCase()===clubName);
+    if(!roster.length){
+        const normal=value=>String(value||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+        const target=normal(clubName);
+        roster=allPlayers.filter(p=>{
+            const club=normal(p.club);
+            return club&&target&&(club===target||club.includes(target)||target.includes(club));
+        });
+    }
+    return roster;
+}
+
+function matchRosterPlayer(name,roster){
+    const normal=value=>String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+    const wanted=normal(name);
+    if(!wanted)return null;
+    let found=roster.find(p=>{
+        const names=[p.commonName,[p.firstName,p.lastName].filter(Boolean).join(" "),p.firstName,p.lastName]
+            .map(normal).filter(Boolean);
+        return names.includes(wanted);
+    });
+    if(found)return found;
+    return roster.find(p=>{
+        const names=[p.commonName,[p.firstName,p.lastName].filter(Boolean).join(" ")]
+            .map(normal).filter(Boolean);
+        return names.some(n=>n.length>4&&(n.includes(wanted)||wanted.includes(n)));
+    })||null;
+}
+
+function officialPlayerName(player){
+    return player.commonName||[player.firstName,player.lastName].filter(Boolean).join(" ")||"";
+}
+
 function openAIMatchReview(data,filenames){
     const career=getCurrentCareer();
-    if(!career){
-        showAIError("Review unavailable","Open a career before analysing screenshots.","match");
-        return;
-    }
+    if(!career){showAIError("Review unavailable","Open a career before analysing screenshots.","match");return;}
 
     const d=data||{};
-    const players=Array.isArray(d.players)?d.players:[];
+    const roster=getCareerClubRoster(career);
+    const extracted=Array.isArray(d.players)?d.players:[];
     const norm=value=>String(value??"").trim().toLowerCase();
     const club=norm(career.clubName);
     const homeTeam=d.homeTeam||"";
     const awayTeam=d.awayTeam||"";
     let homeAway=String(d.homeAway||"").toLowerCase();
-
     if(homeAway==="home")homeAway="Home";
     else if(homeAway==="away")homeAway="Away";
-    else if(homeAway==="neutral")homeAway="Neutral";
     else homeAway="";
 
     if(norm(homeTeam)===club)homeAway="Home";
@@ -3566,57 +3598,60 @@ function openAIMatchReview(data,filenames){
 
     let goalsFor=d.goalsFor??null;
     let goalsAgainst=d.goalsAgainst??null;
-
     const homeScore=d.homeScore??d.homeGoals??null;
     const awayScore=d.awayScore??d.awayGoals??null;
 
     if(goalsFor==null&&homeScore!=null&&awayScore!=null){
         if(norm(homeTeam)===club||homeAway==="Home"){
-            goalsFor=homeScore;
-            goalsAgainst=awayScore;
-            homeAway="Home";
+            goalsFor=homeScore;goalsAgainst=awayScore;homeAway="Home";
         }else if(norm(awayTeam)===club||homeAway==="Away"){
-            goalsFor=awayScore;
-            goalsAgainst=homeScore;
-            homeAway="Away";
-        }else{
-            goalsFor=homeScore;
-            goalsAgainst=awayScore;
+            goalsFor=awayScore;goalsAgainst=homeScore;homeAway="Away";
         }
     }
 
     if((goalsFor==null||goalsAgainst==null)&&typeof d.score==="string"){
         const scoreMatch=d.score.match(/(\d+)\s*[-–:]\s*(\d+)/);
         if(scoreMatch){
-            const first=Number(scoreMatch[1]);
-            const second=Number(scoreMatch[2]);
-            if(homeAway==="Away"){
-                goalsFor=second;
-                goalsAgainst=first;
-            }else{
-                goalsFor=first;
-                goalsAgainst=second;
-            }
+            const first=Number(scoreMatch[1]),second=Number(scoreMatch[2]);
+            if(homeAway==="Away"){goalsFor=second;goalsAgainst=first;}
+            else {goalsFor=first;goalsAgainst=second;}
         }
     }
-
     if(homeAway!=="Home"&&homeAway!=="Away")homeAway="Home";
 
-    window.__careerAIReviewPlayers=players.map(p=>({
-        name:p.name||p.playerName||p.player||p.commonName||
-            [p.firstName,p.lastName].filter(Boolean).join(" ")||"",
-        rating:p.rating??p.playerRating??p.overallRating??null,
-        goals:p.goals??p.goalsScored??0,
-        assists:p.assists??p.assistsMade??0,
-        minutes:p.minutes??p.minutesPlayed??null,
-        yellowCards:p.yellowCards??p.yellow??(p.cards==="Yellow"?1:0),
-        redCards:p.redCards??p.red??(p.cards==="Red"?1:0),
-        saves:p.saves??p.goalkeeperSaves??null,
-        team:p.team||""
-    }));
+    const mapped=[];
+    const unmatched=[];
+    extracted.forEach(p=>{
+        const found=matchRosterPlayer(p.name||p.playerName||p.player||p.commonName||
+            [p.firstName,p.lastName].filter(Boolean).join(" "),roster);
+        if(found){
+            if(!mapped.some(x=>String(x.playerId)===String(found.id))){
+                mapped.push({
+                    playerId:found.id,
+                    name:officialPlayerName(found),
+                    rating:p.rating??p.playerRating??p.overallRating??null,
+                    goals:p.goals??p.goalsScored??0,
+                    assists:p.assists??p.assistsMade??0,
+                    minutes:p.minutes??p.minutesPlayed??null,
+                    yellowCards:p.yellowCards??p.yellow??(p.cards==="Yellow"?1:0),
+                    redCards:p.redCards??p.red??(p.cards==="Red"?1:0),
+                    saves:p.saves??p.goalkeeperSaves??null
+                });
+            }
+        }else{
+            unmatched.push(p.name||p.playerName||p.player||"Unidentified player");
+        }
+    });
 
-    const validDate=/^\d{4}-\d{2}-\d{2}$/.test(String(d.date||""))
-        ?d.date:"";
+    window.__careerAIReviewPlayers=mapped;
+    window.__careerAIReviewRoster=roster;
+    window.__careerAIReviewScorers=Array.isArray(d.scorers)?d.scorers.map(s=>{
+        if(typeof s==="string")return s;
+        return s.name||s.player||"";
+    }).filter(Boolean):[];
+    window.__careerAIReviewUnmatched=unmatched;
+
+    const validDate="";
     const competition=d.competition||"";
     const notes=Array.isArray(d.notes)?d.notes.filter(Boolean):[];
 
@@ -3626,24 +3661,27 @@ function openAIMatchReview(data,filenames){
         <div class="modal-header">
           <div>
             <div class="modal-title">Review AI Match Facts</div>
-            <div class="panel-subtitle" style="margin:5px 0 0">Check and correct everything before saving.</div>
+            <div class="panel-subtitle" style="margin:5px 0 0">Confirm the date and check the match details before saving.</div>
           </div>
           <button class="close-btn" type="button" onclick="closeModal()">×</button>
         </div>
-        <div class="review-warning">AI can misread small text. Verify the date, score, competition, opponent and player statistics. Nothing is saved until you click Save Match.</div>
+        <div class="review-warning">Only players matched to your selected club's FC 27 squad are included. Check the score, scorers and cards before saving.</div>
+        ${roster.length===0?'<div class="review-warning">No players in the FC 27 database matched this career club. Check the club name or add players manually.</div>':""}
+        ${unmatched.length?`<div class="info-box" style="margin:12px 0">Skipped names that did not match your club squad: ${unmatched.map(escapeHTML).join(", ")}</div>`:""}
         ${notes.length?`<div class="info-box" style="margin:12px 0"><strong>AI notes:</strong> ${notes.map(escapeHTML).join(" · ")}</div>`:""}
         <div class="form-grid">
-          <div class="form-group"><label>Date</label><input id="aiMatchDate" class="form-input" type="date" value="${escapeHTML(validDate)}"></div>
+          <div class="form-group"><label>Match date — enter manually</label><input id="aiMatchDate" class="form-input" type="date" value="" required></div>
           <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(competition)}" list="aiCompetitionOptions" placeholder="Choose or type competition"><datalist id="aiCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
           <div class="form-group"><label>Home / Away</label><select id="aiMatchHomeAway" class="form-select"><option value="Home" ${homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${homeAway==="Away"?"selected":""}>Away</option></select></div>
           <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Enter opponent if missing"></div>
-          <div class="form-group full"><label>Score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
+          <div class="form-group full"><label>Final score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
+          <div class="form-group full"><label>Goal scorers (your team; one name per goal, or comma-separated)</label><input id="aiMatchScorers" class="form-input" value="${escapeHTML(window.__careerAIReviewScorers.join(", "))}" placeholder="e.g. Player Name, Player Name"><div class="panel-subtitle">Check the Quick Sim summary and correct this list if needed.</div></div>
         </div>
         <div style="margin-top:18px;padding-top:18px;border-top:1px solid #252c35">
-          <div class="panel-title">Extracted Players (${players.length})</div>
-          <div class="panel-subtitle">Ratings and statistics can be corrected. Add any missing players before saving.</div>
+          <div class="panel-title">Your Club's Players (${mapped.length})</div>
+          <div class="panel-subtitle">Only players matched to ${escapeHTML(career.clubName)} are shown. Ratings, goals, assists and yellow/red cards can be corrected. Use the dropdown to select a player from your FC 27 squad.</div>
           <div id="aiReviewPlayerRows" class="player-entry-list"></div>
-          <button class="secondary-btn" type="button" onclick="addAIReviewPlayer()">+ Add Player</button>
+          <button class="secondary-btn" type="button" onclick="addAIReviewPlayer()">+ Add Player from Squad</button>
         </div>
         <div class="panel-subtitle" style="margin-top:14px">Screenshots: ${(filenames||[]).map(escapeHTML).join(", ")||"—"}</div>
         <div class="modal-actions">
@@ -3658,9 +3696,14 @@ function renderAIReviewPlayers(){
     const container=document.getElementById("aiReviewPlayerRows");
     if(!container)return;
     const players=window.__careerAIReviewPlayers||[];
+    const roster=window.__careerAIReviewRoster||[];
+    const options=roster.map(p=>{
+        const name=officialPlayerName(p);
+        return `<option value="${escapeHTML(name)}">${escapeHTML(name)} · OVR ${escapeHTML(p.overallRating||"—")}</option>`;
+    }).join("");
     container.innerHTML=players.map((p,i)=>`
-      <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(130px,1.4fr) repeat(7,minmax(58px,.65fr)) 34px">
-        <input class="form-input" data-ai-field="name" value="${escapeHTML(p.name)}" placeholder="Player name" aria-label="Player name">
+      <div class="player-entry" data-ai-player="${i}" style="grid-template-columns:minmax(150px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px">
+        <div><input class="form-input" data-ai-field="name" list="aiSquadOptions" value="${escapeHTML(p.name)}" placeholder="Choose squad player" aria-label="Player name"><datalist id="aiSquadOptions">${options}</datalist></div>
         <input class="form-input" data-ai-field="rating" type="number" min="0" max="10" step=".1" value="${p.rating==null?"":escapeHTML(p.rating)}" placeholder="Rating" aria-label="Rating">
         <input class="form-input" data-ai-field="goals" type="number" min="0" value="${p.goals==null?"":escapeHTML(p.goals)}" placeholder="G" aria-label="Goals">
         <input class="form-input" data-ai-field="assists" type="number" min="0" value="${p.assists==null?"":escapeHTML(p.assists)}" placeholder="A" aria-label="Assists">
@@ -3669,12 +3712,19 @@ function renderAIReviewPlayers(){
         <input class="form-input" data-ai-field="redCards" type="number" min="0" value="${p.redCards==null?"":escapeHTML(p.redCards)}" placeholder="RC" aria-label="Red cards">
         <input class="form-input" data-ai-field="saves" type="number" min="0" value="${p.saves==null?"":escapeHTML(p.saves)}" placeholder="Saves" aria-label="Saves">
         <button class="remove-player" type="button" onclick="removeAIReviewPlayer(${i})">×</button>
-      </div>`).join("")||'<div class="info-box">No players were detected. Use Add Player to enter them manually.</div>';
+      </div>`).join("")||'<div class="info-box">No players matched the screenshot to your squad. Use Add Player from Squad to choose players manually.</div>';
 }
 
 function addAIReviewPlayer(){
     if(!Array.isArray(window.__careerAIReviewPlayers))window.__careerAIReviewPlayers=[];
-    window.__careerAIReviewPlayers.push({name:"",rating:null,goals:0,assists:0,minutes:null,yellowCards:0,redCards:0,saves:null});
+    const roster=window.__careerAIReviewRoster||[];
+    const used=new Set(window.__careerAIReviewPlayers.map(p=>String(p.playerId)));
+    const next=roster.find(p=>!used.has(String(p.id)));
+    window.__careerAIReviewPlayers.push({
+        playerId:next?.id||null,
+        name:next?officialPlayerName(next):"",
+        rating:null,goals:0,assists:0,minutes:null,yellowCards:0,redCards:0,saves:null
+    });
     renderAIReviewPlayers();
 }
 
@@ -3685,14 +3735,25 @@ function removeAIReviewPlayer(index){
 
 function saveAIReviewPlayerInputs(){
     const rows=document.querySelectorAll("#aiReviewPlayerRows [data-ai-player]");
+    const roster=window.__careerAIReviewRoster||[];
     const players=[];
     rows.forEach(row=>{
         const get=field=>row.querySelector('[data-ai-field="'+field+'"]')?.value??"";
-        const name=get("name").trim();
-        if(!name)return;
-        const num=(v)=>v===""?null:Number(v);
+        const typedName=get("name").trim();
+        if(!typedName)return;
+        const matched=matchRosterPlayer(typedName,roster);
+        if(!matched){
+            alert('"'+typedName+'" is not in your selected club squad. Choose a player from the squad list or remove this row.');
+            throw new Error("Player does not match selected squad.");
+        }
+        if(players.some(p=>String(p.playerId)===String(matched.id))){
+            alert('"' + officialPlayerName(matched) + '" appears more than once. Each squad player should only be entered once.');
+            throw new Error("Duplicate player.");
+        }
+        const num=v=>v===""?null:Number(v);
         players.push({
-            name,
+            playerId:matched.id,
+            name:officialPlayerName(matched),
             rating:num(get("rating")),
             goals:num(get("goals"))??0,
             assists:num(get("assists"))??0,
@@ -3704,29 +3765,43 @@ function saveAIReviewPlayerInputs(){
     });
     return players;
 }
-
 function saveAIMatchReview(){
     const career=getCurrentCareer();
     if(!career)return;
     const competition=document.getElementById("aiMatchCompetition").value.trim();
     const opponent=document.getElementById("aiMatchOpponent").value.trim();
     const date=document.getElementById("aiMatchDate").value;
-    if(!date){alert("Please confirm the match date before saving.");return;}
+    if(!date){alert("Enter the match date manually before saving.");return;}
     if(!competition||!opponent){alert("Please enter a competition and opponent.");return;}
     const goalsFor=document.getElementById("aiGoalsFor").value;
     const goalsAgainst=document.getElementById("aiGoalsAgainst").value;
-    if(goalsFor===""||goalsAgainst===""){alert("Please check and enter the score.");return;}
+    if(goalsFor===""||goalsAgainst===""){alert("Please confirm the final score before saving.");return;}
     const gf=Number(goalsFor),ga=Number(goalsAgainst);
-    const players=saveAIReviewPlayerInputs();
+    let players;
+    try{players=saveAIReviewPlayerInputs();}catch(error){return;}
+    const scorerText=document.getElementById("aiMatchScorers")?.value||"";
+    const scorers=scorerText.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+    const scorerCounts={};
+    scorers.forEach(name=>{
+        const player=matchRosterPlayer(name,window.__careerAIReviewRoster||[]);
+        if(player){
+            const official=officialPlayerName(player);
+            scorerCounts[official]=(scorerCounts[official]||0)+1;
+        }
+    });
+    players=players.map(p=>({
+        ...p,
+        goals:scorerCounts[p.name]!==undefined?scorerCounts[p.name]:p.goals
+    }));
     career.matches.push({
         id:createId(),season:career.currentSeason,
-        date,
-        competition,
+        date,competition,
         homeAway:document.getElementById("aiMatchHomeAway").value,
         opponent,goalsFor:gf,goalsAgainst:ga,
         result:gf>ga?"W":gf<ga?"L":"D",
         cleanSheet:ga===0,entryMethod:"ai",
         screenshots:aiReviewFiles.slice(),
+        scorers,
         players
     });
     saveCareers();
@@ -3734,7 +3809,6 @@ function saveAIMatchReview(){
     closeModal();
     renderMatches();
 }
-
 
 
 /* =========================================================
