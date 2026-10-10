@@ -3054,7 +3054,7 @@ onchange="matchCompetitionChanged()"
 Select competition
 </option>
 
-${competitions.map(c=>`
+${getParticipatingCompetitions(career).map(c=>`
 <option value="${escapeHTML(c)}">
 ${escapeHTML(c)}
 </option>
@@ -3369,6 +3369,7 @@ function saveManualMatch(){
         alert("Please select a competition.");
         return;
     }
+    if(!isParticipatingInCompetition(career,competition)){alert("Join this competition in the Competitions tab before adding matches.");return;}
 
     const opponent=
         document.getElementById("matchOpponent").value.trim();
@@ -3785,7 +3786,7 @@ function openAIMatchReview(data,filenames){
         ${notes.length?`<div class="info-box" style="margin:12px 0"><strong>AI notes:</strong> ${notes.map(escapeHTML).join(" · ")}</div>`:""}
         <div class="form-grid">
           <div class="form-group"><label>Match date — enter manually</label><input id="aiMatchDate" class="form-input" type="date" value="" required></div>
-          <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(competition)}" list="aiCompetitionOptions" placeholder="Choose or type competition"><datalist id="aiCompetitionOptions">${competitions.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
+          <div class="form-group"><label>Competition</label><input id="aiMatchCompetition" class="form-input" value="${escapeHTML(competition)}" list="aiCompetitionOptions" placeholder="Choose or type competition"><datalist id="aiCompetitionOptions">${getParticipatingCompetitions(career).map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}</datalist></div>
           <div class="form-group"><label>Home / Away</label><select id="aiMatchHomeAway" class="form-select"><option value="Home" ${homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${homeAway==="Away"?"selected":""}>Away</option></select></div>
           <div class="form-group"><label>Opponent</label><input id="aiMatchOpponent" class="form-input" value="${escapeHTML(opponent)}" placeholder="Enter opponent if missing"></div>
           <div class="form-group full"><label>Final score (your team first)</label><div class="score-inputs"><input id="aiGoalsFor" class="form-input" type="number" min="0" value="${goalsFor==null?"":escapeHTML(goalsFor)}" placeholder="For"><span>–</span><input id="aiGoalsAgainst" class="form-input" type="number" min="0" value="${goalsAgainst==null?"":escapeHTML(goalsAgainst)}" placeholder="Against"></div></div>
@@ -3915,6 +3916,7 @@ function saveAIMatchReview(){
     const date=document.getElementById("aiMatchDate").value;
     if(!date){alert("Enter the match date manually before saving.");return;}
     if(!competition||!opponent){alert("Please enter a competition and opponent.");return;}
+    if(!isParticipatingInCompetition(career,competition)){alert("Join this competition in the Competitions tab before saving this match.");return;}
     const goalsFor=document.getElementById("aiGoalsFor").value;
     const goalsAgainst=document.getElementById("aiGoalsAgainst").value;
     if(goalsFor===""||goalsAgainst===""){alert("Please confirm the final score before saving.");return;}
