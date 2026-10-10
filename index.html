@@ -2045,6 +2045,10 @@ onclick="openSeasonSetup(false)"
 Season Setup
 </button>
 
+<button type="button" class="secondary-btn" onclick="startNextSeason()">
+Start Next Season
+</button>
+
 <button
 type="button"
 class="primary-btn"
@@ -2116,6 +2120,21 @@ ${seasonStatisticsHTML(career)}
 `;
 }
 
+
+function startNextSeason(){
+ const c=getCurrentCareer();if(!c)return;
+ const current=String(c.currentSeason||"2026/27"),match=current.match(/^(\d{4})\s*\/\s*(\d{2}|\d{4})$/);
+ if(!match){alert("The current season label is not in a format I can advance automatically. Please use a format like 2026/27.");return;}
+ const first=Number(match[1]),nextStart=first+1,nextEnd=String(nextStart+1).slice(-2),next=nextStart+"/"+nextEnd;
+ if((c.seasons||[]).some(s=>s.season===next)){alert("The next season already exists in this career.");return;}
+ const stats=getSeasonStatistics(c,current);
+ if(!confirm("Finish "+current+" and start "+next+"?\n\nYour "+stats.played+" recorded matches and season history will be kept. The new season starts with your main league; join other competitions in the Competitions tab."))return;
+ const old=getSeason(c);if(old){old.completed=true;old.completedAt=todayDate();old.finalSummary={played:stats.played,wins:stats.wins,draws:stats.draws,losses:stats.losses,goalsFor:stats.goalsFor,goalsAgainst:stats.goalsAgainst,points:stats.points};}
+ c.currentSeason=next;c.seasonNumber=Number(c.seasonNumber||1)+1;
+ c.seasons.push({season:next,league:c.league,leagueTeams:[],competitions:[],leagueResults:[],calendarUploaded:false});
+ delete c.leagueTableImport;delete c.leagueBracketImport;
+ saveCareers();renderCareerHome();
+}
 
 function seasonSummaryHTML(c){
  var s=getSeason(c),st=getSeasonStatistics(c,c.currentSeason);if(!s)return '<div class="info-box">No season setup found.</div>';
