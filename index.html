@@ -1168,6 +1168,8 @@ function showPage(page){
         renderPastSeasons();
     else if(page==="youth")
         renderYouthAcademy();
+    else if(page==="national")
+        renderNationalTeamHub();
     else
         renderPlaceholder(pageTitle(page),"This section will be built next.");
 }
@@ -1301,7 +1303,7 @@ function renderDashboard(){
  var all=careers.reduce(function(a,c){return a.concat(c.matches||[]);},[]);
  var trophies=careers.reduce(function(n,c){return n+(c.trophies||[]).length;},0);
  var wins=all.filter(function(m){return m.result==="W"||Number(m.goalsFor)>Number(m.goalsAgainst);}).length;
- var html='<div class="topbar"><div><div class="page-title">Dashboard</div><div class="page-subtitle">Progress updates automatically from saved matches and trophies.</div></div><button class="primary-btn" onclick="startNewCareer()">+ New Career</button></div>';
+ var html='<div class="topbar"><div><div class="page-title">Dashboard</div><div class="page-subtitle">Progress updates automatically from saved matches and trophies.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary-btn" onclick="exportCareerBackup()">Export Backup</button><button class="secondary-btn" onclick="document.getElementById(\'careerBackupInput\').click()">Import Backup</button><input id="careerBackupInput" type="file" accept=".json,application/json" style="display:none" onchange="importCareerBackup(event)"><button class="primary-btn" onclick="startNewCareer()">+ New Career</button></div></div>';
  html+='<div class="match-summary-grid" style="margin-bottom:24px"><div class="match-stat"><div class="match-stat-label">Careers</div><div class="match-stat-number">'+careers.length+'</div></div><div class="match-stat"><div class="match-stat-label">Matches Logged</div><div class="match-stat-number">'+all.length+'</div></div><div class="match-stat"><div class="match-stat-label">Wins</div><div class="match-stat-number">'+wins+'</div></div><div class="match-stat"><div class="match-stat-label">Trophies</div><div class="match-stat-number">'+trophies+'</div></div></div><div class="panel-title">Your Careers</div>';
  html+=careers.length?'<div class="careers-grid">'+careers.map(createCareerCard).join("")+'</div>':'<div class="empty-state"><h2>No careers yet</h2><p>Create your first Career Mode save to get started.</p><button class="primary-btn" onclick="startNewCareer()">Create Career</button></div>';
  document.getElementById("pageContent").innerHTML=html;
@@ -1955,6 +1957,8 @@ function createCareer(){
         trophies:[],
         squad:[],
         youthAcademy:[],
+        nationalSquad:[],
+        internationalMatches:[],
 
         seasons:[{
 
@@ -5064,6 +5068,62 @@ function deleteYouthPlayer(id){
     saveCareers();renderYouthAcademy();
 }
 
+
+function renderNationalTeamHub(){
+ const c=getCurrentCareer();if(!c){renderDashboard();return;}
+ if(!c.nationalTeam){document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">National Team Hub</div><div class="page-subtitle">Track international squads and matches alongside your club career.</div></div></div><div class="panel"><div class="panel-title">No National Team Selected</div><div class="panel-subtitle">You did not choose a national team when creating this career. Create a new career with a national team selected to use this hub.</div></div>';return;}
+ if(!Array.isArray(c.nationalSquad))c.nationalSquad=[];
+ if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];
+ const matches=c.internationalMatches.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+ const wins=matches.filter(m=>Number(m.goalsFor)>Number(m.goalsAgainst)).length,draws=matches.filter(m=>Number(m.goalsFor)===Number(m.goalsAgainst)).length,losses=matches.filter(m=>Number(m.goalsFor)<Number(m.goalsAgainst)).length;
+ const squadRows=c.nationalSquad.map(p=>'<tr><td>'+escapeHTML(p.name)+'</td><td>'+escapeHTML(p.position)+'</td><td>'+escapeHTML(p.club||"—")+'</td><td>'+escapeHTML(p.age??"—")+'</td><td>'+escapeHTML(p.caps||0)+'</td><td>'+escapeHTML(p.goals||0)+'</td><td><button class="secondary-btn" onclick="deleteNationalPlayer(\''+escapeJS(p.id)+'\')">Remove</button></td></tr>').join("");
+ const matchRows=matches.map(m=>'<tr><td>'+escapeHTML(m.date||"—")+'</td><td>'+escapeHTML(m.competition||"International")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.goalsFor)+'–'+escapeHTML(m.goalsAgainst)+'</td><td>'+escapeHTML(Number(m.goalsFor)>Number(m.goalsAgainst)?"W":Number(m.goalsFor)===Number(m.goalsAgainst)?"D":"L")+'</td><td><button class="secondary-btn" onclick="deleteInternationalMatch(\''+escapeJS(m.id)+'\')">Delete</button></td></tr>').join("");
+ document.getElementById("pageContent").innerHTML=careerBanner(c)+
+ '<div class="topbar"><div><div class="page-title">National Team Hub</div><div class="page-subtitle">International career tracking for '+escapeHTML(c.nationalTeam)+'.</div></div></div>'+
+ '<div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Squad Players</div><div class="match-stat-number">'+c.nationalSquad.length+'</div></div><div class="match-stat"><div class="match-stat-label">Matches</div><div class="match-stat-number">'+matches.length+'</div></div><div class="match-stat"><div class="match-stat-label">Wins</div><div class="match-stat-number">'+wins+'</div></div><div class="match-stat"><div class="match-stat-label">Draws</div><div class="match-stat-number">'+draws+'</div></div><div class="match-stat"><div class="match-stat-label">Losses</div><div class="match-stat-number">'+losses+'</div></div></div>'+
+ '<div class="panel"><div class="panel-title">Add National Team Player</div><div class="panel-subtitle">Build the international squad and track caps and goals.</div><form onsubmit="addNationalPlayer(event)" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px">'+
+ '<label class="setup-label">Player name<input id="ntPlayerName" class="form-input" required maxlength="80" placeholder="Full name"></label>'+
+ '<label class="setup-label">Position<select id="ntPlayerPosition" class="form-select" required><option value="">Choose</option><option>GK</option><option>CB</option><option>LB</option><option>RB</option><option>LWB</option><option>RWB</option><option>CDM</option><option>CM</option><option>CAM</option><option>LM</option><option>RM</option><option>LW</option><option>RW</option><option>CF</option><option>ST</option></select></label>'+
+ '<label class="setup-label">Club<input id="ntPlayerClub" class="form-input" maxlength="80" placeholder="Club team"></label>'+
+ '<label class="setup-label">Age<input id="ntPlayerAge" class="form-input" type="number" min="14" max="60" step="1" placeholder="Age"></label>'+
+ '<label class="setup-label">Caps<input id="ntPlayerCaps" class="form-input" type="number" min="0" max="1000" value="0" step="1" required></label>'+
+ '<label class="setup-label">Goals<input id="ntPlayerGoals" class="form-input" type="number" min="0" max="1000" value="0" step="1" required></label>'+
+ '<div style="display:flex;align-items:end"><button class="primary-btn" type="submit" style="width:100%">+ Add Player</button></div></form></div>'+
+ '<div class="panel"><div class="panel-title">National Squad</div>'+(squadRows?'<div style="overflow-x:auto"><table class="data-table" style="width:100%"><thead><tr><th>Name</th><th>Position</th><th>Club</th><th>Age</th><th>Caps</th><th>Goals</th><th>Action</th></tr></thead><tbody>'+squadRows+'</tbody></table></div>':'<div class="empty-state"><p>No national-team players yet. Add your first player above.</p></div>')+'</div>'+
+ '<div class="panel"><div class="panel-title">Record International Match</div><form onsubmit="addInternationalMatch(event)" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px">'+
+ '<label class="setup-label">Date<input id="ntMatchDate" class="form-input" type="date" required value="'+todayDate()+'"></label>'+
+ '<label class="setup-label">Competition<input id="ntMatchCompetition" class="form-input" required maxlength="80" placeholder="e.g. World Cup"></label>'+
+ '<label class="setup-label">Opponent<input id="ntMatchOpponent" class="form-input" required maxlength="80" placeholder="Opposition"></label>'+
+ '<label class="setup-label">Goals For<input id="ntGoalsFor" class="form-input" type="number" min="0" max="99" required></label>'+
+ '<label class="setup-label">Goals Against<input id="ntGoalsAgainst" class="form-input" type="number" min="0" max="99" required></label>'+
+ '<div style="display:flex;align-items:end"><button class="primary-btn" type="submit" style="width:100%">+ Save Match</button></div></form></div>'+
+ '<div class="panel"><div class="panel-title">International Match History</div>'+(matchRows?'<div style="overflow-x:auto"><table class="data-table" style="width:100%"><thead><tr><th>Date</th><th>Competition</th><th>Opponent</th><th>Score</th><th>Result</th><th>Action</th></tr></thead><tbody>'+matchRows+'</tbody></table></div>':'<div class="empty-state"><p>No international matches recorded yet.</p></div>')+'</div>';
+}
+function addNationalPlayer(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;if(!Array.isArray(c.nationalSquad))c.nationalSquad=[];
+ const name=document.getElementById("ntPlayerName").value.trim(),position=document.getElementById("ntPlayerPosition").value,club=document.getElementById("ntPlayerClub").value.trim(),age=document.getElementById("ntPlayerAge").value,caps=Number(document.getElementById("ntPlayerCaps").value),goals=Number(document.getElementById("ntPlayerGoals").value);
+ if(!name||!position){alert("Enter a player name and position.");return;}if(!Number.isInteger(caps)||caps<0||!Number.isInteger(goals)||goals<0){alert("Caps and goals must be whole numbers of zero or more.");return;}
+ c.nationalSquad.push({id:createId(),name,position,club,age:age===""?null:Number(age),caps,goals});saveCareers();renderNationalTeamHub();
+}
+function deleteNationalPlayer(id){const c=getCurrentCareer();if(!c)return;const p=(c.nationalSquad||[]).find(x=>String(x.id)===String(id));if(!p||!confirm("Remove "+p.name+" from the national squad?"))return;c.nationalSquad=c.nationalSquad.filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
+function addInternationalMatch(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;const date=document.getElementById("ntMatchDate").value,competition=document.getElementById("ntMatchCompetition").value.trim(),opponent=document.getElementById("ntMatchOpponent").value.trim(),gf=Number(document.getElementById("ntGoalsFor").value),ga=Number(document.getElementById("ntGoalsAgainst").value);
+ if(!date||!competition||!opponent||!Number.isInteger(gf)||!Number.isInteger(ga)||gf<0||ga<0){alert("Please enter a valid date, competition, opponent and score.");return;}
+ if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];c.internationalMatches.push({id:createId(),date,competition,opponent,goalsFor:gf,goalsAgainst:ga});saveCareers();renderNationalTeamHub();
+}
+function deleteInternationalMatch(id){const c=getCurrentCareer();if(!c)return;const m=(c.internationalMatches||[]).find(x=>String(x.id)===String(id));if(!m||!confirm("Delete the international match against "+m.opponent+"?"))return;c.internationalMatches=c.internationalMatches.filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
+
+function exportCareerBackup(){
+ try{const payload={app:"Career Mode Hub",version:1,exportedAt:new Date().toISOString(),careers:careers};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="career-mode-hub-backup-"+todayDate()+".json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);alert("Backup exported. Keep the JSON file somewhere safe.");}
+ catch(e){alert("Could not export backup: "+e.message);}
+}
+async function importCareerBackup(event){
+ const input=event.target,file=input.files&&input.files[0];if(!file)return;
+ try{const parsed=JSON.parse(await file.text()),incoming=Array.isArray(parsed)?parsed:parsed.careers;if(!Array.isArray(incoming)||incoming.some(c=>!c||typeof c!=="object"||!c.id||!c.clubName||!Array.isArray(c.matches)))throw new Error("This does not look like a valid Career Mode Hub backup.");
+ const choice=confirm("Choose OK to REPLACE all current careers with this backup. Choose Cancel to MERGE it with your existing careers.");if(choice){careers=incoming;}else{const ids=new Set(careers.map(c=>String(c.id)));incoming.forEach(c=>{if(!ids.has(String(c.id)))careers.push(c);});}
+ saveCareers();alert("Backup imported successfully.");renderDashboard();
+ }catch(e){alert("Could not import backup: "+e.message);}finally{input.value="";}
+}
 
 function renderPlaceholder(title,description){
 
