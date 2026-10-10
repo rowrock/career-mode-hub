@@ -3538,20 +3538,20 @@ function matchRosterPlayer(name,roster){
     const wanted=normal(name);
     if(!wanted)return null;
     let found=roster.find(p=>{
-        const names=[p.commonName,[p.firstName,p.lastName].filter(Boolean).join(" "),p.firstName,p.lastName]
+        const names=[p.commonName,p.name,[p.firstName,p.lastName].filter(Boolean).join(" "),p.firstName,p.lastName]
             .map(normal).filter(Boolean);
         return names.includes(wanted);
     });
     if(found)return found;
     return roster.find(p=>{
-        const names=[p.commonName,[p.firstName,p.lastName].filter(Boolean).join(" ")]
+        const names=[p.commonName,p.name,[p.firstName,p.lastName].filter(Boolean).join(" ")]
             .map(normal).filter(Boolean);
         return names.some(n=>n.length>4&&(n.includes(wanted)||wanted.includes(n)));
     })||null;
 }
 
 function officialPlayerName(player){
-    return player.commonName||[player.firstName,player.lastName].filter(Boolean).join(" ")||"";
+    return player.commonName||[player.firstName,player.lastName].filter(Boolean).join(" ")||player.name||"";
 }
 
 function openAIMatchReview(data,filenames){
