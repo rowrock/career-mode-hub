@@ -4887,8 +4887,52 @@ function saveAICalendarReview(){
 function renderTransfers(){
  let c=getCurrentCareer();if(!c){renderDashboard();return;}if(!Array.isArray(c.transfers))c.transfers=[];
  let rows=c.transfers.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).map(t=>'<tr><td>'+escapeHTML(t.date||"—")+'</td><td>'+escapeHTML(t.type||"Permanent")+'</td><td>'+escapeHTML(t.playerName||"Unknown")+'</td><td>'+escapeHTML(t.direction==="in"?"Incoming":"Outgoing")+'</td><td>'+escapeHTML(t.fromClub||"—")+'</td><td>'+escapeHTML(t.toClub||"—")+'</td><td>'+escapeHTML(t.fee||"Undisclosed")+'</td><td><button class="secondary-btn" onclick="deleteCareerTransfer(\''+escapeHTML(t.id)+'\')">Delete</button></td></tr>').join("");
- document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Transfers</div><div class="page-subtitle">Record signings, sales, loans and free transfers. Incoming players join your Squad Hub.</div></div><button class="primary-btn" onclick="openTransferForm()">+ Add Transfer</button></div><div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Transfers</div><div class="match-stat-number">'+c.transfers.length+'</div></div><div class="match-stat"><div class="match-stat-label">Incoming</div><div class="match-stat-number">'+c.transfers.filter(t=>t.direction==="in").length+'</div></div><div class="match-stat"><div class="match-stat-label">Outgoing</div><div class="match-stat-number">'+c.transfers.filter(t=>t.direction==="out").length+'</div></div></div><div class="panel"><div class="panel-title">Transfer History</div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Player</th><th>Direction</th><th>From</th><th>To</th><th>Fee</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+(rows?"":'<div class="squad-empty">No transfers recorded yet. Add a transfer to update your squad.</div>')+'</div>';
+ document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Transfers</div><div class="page-subtitle">Record signings, sales, loans and free transfers. Incoming players join your Squad Hub.</div></div><button class="primary-btn" onclick="openTransferForm()">+ Add Transfer</button></div><div class="match-summary-grid"><div class="match-stat"><div class="match-stat-label">Transfers</div><div class="match-stat-number">'+c.transfers.length+'</div></div><div class="match-stat"><div class="match-stat-label">Incoming</div><div class="match-stat-number">'+c.transfers.filter(t=>t.direction==="in").length+'</div></div><div class="match-stat"><div class="match-stat-label">Outgoing</div><div class="match-stat-number">'+c.transfers.filter(t=>t.direction==="out").length+'</div></div></div><div class="panel"><div class="panel-title">Import Transfer Screenshots</div><div class="panel-subtitle">Upload FC 27 transfer confirmation or transfer-history screenshots. Detected transfers will be reviewed before saving.</div><input id="transferScreenshotFiles" class="form-input" type="file" accept="image/png,image/jpeg,image/webp" multiple><button class="primary-btn" style="margin-top:12px" onclick="analyseTransferScreenshots()">Analyse Transfer Screenshots</button></div><div class="panel"><div class="panel-title">Transfer History</div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Player</th><th>Direction</th><th>From</th><th>To</th><th>Fee</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+(rows?"":'<div class="squad-empty">No transfers recorded yet. Add a transfer to update your squad.</div>')+'</div>';
 }
+async function analyseTransferScreenshots(){
+ const files=Array.from(document.getElementById("transferScreenshotFiles")?.files||[]);
+ if(!files.length){alert("Choose at least one transfer screenshot first.");return;}
+ try{
+  const data=await analyseCareerScreenshots("transfer",files);
+  const items=Array.isArray(data.transfers)?data.transfers:[];
+  if(!items.length){alert("No clear transfers were detected. Try a clearer screenshot.");return;}
+  const preview=items.slice(0,12).map((t,i)=>(i+1)+". "+(t.playerName||t.name||"Unknown player")+" · "+(t.direction||"direction unclear")+" · "+(t.fromClub||"?")+" → "+(t.toClub||"?")+" · "+(t.fee||"fee unclear")).join("\n");
+  if(!confirm("Detected "+items.length+" transfer(s):\n\n"+preview+"\n\nImport these into this career? Please check the extraction carefully."))return;
+  const c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.transfers))c.transfers=[];
+  const hub=ensureSquadHub(c);let added=0;
+  items.forEach(t=>{
+   const name=String(t.playerName||t.name||"").trim();if(!name)return;
+   const direction=/out|sell|departure/i.test(String(t.direction||""))?"out":"in";
+   const from=String(t.fromClub||(direction==="out"?c.clubName:"")||"").trim();
+   const to=String(t.toClub||(direction==="in"?c.clubName:"")||"").trim();
+   const norm=x=>String(x||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+   const player=Array.isArray(allPlayers)?allPlayers.find(p=>norm(p.commonName||[p.firstName,p.lastName].filter(Boolean).join(" ")||p.name)===norm(name)):null;
+   const id=player?String(player.id||player.playerId||""):null;
+   const rawDate=String(t.date||"");
+   const rating=Number(t.overallRating??t.rating);
+   const transfer={id:createId(),season:c.currentSeason,date:/^\d{4}-\d{2}-\d{2}$/.test(rawDate)?rawDate:todayDate(),direction,type:String(t.type||"Permanent"),playerId:id,playerName:name,country:String(t.country||player?.nationality||""),age:Number(t.age)||null,birthday:t.birthday||"",position:String(t.position||player?.position||""),rating:Number.isFinite(rating)&&rating>=1&&rating<=99?rating:null,fromClub:from,toClub:to,fee:String(t.fee||"Undisclosed")};
+   c.transfers.push(transfer);
+   if(id){if(direction==="in"){if(!hub.addedIds.map(String).includes(id))hub.addedIds.push(id);hub.removedIds=hub.removedIds.filter(x=>String(x)!==id);if(transfer.rating)hub.playerRatings[id]=transfer.rating;}else{if(!hub.removedIds.map(String).includes(id))hub.removedIds.push(id);hub.addedIds=hub.addedIds.filter(x=>String(x)!==id);Object.keys(hub.lineup||{}).forEach(k=>{if(String(hub.lineup[k])===id)delete hub.lineup[k];});Object.keys(hub.alternatives||{}).forEach(k=>{if(String(hub.alternatives[k])===id)delete hub.alternatives[k];});}}
+   added++;
+  });
+  if(added){saveCareers();renderTransfers();alert("Imported "+added+" transfer(s). Check the transfer history and squad.");}
+ }catch(e){alert("Transfer screenshot analysis failed: "+(e.message||"Please try again."));}
+}
+async function analyseYouthScreenshots(){
+ const files=Array.from(document.getElementById("youthScreenshotFiles")?.files||[]);
+ if(!files.length){alert("Choose at least one youth academy screenshot first.");return;}
+ try{
+  const data=await analyseCareerScreenshots("youth",files);
+  const items=Array.isArray(data.players)?data.players:[];
+  if(!items.length){alert("No clear academy players were detected. Try a clearer screenshot.");return;}
+  const preview=items.slice(0,15).map((p,i)=>(i+1)+". "+(p.name||"Unknown")+" · "+(p.position||"?")+" · age "+(p.age??"?")+" · potential "+(p.potentialMin??"?")+"–"+(p.potentialMax??"?")).join("\n");
+  if(!confirm("Detected "+items.length+" academy player(s):\n\n"+preview+"\n\nAdd these players? Please verify details before confirming."))return;
+  const c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.youthAcademy))c.youthAcademy=[];let added=0;
+  items.forEach(p=>{const name=String(p.name||p.playerName||"").trim();if(!name)return;const lo=Number(p.potentialMin??p.minPotential??p.potentialLow),hi=Number(p.potentialMax??p.maxPotential??p.potentialHigh),age=Number(p.age);c.youthAcademy.push({id:createId(),name,position:String(p.position||"").trim()||"—",country:String(p.country||p.nationality||"").trim()||"Unknown",age:Number.isInteger(age)&&age>0?age:null,potentialMin:Number.isInteger(lo)&&lo>=1&&lo<=99?lo:null,potentialMax:Number.isInteger(hi)&&hi>=1&&hi<=99&&hi>=(Number.isInteger(lo)?lo:1)?hi:null,createdAt:todayDate(),source:"screenshot"});added++;});
+  if(added){saveCareers();renderYouthAcademy();alert("Imported "+added+" academy player(s). Check missing details and potential ranges.");}
+ }catch(e){alert("Youth Academy screenshot analysis failed: "+(e.message||"Please try again."));}
+}
+
 function openTransferForm(){
  let c=getCurrentCareer();if(!c)return;
  let clubs=[...new Set(allPlayers.map(p=>String(p.club||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
@@ -5084,6 +5128,7 @@ function renderYouthAcademy(){
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Minimum potential<input class="search-input" id="youthPotentialMin" type="number" min="1" max="99" step="1" required placeholder="e.g. 63"></label>'+
     '<label style="display:flex;flex-direction:column;gap:7px;color:#aeb8c6;font-size:13px">Maximum potential<input class="search-input" id="youthPotentialMax" type="number" min="1" max="99" step="1" required placeholder="e.g. 87"></label>'+
     '<div style="display:flex;align-items:end"><button class="primary-btn" type="submit" style="width:100%">+ Add Youth Player</button></div></form></div>'+
+    '<div class="panel"><div class="panel-title">Import Youth Academy Screenshots</div><div class="panel-subtitle">Upload academy report screenshots. Detected players will be reviewed before being added.</div><input id="youthScreenshotFiles" class="form-input" type="file" accept="image/png,image/jpeg,image/webp" multiple><button class="primary-btn" style="margin-top:12px" onclick="analyseYouthScreenshots()">Analyse Youth Screenshots</button></div>'+
     '<div class="panel" style="margin-top:18px"><div class="panel-title">Your Youth Academy</div><div class="panel-subtitle">These players are saved to this career.</div>'+
     (players.length?'<div style="overflow-x:auto;margin-top:14px"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Name</th><th>Position</th><th>Country</th><th>Age</th><th>Estimated Potential</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div style="padding:28px 8px;text-align:center;color:#7f8996">No youth players yet. Use the form above to create your first prospect.</div>')+
     '</div>';
@@ -5597,7 +5642,7 @@ function fileToDataURL(file){
 }
 
 async function analyseCareerScreenshots(task,files){
-    if(!["match","calendar","league"].includes(task))
+    if(!["match","calendar","league","transfer","youth"].includes(task))
         throw new Error("Unknown AI task.");
     if(!files||files.length<1||files.length>4)
         throw new Error("Choose between 1 and 4 screenshots at a time.");
