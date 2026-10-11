@@ -5222,6 +5222,19 @@ function joinNationalTeam(event){
  c.nationalTeam=selected;c.nationalSquad=[];c.internationalMatches=[];
  saveCareers();renderNationalTeamHub();
 }
+function removeNationalTeam(){
+ const c=getCurrentCareer();if(!c||!c.nationalTeam)return;
+ const country=c.nationalTeam;
+ if(!confirm("Remove "+country+" as your managed national team? This will remove its squad, lineup, international calendar and recorded international matches. Your club career and club data will stay unchanged."))return;
+ c.nationalTeam="";
+ c.nationalSquad=[];
+ c.nationalLineup={};
+ c.nationalCalendar=[];
+ c.internationalMatches=[];
+ nationalSection="overview";
+ saveCareers();
+ renderNationalTeamHub();
+}
 let nationalSection="overview";
 function nationalCountryKey(v){return String(v||"").toLowerCase().replace(/[^a-z]/g,"");}
 function getNationalEligiblePlayers(c){
@@ -5247,7 +5260,7 @@ function renderNationalTeamHub(){
  if(!c.nationalLineup||typeof c.nationalLineup!=="object")c.nationalLineup={};
  const matches=c.internationalMatches.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
  const wins=matches.filter(m=>Number(m.goalsFor)>Number(m.goalsAgainst)).length,draws=matches.filter(m=>Number(m.goalsFor)===Number(m.goalsAgainst)).length,losses=matches.filter(m=>Number(m.goalsFor)<Number(m.goalsAgainst)).length;
- const head=careerBanner(c)+'<div class="topbar"><div><div class="page-title">'+escapeHTML(c.nationalTeam)+' National Team</div><div class="page-subtitle">Manage international fixtures, squad selection, lineup and match records.</div></div></div>'+nationalTabs(nationalSection);
+ const head=careerBanner(c)+'<div class="topbar" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px"><div><div class="page-title">'+escapeHTML(c.nationalTeam)+' National Team</div><div class="page-subtitle">Manage international fixtures, squad selection, lineup and match records.</div></div><button type="button" class="delete-btn" onclick="removeNationalTeam()" style="flex-shrink:0">Remove National Team</button></div>'+nationalTabs(nationalSection);
  let html="";
  if(nationalSection==="calendar"){
   const rows=c.nationalCalendar.slice().sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))).map(m=>'<tr><td>'+escapeHTML(m.date)+'</td><td>'+escapeHTML(m.competition||"International")+'</td><td>'+escapeHTML(m.opponent)+'</td><td>'+escapeHTML(m.venue||"—")+'</td><td><button class="secondary-btn" onclick="deleteNationalFixture(\''+escapeJS(m.id)+'\')">Delete</button></td></tr>').join("");
