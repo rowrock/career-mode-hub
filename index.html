@@ -4237,8 +4237,8 @@ function calendarMonthChange(delta){
 }
 function calendarDayClick(date){
     const career=getCurrentCareer();if(!career)return;
-    const bounds=calendarSeasonBounds(career),d=new Date(date+"T12:00:00");
-    if(d<bounds.start||d>bounds.end)return;
+    const bounds=calendarSeasonBounds(career);
+    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end))return;
     openManualCalendarEntry("",date);
 }
 function renderCalendar(){
@@ -4885,8 +4885,8 @@ function saveAICalendarReview(){
     calendarUploadFiles=[];
     closeModal();
     renderCalendar();
-    if(added===0)alert("No new fixtures were added because all reviewed fixtures were already in your calendar.");
-    else if(outsideSeason)alert(`Saved ${added} fixtures. ${outsideSeason} fixture(s) outside 1 July ${bounds.startYear} – 30 June ${bounds.startYear+1} were skipped.`);
+    if(outsideSeason)alert(`Saved ${added} fixtures. ${outsideSeason} fixture(s) outside 1 July ${bounds.startYear} – 30 June ${bounds.startYear+1} were skipped.`);
+    else if(added===0)alert("No new fixtures were added because all reviewed fixtures were already in your calendar.");
     else if(added<extracted.length)alert(`Saved ${added} new fixtures. Duplicate fixtures were skipped.`);
 }
 
