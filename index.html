@@ -959,6 +959,34 @@ button{cursor:pointer}
 .slot-alt{font-size:8px;line-height:1.1;color:#ffe0a6;max-width:68px;overflow:hidden;max-height:18px}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th,.data-table td{padding:10px 12px;border-bottom:1px solid #303844;text-align:left;white-space:nowrap}.data-table th{color:#9ba6b4;font-size:10px;text-transform:uppercase}.squad-pick-row{color:inherit;text-align:left}
 
 .trophy-art{display:block;width:100%;height:142px;object-fit:contain;margin:0 auto 14px;padding:8px;box-sizing:border-box}.trophy-art-fallback{height:142px;display:flex;align-items:center;justify-content:center;font-size:76px;margin-bottom:14px;background:linear-gradient(135deg,rgba(255,200,70,.08),rgba(255,255,255,.015));border-radius:12px}.trophy-card,.trophy-catalogue-card{display:flex;flex-direction:column;align-items:stretch;gap:8px}.trophy-remove-btn{margin-top:10px}.trophy-catalogue-card .career-name,.trophy-card .career-name{min-height:2.5em}.trophy-catalogue-card .primary-btn,.trophy-catalogue-card .secondary-btn{margin-top:auto}
+
+/* Month-grid season calendar */
+.calendar-month-toolbar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:12px;margin-bottom:18px}
+.calendar-nav-btn{font-size:27px;line-height:1;padding:8px 12px;min-height:42px}
+.calendar-nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.calendar-month-heading{text-align:center}
+.calendar-season-strip{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#171d25;border:1px solid #252c35;border-radius:8px;padding:11px 14px;color:#8993a0;font-size:12px;margin-bottom:14px}
+.calendar-season-strip strong{color:#e8edf3}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-weekday{text-align:center;padding:10px 3px;color:#8993a0;font-size:11px;font-weight:800;text-transform:uppercase}
+.calendar-day{min-width:0;min-height:112px;background:#171d25;border:1px solid #2a323d;border-radius:8px;padding:7px;cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden}
+.calendar-day:hover{border-color:#3288e8;background:#1a2532}
+.calendar-day.outside-month{opacity:.42}
+.calendar-day.out-of-season{opacity:.2;cursor:default;background:#0b0f14}
+.calendar-day.out-of-season:hover{border-color:#2a323d;background:#0b0f14}
+.calendar-day-number{font-size:12px;font-weight:800;color:#cbd2da;margin-bottom:7px}
+.calendar-day.has-fixture{border-color:#3a526d}
+.calendar-day-event{display:block;width:100%;text-align:left;color:#fff;border:1px solid #405065;border-radius:5px;padding:5px 6px;margin:4px 0;font-size:10px;line-height:1.3;cursor:pointer;overflow:hidden}
+.calendar-day-event span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calendar-day-more{font-size:10px;color:#aab5c2;margin-top:5px}
+.calendar-day-add{display:none;color:#78b8ff;font-size:10px;margin-top:8px}
+.calendar-day:not(.out-of-season):not(.has-fixture):hover .calendar-day-add{display:block}
+.calendar-legend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#8993a0;font-size:11px;margin-top:14px}
+.calendar-legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3288e8;margin-right:6px}
+.calendar-footer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:760px){.calendar-day{min-height:78px;padding:5px}.calendar-day-event{font-size:9px;padding:4px}.calendar-day-add{display:none!important}.calendar-weekday{font-size:9px;padding:7px 1px}.calendar-grid{gap:3px}.calendar-month-toolbar{grid-template-columns:38px 1fr 38px}.calendar-month-heading .panel-title{font-size:16px}}
+@media(max-width:480px){.calendar-day{min-height:60px}.calendar-day-event span{font-size:8px}.calendar-day-number{font-size:11px;margin-bottom:4px}.calendar-day-more{font-size:8px}}
+
 </style>
 </head>
 
@@ -2157,7 +2185,7 @@ function startNextSeason(){
  const stats=getSeasonStatistics(c,current);
  if(!confirm("Finish "+current+" and start "+next+"?\n\nYour "+stats.played+" recorded matches and season history will be kept. The new season starts with your main league; join other competitions in the Competitions tab."))return;
  const old=getSeason(c);if(old){old.completed=true;old.completedAt=todayDate();old.finalSummary={played:stats.played,wins:stats.wins,draws:stats.draws,losses:stats.losses,goalsFor:stats.goalsFor,goalsAgainst:stats.goalsAgainst,points:stats.points};}
- c.currentSeason=next;c.seasonNumber=Number(c.seasonNumber||1)+1;
+ c.currentSeason=next;c.seasonNumber=Number(c.seasonNumber||1)+1;window.__careerCalendarView={season:next,year:nextStart,month:6};
  c.seasons.push({season:next,league:c.league,leagueTeams:[],competitions:[],leagueResults:[],calendarUploaded:false});
  delete c.leagueTableImport;delete c.leagueBracketImport;
  saveCareers();renderCareerHome();
@@ -4186,112 +4214,86 @@ function deleteMatch(id){
    CALENDAR
 ========================================================= */
 
+function calendarSeasonBounds(career){
+    const label=String(career?.currentSeason||"2026/27");
+    const match=label.match(/^(\d{4})\s*\/\s*(\d{2}|\d{4})$/);
+    const startYear=match?Number(match[1]):2026;
+    return {start:new Date(startYear,6,1),end:new Date(startYear+1,5,30),startYear};
+}
+function calendarDateKey(date){
+    return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0");
+}
+function calendarMonthChange(delta){
+    const career=getCurrentCareer();if(!career)return;
+    const bounds=calendarSeasonBounds(career);
+    let view=window.__careerCalendarView;
+    if(!view||view.season!==career.currentSeason)view={season:career.currentSeason,year:bounds.startYear,month:6};
+    const next=new Date(view.year,view.month+delta,1);
+    const firstMonth=6,lastMonth=5;
+    const min=new Date(bounds.startYear,firstMonth,1),max=new Date(bounds.startYear+1,lastMonth,1);
+    if(next<min||next>max)return;
+    window.__careerCalendarView={season:career.currentSeason,year:next.getFullYear(),month:next.getMonth()};
+    renderCalendar();
+}
+function calendarDayClick(date){
+    const career=getCurrentCareer();if(!career)return;
+    const bounds=calendarSeasonBounds(career),d=new Date(date+"T12:00:00");
+    if(d<bounds.start||d>bounds.end)return;
+    openManualCalendarEntry("",date);
+}
 function renderCalendar(){
-
     const career=getCurrentCareer();
-
-    if(!career){
-        renderDashboard();
-        return;
+    if(!career){renderDashboard();return;}
+    if(!Array.isArray(career.calendar))career.calendar=[];
+    const bounds=calendarSeasonBounds(career);
+    let view=window.__careerCalendarView;
+    if(!view||view.season!==career.currentSeason||new Date(view.year,view.month,1)<new Date(bounds.startYear,6,1)||new Date(view.year,view.month,1)>new Date(bounds.startYear+1,5,1)){
+        view={season:career.currentSeason,year:bounds.startYear,month:6};
+        window.__careerCalendarView=view;
     }
-
-    const calendar=[...career.calendar]
-        .sort(
-            (a,b)=>
-                new Date(a.date)-new Date(b.date)
-        );
-
+    const monthStart=new Date(view.year,view.month,1);
+    const monthEnd=new Date(view.year,view.month+1,0);
+    const gridStart=new Date(view.year,view.month,1-monthStart.getDay());
+    const gridEnd=new Date(view.year,view.month,monthEnd.getDate()+(6-monthEnd.getDay()));
+    const monthNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const seasonCalendar=career.calendar.filter(e=>{
+        if(!e||!e.date)return false;
+        const date=new Date(e.date+"T12:00:00");
+        return date>=bounds.start&&date<=bounds.end&&(!e.season||e.season===career.currentSeason);
+    }).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    const eventByDate={};
+    seasonCalendar.forEach(e=>(eventByDate[e.date]||(eventByDate[e.date]=[])).push(e));
+    const cells=[];
+    for(let d=new Date(gridStart);d<=gridEnd;d.setDate(d.getDate()+1)){
+        const dateKey=calendarDateKey(d),inSeason=d>=bounds.start&&d<=bounds.end,inMonth=d.getMonth()===view.month;
+        const events=eventByDate[dateKey]||[];
+        const eventHtml=events.slice(0,2).map(e=>'<button type="button" class="calendar-day-event '+competitionTheme(e.competition)+'" onclick="event.stopPropagation();openCalendarMatch(\''+escapeJS(e.id)+'\')" title="'+escapeHTML(e.competition+' — '+e.opponent)+'"><span>'+escapeHTML(e.opponent||"Fixture")+'</span></button>').join("");
+        const more=events.length>2?'<div class="calendar-day-more">+'+(events.length-2)+' more</div>':"";
+        cells.push('<div class="calendar-day '+(!inMonth?'outside-month ':'')+(!inSeason?'out-of-season ':'')+(events.length?'has-fixture':'')+'" '+(inSeason?'role="button" tabindex="0" onclick="calendarDayClick(\''+dateKey+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();calendarDayClick(\''+dateKey+'\')}"':'aria-disabled="true"')+'><div class="calendar-day-number">'+d.getDate()+'</div>'+eventHtml+more+(inSeason&&!events.length?'<div class="calendar-day-add">+ Add match</div>':"")+'</div>');
+    }
+    const prevDisabled=view.year===bounds.startYear&&view.month===6;
+    const nextDisabled=view.year===bounds.startYear+1&&view.month===5;
     document.getElementById("pageContent").innerHTML=`
-
-${careerBanner(career)}
-
-<div class="topbar">
-
-<div>
-<div class="page-title">Calendar</div>
-
-<div class="page-subtitle">
-Your complete ${escapeHTML(career.currentSeason)} fixture calendar.
-</div>
-</div>
-
-<div style="display:flex;gap:8px">
-
-<button
-type="button"
-class="secondary-btn"
-onclick="openManualCalendarEntry()"
->
-＋ Add Fixture
-</button>
-
-<button
-type="button"
-class="secondary-btn"
-onclick="openCalendarUpload()"
->
-📸 Upload Calendar
-</button>
-
-</div>
-
-</div>
-
-
-<div class="panel">
-
-<div class="calendar-toolbar">
-
-<div>
-<div class="panel-title">
-${calendar.length} scheduled matches
-</div>
-
-<div class="panel-subtitle" style="margin-bottom:0">
-Click a match for details. ⭐ favourite important fixtures.
-</div>
-</div>
-
-</div>
-
-
-${
-calendar.length
-?
-`
-<div class="calendar-list">
-${calendar.map(createCalendarMatch).join("")}
-</div>
-`
-:
-`
-<div class="calendar-empty">
-
-<h2 style="color:white">
-No calendar yet
-</h2>
-
-<p>
-Upload screenshots of your season calendar.
-</p>
-
-<button
-type="button"
-class="primary-btn"
-onclick="openCalendarUpload()"
->
-Upload Calendar Screenshots
-</button>
-
-</div>
-`
+    ${careerBanner(career)}
+    <div class="topbar">
+      <div><div class="page-title">Season Calendar</div><div class="page-subtitle">${escapeHTML(career.currentSeason)} · 1 July ${bounds.startYear} – 30 June ${bounds.startYear+1}</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="secondary-btn" onclick="openCalendarUpload()">📸 Upload Calendar (AI)</button></div>
+    </div>
+    <div class="panel calendar-panel">
+      <div class="calendar-month-toolbar">
+        <button type="button" class="secondary-btn calendar-nav-btn" onclick="calendarMonthChange(-1)" ${prevDisabled?"disabled":""} aria-label="Previous month">‹</button>
+        <div class="calendar-month-heading"><div class="panel-title">${monthNames[view.month]} ${view.year}</div><div class="panel-subtitle" style="margin:4px 0 0">${seasonCalendar.length} fixtures this season · Click any day to add a match</div></div>
+        <button type="button" class="secondary-btn calendar-nav-btn" onclick="calendarMonthChange(1)" ${nextDisabled?"disabled":""} aria-label="Next month">›</button>
+      </div>
+      <div class="calendar-season-strip"><span>Season starts <strong>1 Jul ${bounds.startYear}</strong></span><span>Season ends <strong>30 Jun ${bounds.startYear+1}</strong></span></div>
+      <div class="calendar-grid">
+        ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day=>'<div class="calendar-weekday">'+day+'</div>').join("")}
+        ${cells.join("")}
+      </div>
+      <div class="calendar-legend"><span><i class="calendar-legend-dot"></i> Scheduled fixture</span><span>Click a date to add a fixture</span></div>
+      <div class="calendar-footer-actions"><button type="button" class="primary-btn" onclick="openManualCalendarEntry()">＋ Add Fixture</button><button type="button" class="secondary-btn" onclick="openCalendarUpload()">📸 Upload Calendar Screenshots</button></div>
+    </div>`;
 }
-
-</div>
-
-`;
-}
-
 
 function competitionTheme(competition){
 
@@ -4544,11 +4546,11 @@ function toggleFavoriteFromModal(id){
    CALENDAR UPLOAD
 ========================================================= */
 
-function openManualCalendarEntry(eventId){
+function openManualCalendarEntry(eventId, selectedDate){
     const career=getCurrentCareer();
     if(!career)return;
     const existing=eventId?(career.calendar||[]).find(e=>e.id===eventId):null;
-    const item=existing||{date:"",competition:"",opponent:"",homeAway:"",round:"",notes:""};
+    const bounds=calendarSeasonBounds(career);\n    const item=existing||{date:selectedDate||"",competition:"",opponent:"",homeAway:"",round:"",notes:""};
     document.getElementById("modalContainer").innerHTML=`
     <div class="modal-overlay" onclick="closeModalOutside(event)">
       <div class="modal" onclick="event.stopPropagation()">
@@ -4557,7 +4559,7 @@ function openManualCalendarEntry(eventId){
           <button type="button" class="close-btn" onclick="closeModal()">×</button>
         </div>
         <div class="form-grid">
-          <div class="form-group"><label for="manualCalendarDate">Date *</label><input id="manualCalendarDate" class="form-input" type="date" value="${escapeHTML(item.date)}" required></div>
+          <div class="form-group"><label for="manualCalendarDate">Date *</label><input id="manualCalendarDate" class="form-input" type="date" value="${escapeHTML(item.date)}" min="${calendarDateKey(bounds.start)}" max="${calendarDateKey(bounds.end)}" required></div>
           <div class="form-group"><label for="manualCalendarCompetition">Competition *</label><select id="manualCalendarCompetition" class="form-select" required><option value="" ${!item.competition?"selected":""}>Choose a competition…</option>${getCalendarCompetitionOptions(item.competition).map(c=>`<option value="${escapeHTML(c)}" ${c===item.competition?"selected":""}>${escapeHTML(c)}</option>`).join("")}</select></div>
           <div class="form-group"><label for="manualCalendarOpponent">Opponent *</label><select id="manualCalendarOpponent" class="form-select" required><option value="">Choose a team…</option>${getCalendarTeamOptions(item.opponent).map(t=>`<option value="${escapeHTML(t)}" ${t===item.opponent?"selected":""}>${escapeHTML(t)}</option>`).join("")}</select></div>
           <div class="form-group"><label for="manualCalendarHomeAway">Home / Away</label><select id="manualCalendarHomeAway" class="form-select"><option value="" ${!item.homeAway?"selected":""}>Unknown</option><option value="Home" ${item.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${item.homeAway==="Away"?"selected":""}>Away</option><option value="Neutral" ${item.homeAway==="Neutral"?"selected":""}>Neutral</option></select></div>
@@ -4576,7 +4578,7 @@ function saveManualCalendarEntry(eventId){
     if(!career)return;
     const value=id=>document.getElementById(id)?.value.trim()||"";
     const date=value("manualCalendarDate"),competition=value("manualCalendarCompetition"),opponent=value("manualCalendarOpponent");
-    if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}
+    if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}\n    const bounds=calendarSeasonBounds(career);\n    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end)){alert("Fixtures must be between 1 July "+bounds.startYear+" and 30 June "+(bounds.startYear+1)+".");return;}
     if(!Array.isArray(career.calendar))career.calendar=[];
     const duplicate=career.calendar.find(e=>e.id!==eventId&&e.date===date&&(e.opponent||"").toLowerCase()===opponent.toLowerCase()&&(e.competition||"").toLowerCase()===competition.toLowerCase());
     if(duplicate){alert("That fixture is already in your calendar.");return;}
