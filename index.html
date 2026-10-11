@@ -38,6 +38,19 @@ button{cursor:pointer}
 }
 
 .logo span{color:#4da3ff}
+.account-panel{margin:0 4px 22px;padding:12px;background:#171d25;border:1px solid #303844;border-radius:10px}
+.account-status{font-size:12px;color:#9ca5b1;line-height:1.5;margin-bottom:9px;overflow-wrap:anywhere}
+.account-btn{width:100%;padding:9px 10px;border-radius:7px;border:1px solid #3a4654;background:#243140;color:#fff;font-weight:700;margin-top:5px}
+.account-btn.secondary{background:transparent;color:#cbd5e1}
+.auth-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:18px}
+.auth-card{width:min(440px,100%);background:#11161d;border:1px solid #303844;border-radius:14px;padding:24px;box-shadow:0 20px 70px #0009}
+.auth-card h2{margin:0 0 7px;font-size:23px}.auth-muted{color:#8d97a3;font-size:13px;line-height:1.5;margin-bottom:18px}
+.auth-field{display:block;margin:13px 0 6px;font-size:13px;font-weight:700}
+.auth-input{width:100%;padding:12px;border-radius:8px;border:1px solid #303844;background:#0b0f14;color:#fff;font-size:14px}
+.auth-actions{display:flex;gap:8px;margin-top:18px}.auth-actions button{flex:1}
+.auth-error{color:#ff9a9a;font-size:13px;margin-top:12px;line-height:1.5}
+.auth-link{background:none;border:0;color:#78b8ff;padding:12px 0 0;text-decoration:underline;font-size:13px}
+@media(max-width:700px){.sidebar{width:190px;padding:16px 9px}.main{margin-left:190px;padding:20px 14px}.logo{font-size:18px;padding-left:7px}.account-panel{padding:9px 7px}}
 
 .nav-title{
     color:#707986;
@@ -957,6 +970,11 @@ button{cursor:pointer}
 Career Mode <span>Hub</span>
 </div>
 
+<div class="account-panel" id="accountPanel">
+  <div class="account-status" id="accountStatus">Checking account…</div>
+  <button class="account-btn" id="accountMainButton" onclick="openAuthModal()">Log in / Sign up</button>
+</div>
+
 <div class="nav-title">Career</div>
 
 <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
@@ -1022,6 +1040,7 @@ National Team
 
 <div id="modalContainer"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
 /* =========================================================
@@ -1107,6 +1126,7 @@ function saveCareers(){
         "careerModeHubCareers",
         JSON.stringify(careers)
     );
+    scheduleCloudSave();
 }
 
 
@@ -5756,6 +5776,123 @@ function addNationalPlayer(event){
  saveCareers();nationalSection="squad";renderNationalTeamHub();
 }
 function deleteNationalPlayer(id){const c=getCurrentCareer();if(!c)return;const p=(c.nationalSquad||[]).find(x=>String(x.id)===String(id));if(!p||!confirm("Remove "+p.name+" from the national squad?"))return;c.nationalSquad=c.nationalSquad.filter(x=>String(x.id)!==String(id));if(c.nationalLineup)Object.keys(c.nationalLineup).forEach(k=>{if(String(c.nationalLineup[k])===String(id))delete c.nationalLineup[k];});saveCareers();renderNationalTeamHub();}
+
+
+/* =========================================================
+   ACCOUNT LOGIN + PRIVATE CLOUD SAVES
+========================================================= */
+const SUPABASE_URL = "https://fsnxymgrcvjrxyarapdf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_zRNo_w40HXRgpb0KptGOQg_KacP-tNK";
+let supabaseClient = null, signedInUser = null, cloudReady = false, cloudLoading = false, cloudSaveTimer = null, authMode = "login", supabaseInitialized = false;
+
+function initSupabaseAuth(){
+  if(supabaseInitialized)return;
+  supabaseInitialized=true;
+  try{
+    if(!window.supabase || !window.supabase.createClient){setAccountStatus("Login service could not load. Refresh the page and try again.");return;}
+    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+    supabaseClient.auth.onAuthStateChange((event,session)=>{
+      signedInUser=session?.user||null;updateAccountPanel();
+      if(signedInUser&&(event==="SIGNED_IN"||event==="INITIAL_SESSION"||event==="TOKEN_REFRESHED"))setTimeout(()=>loadCloudCareers(),0);
+    });
+    supabaseClient.auth.getSession().then(({data,error})=>{
+      if(error)throw error;signedInUser=data.session?.user||null;updateAccountPanel();if(signedInUser)loadCloudCareers();
+    }).catch(e=>setAccountStatus("Could not check login: "+friendlyAuthError(e)));
+  }catch(e){setAccountStatus("Login setup error: "+friendlyAuthError(e));}
+}
+function setAccountStatus(message){const el=document.getElementById("accountStatus");if(el)el.textContent=message;}
+function updateAccountPanel(){
+  const el=document.getElementById("accountStatus"),btn=document.getElementById("accountMainButton");if(!el||!btn)return;
+  if(signedInUser){el.textContent="Signed in as "+(signedInUser.user_metadata?.username||signedInUser.email||"your account")+" · cloud saves enabled";btn.textContent="Account options";btn.onclick=openAccountOptions;}
+  else{el.textContent="Log in to sync your careers across devices.";btn.textContent="Log in / Sign up";btn.onclick=openAuthModal;}
+}
+function openAccountOptions(){
+  const action=prompt("Signed in as "+(signedInUser?.user_metadata?.username||signedInUser?.email||"your account")+". Type LOGOUT to sign out, or leave blank to cancel.");
+  if(action&&action.trim().toUpperCase()==="LOGOUT")signOutAccount();
+}
+function openAuthModal(mode){
+  authMode=mode||"login";document.getElementById("authOverlay")?.remove();
+  const overlay=document.createElement("div");overlay.id="authOverlay";overlay.className="auth-overlay";overlay.innerHTML=renderAuthModal();document.body.appendChild(overlay);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove();});
+}
+function renderAuthModal(){
+  const signup=authMode==="signup";
+  return '<div class="auth-card"><h2>'+(signup?'Create your account':'Welcome back')+'</h2><div class="auth-muted">Use your email and password. Your careers are stored privately against your account so you can access them on another device.</div>'+
+  (signup?'<label class="auth-field" for="authUsername">Username</label><input class="auth-input" id="authUsername" autocomplete="username" maxlength="24" placeholder="Choose a username">':'')+
+  '<label class="auth-field" for="authEmail">Email</label><input class="auth-input" id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>'+
+  '<label class="auth-field" for="authPassword">Password</label><input class="auth-input" id="authPassword" type="password" autocomplete="'+(signup?'new-password':'current-password')+'" minlength="8" placeholder="At least 8 characters" required>'+
+  '<div id="authError" class="auth-error" role="status" aria-live="polite"></div><div class="auth-actions"><button class="secondary-btn" onclick="document.getElementById(\'authOverlay\').remove()">Cancel</button><button class="primary-btn" id="authSubmit" onclick="submitAuthForm()">'+(signup?'Create account':'Log in')+'</button></div>'+
+  '<button class="auth-link" onclick="openAuthModal(\''+(signup?'login':'signup')+'\')">'+(signup?'Already have an account? Log in':'New here? Create an account')+'</button>'+
+  (!signup?'<br><button class="auth-link" onclick="sendPasswordReset()">Forgot your password?</button>':'')+'</div>';
+}
+function friendlyAuthError(e){
+  const msg=String(e?.message||e||"Unknown error");
+  if(/invalid login credentials/i.test(msg))return "Email or password is incorrect.";
+  if(/email not confirmed/i.test(msg))return "Please confirm your email using the link we sent you.";
+  if(/user already registered/i.test(msg))return "An account with this email already exists. Try logging in.";
+  if(/password should be at least/i.test(msg))return "Use a password with at least 8 characters.";
+  if(/failed to fetch|network/i.test(msg))return "Could not reach Supabase. Check the project URL and internet connection.";
+  if(/relation .* does not exist|could not find the table/i.test(msg))return "The cloud-save table has not been created yet. Follow the SQL setup steps in ChatGPT.";
+  return msg;
+}
+async function submitAuthForm(){
+  if(!supabaseClient){showAuthError("Login service is not ready. Refresh and try again.");return;}
+  const email=document.getElementById("authEmail")?.value.trim()||"",password=document.getElementById("authPassword")?.value||"",username=document.getElementById("authUsername")?.value.trim()||"";
+  if(!email||!password){showAuthError("Enter your email and password.");return;}
+  if(password.length<8){showAuthError("Use a password with at least 8 characters.");return;}
+  if(authMode==="signup"&&!/^[a-zA-Z0-9_.-]{3,24}$/.test(username)){showAuthError("Username must be 3–24 characters and use letters, numbers, dots, underscores or hyphens.");return;}
+  const btn=document.getElementById("authSubmit");if(btn){btn.disabled=true;btn.textContent="Please wait…";}
+  try{
+    let result;
+    if(authMode==="signup"){
+      result=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});if(result.error)throw result.error;
+      if(!result.data.session){showAuthError("Account created. Check your email and click the confirmation link, then log in here.");if(btn){btn.disabled=false;btn.textContent="Create account";}return;}
+    }else{result=await supabaseClient.auth.signInWithPassword({email,password});if(result.error)throw result.error;}
+    document.getElementById("authOverlay")?.remove();signedInUser=result.data.user||result.data.session?.user||signedInUser;updateAccountPanel();await loadCloudCareers();
+  }catch(e){showAuthError(friendlyAuthError(e));if(btn){btn.disabled=false;btn.textContent=authMode==="signup"?"Create account":"Log in";}}
+}
+function showAuthError(message){const el=document.getElementById("authError");if(el)el.textContent=message;}
+async function sendPasswordReset(){
+  const email=document.getElementById("authEmail")?.value.trim()||"";if(!email){showAuthError("Enter your email above first.");return;}
+  try{const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;showAuthError("Password reset email sent if an account exists for that address. Check your inbox.");}catch(e){showAuthError(friendlyAuthError(e));}
+}
+async function signOutAccount(){
+  if(!supabaseClient)return;
+  try{await flushCloudSave();const {error}=await supabaseClient.auth.signOut();if(error)throw error;signedInUser=null;cloudReady=false;updateAccountPanel();alert("Signed out. Your careers remain saved on this device.");}
+  catch(e){alert("Could not sign out cleanly: "+friendlyAuthError(e));}
+}
+async function loadCloudCareers(){
+  if(!supabaseClient||!signedInUser||cloudLoading)return;
+  cloudLoading=true;cloudReady=false;setAccountStatus("Loading your private cloud saves…");
+  try{
+    const {data,error}=await supabaseClient.from("career_mode_hub_saves").select("careers").eq("user_id",signedInUser.id).maybeSingle();if(error)throw error;
+    const local=Array.isArray(careers)?careers:[],remote=data&&Array.isArray(data.careers)?data.careers:[];
+    if(remote.length){
+      const byId=new Map();remote.forEach(c=>byId.set(String(c.id),c));local.forEach(c=>byId.set(String(c.id),c));careers=Array.from(byId.values());
+      localStorage.setItem("careerModeHubCareers",JSON.stringify(careers));if(currentCareerId&&!careers.some(c=>c.id===currentCareerId))currentCareerId=null;showPage(currentCareerId?"mycareer":"dashboard");
+      if(local.length)alert("Cloud saves loaded. Existing careers on this device were kept and merged. If the same career existed in both places, the version on this device was kept.");
+    }
+    cloudReady=true;updateAccountPanel();if(remote.length===0&&local.length)await flushCloudSave();
+    setAccountStatus("Signed in as "+(signedInUser.user_metadata?.username||signedInUser.email)+" · cloud saves up to date");
+  }catch(e){
+    cloudReady=false;setAccountStatus("Signed in, but cloud saves need setup.");
+    alert("Login worked, but cloud saves are not ready yet. "+friendlyAuthError(e)+"\n\nThe Supabase save table and its security policies must be created first. Your local careers have not been deleted.");
+  }finally{cloudLoading=false;}
+}
+function scheduleCloudSave(){
+  if(!signedInUser||!cloudReady||cloudLoading)return;
+  if(cloudSaveTimer)clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(()=>flushCloudSave(),900);
+}
+async function flushCloudSave(){
+  if(!supabaseClient||!signedInUser||!cloudReady||cloudLoading)return;
+  if(cloudSaveTimer){clearTimeout(cloudSaveTimer);cloudSaveTimer=null;}
+  const snapshot=JSON.parse(JSON.stringify(careers)),userId=signedInUser.id;
+  const {error}=await supabaseClient.from("career_mode_hub_saves").upsert({user_id:userId,careers:snapshot,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  if(error){setAccountStatus("Cloud save failed. Local save is still safe.");console.error("Career Mode Hub cloud save failed:",error);return;}
+  setAccountStatus("Signed in as "+(signedInUser.user_metadata?.username||signedInUser.email)+" · cloud saves up to date");
+}
+
+setTimeout(initSupabaseAuth,0);
 
 </script>
 
