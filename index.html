@@ -4580,7 +4580,8 @@ function saveManualCalendarEntry(eventId){
     const value=id=>document.getElementById(id)?.value.trim()||"";
     const date=value("manualCalendarDate"),competition=value("manualCalendarCompetition"),opponent=value("manualCalendarOpponent");
     if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}
-    const bounds=calendarSeasonBounds(career);\n    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end)){alert("Fixtures must be between 1 July "+bounds.startYear+" and 30 June "+(bounds.startYear+1)+".");return;}
+    const bounds=calendarSeasonBounds(career);
+    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end)){alert("Fixtures must be between 1 July "+bounds.startYear+" and 30 June "+(bounds.startYear+1)+".");return;}
     if(!Array.isArray(career.calendar))career.calendar=[];
     const duplicate=career.calendar.find(e=>e.id!==eventId&&e.date===date&&(e.opponent||"").toLowerCase()===opponent.toLowerCase()&&(e.competition||"").toLowerCase()===competition.toLowerCase());
     if(duplicate){alert("That fixture is already in your calendar.");return;}
