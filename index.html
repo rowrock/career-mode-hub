@@ -4550,7 +4550,8 @@ function openManualCalendarEntry(eventId, selectedDate){
     const career=getCurrentCareer();
     if(!career)return;
     const existing=eventId?(career.calendar||[]).find(e=>e.id===eventId):null;
-    const bounds=calendarSeasonBounds(career);\n    const item=existing||{date:selectedDate||"",competition:"",opponent:"",homeAway:"",round:"",notes:""};
+    const bounds=calendarSeasonBounds(career);
+    const item=existing||{date:selectedDate||"",competition:"",opponent:"",homeAway:"",round:"",notes:""};
     document.getElementById("modalContainer").innerHTML=`
     <div class="modal-overlay" onclick="closeModalOutside(event)">
       <div class="modal" onclick="event.stopPropagation()">
@@ -4578,7 +4579,8 @@ function saveManualCalendarEntry(eventId){
     if(!career)return;
     const value=id=>document.getElementById(id)?.value.trim()||"";
     const date=value("manualCalendarDate"),competition=value("manualCalendarCompetition"),opponent=value("manualCalendarOpponent");
-    if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}\n    const bounds=calendarSeasonBounds(career);\n    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end)){alert("Fixtures must be between 1 July "+bounds.startYear+" and 30 June "+(bounds.startYear+1)+".");return;}
+    if(!date||!competition||!opponent){alert("Please enter a date, competition and opponent.");return;}
+    const bounds=calendarSeasonBounds(career);\n    if(date<calendarDateKey(bounds.start)||date>calendarDateKey(bounds.end)){alert("Fixtures must be between 1 July "+bounds.startYear+" and 30 June "+(bounds.startYear+1)+".");return;}
     if(!Array.isArray(career.calendar))career.calendar=[];
     const duplicate=career.calendar.find(e=>e.id!==eventId&&e.date===date&&(e.opponent||"").toLowerCase()===opponent.toLowerCase()&&(e.competition||"").toLowerCase()===competition.toLowerCase());
     if(duplicate){alert("That fixture is already in your calendar.");return;}
@@ -4860,7 +4862,10 @@ function saveAICalendarReview(){
     if(!Array.isArray(career.calendar))career.calendar=[];
     const existing=new Set(career.calendar.map(e=>[e.date,e.competition,e.opponent].join("|").toLowerCase()));
     let added=0;
+    const bounds=calendarSeasonBounds(career);
+    let outsideSeason=0;
     extracted.forEach(event=>{
+        if(event.date<calendarDateKey(bounds.start)||event.date>calendarDateKey(bounds.end)){outsideSeason++;return;}
         const key=[event.date,event.competition,event.opponent].join("|").toLowerCase();
         if(existing.has(key))return;
         existing.add(key);
@@ -4881,6 +4886,7 @@ function saveAICalendarReview(){
     closeModal();
     renderCalendar();
     if(added===0)alert("No new fixtures were added because all reviewed fixtures were already in your calendar.");
+    else if(outsideSeason)alert(`Saved ${added} fixtures. ${outsideSeason} fixture(s) outside 1 July ${bounds.startYear} – 30 June ${bounds.startYear+1} were skipped.`);
     else if(added<extracted.length)alert(`Saved ${added} new fixtures. Duplicate fixtures were skipped.`);
 }
 
