@@ -5872,7 +5872,11 @@ async function loadCloudCareers(){
       localStorage.setItem("careerModeHubCareers",JSON.stringify(careers));if(currentCareerId&&!careers.some(c=>c.id===currentCareerId))currentCareerId=null;showPage(currentCareerId?"mycareer":"dashboard");
       if(local.length)alert("Cloud saves loaded. Existing careers on this device were kept and merged. If the same career existed in both places, the version on this device was kept.");
     }
-    cloudReady=true;updateAccountPanel();if(remote.length===0&&local.length)await flushCloudSave();
+    cloudReady=true;updateAccountPanel();
+    if(remote.length===0&&local.length){
+      const {error:saveError}=await supabaseClient.from("career_mode_hub_saves").upsert({user_id:signedInUser.id,careers:JSON.parse(JSON.stringify(careers)),updated_at:new Date().toISOString()},{onConflict:"user_id"});
+      if(saveError)throw saveError;
+    }
     setAccountStatus("Signed in as "+(signedInUser.user_metadata?.username||signedInUser.email)+" · cloud saves up to date");
   }catch(e){
     cloudReady=false;setAccountStatus("Signed in, but cloud saves need setup.");
