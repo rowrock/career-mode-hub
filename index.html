@@ -1110,6 +1110,13 @@ function loadCareers(){
             if(!c.seasonNumber)
                 c.seasonNumber=1;
 
+            // Older saves may not have a season stamped on each match.
+            // Assign legacy records to the current season so they are not
+            // incorrectly counted in every past season.
+            c.matches.forEach(m=>{
+                if(m && !m.season) m.season=c.currentSeason;
+            });
+
         });
 
     }catch(e){
@@ -4551,7 +4558,7 @@ function openManualCalendarEntry(eventId){
         </div>
         <div class="form-grid">
           <div class="form-group"><label for="manualCalendarDate">Date *</label><input id="manualCalendarDate" class="form-input" type="date" value="${escapeHTML(item.date)}" required></div>
-          <div class="form-group"><label for="manualCalendarCompetition">Competition *</label><select id="manualCalendarCompetition" class="form-select" required>${getCalendarCompetitionOptions(item.competition).map(c=>`<option value="${escapeHTML(c)}" ${c===item.competition?"selected":""}>${escapeHTML(c)}</option>`).join("")}</select></div>
+          <div class="form-group"><label for="manualCalendarCompetition">Competition *</label><select id="manualCalendarCompetition" class="form-select" required><option value="" ${!item.competition?"selected":""}>Choose a competition…</option>${getCalendarCompetitionOptions(item.competition).map(c=>`<option value="${escapeHTML(c)}" ${c===item.competition?"selected":""}>${escapeHTML(c)}</option>`).join("")}</select></div>
           <div class="form-group"><label for="manualCalendarOpponent">Opponent *</label><select id="manualCalendarOpponent" class="form-select" required><option value="">Choose a team…</option>${getCalendarTeamOptions(item.opponent).map(t=>`<option value="${escapeHTML(t)}" ${t===item.opponent?"selected":""}>${escapeHTML(t)}</option>`).join("")}</select></div>
           <div class="form-group"><label for="manualCalendarHomeAway">Home / Away</label><select id="manualCalendarHomeAway" class="form-select"><option value="" ${!item.homeAway?"selected":""}>Unknown</option><option value="Home" ${item.homeAway==="Home"?"selected":""}>Home</option><option value="Away" ${item.homeAway==="Away"?"selected":""}>Away</option><option value="Neutral" ${item.homeAway==="Neutral"?"selected":""}>Neutral</option></select></div>
           <div class="form-group"><label for="manualCalendarRound">Round (optional)</label><input id="manualCalendarRound" class="form-input" value="${escapeHTML(item.round)}" placeholder="e.g. Round 12"></div>
@@ -5177,39 +5184,12 @@ function searchNationalPlayers(query){
  const list=(Array.isArray(allPlayers)?allPlayers:[]).filter(p=>nationalCountryKey(p.nationality||p.country||"")===country&&nationalPlayerLabel(p).toLowerCase().includes(q)).slice(0,100);
  box.innerHTML=list.length?list.map(p=>'<div class="player-card"><div class="player-name">'+escapeHTML(nationalPlayerLabel(p))+'</div><div class="player-club">'+escapeHTML(p.club||"Free Agent")+'</div><div style="display:flex;gap:15px;margin-top:12px;color:#8d97a3;font-size:12px"><span><strong style="color:white">'+escapeHTML(p.overallRating||"—")+'</strong> OVR</span><span>'+escapeHTML(p.position||"—")+'</span><span>'+escapeHTML(p.nationality||"—")+'</span></div></div>').join(""):'<div style="color:#7f8996">No eligible players found for this country.</div>';
 }
-function addNationalPlayer(event){
- event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;if(!Array.isArray(c.nationalSquad))c.nationalSquad=[];
- const label=document.getElementById("ntPlayerSearch").value.trim(),caps=Number(document.getElementById("ntPlayerCaps").value);
- const p=(Array.isArray(allPlayers)?allPlayers:[]).find(x=>nationalPlayerLabel(x).toLowerCase()===label.toLowerCase()&&nationalCountryKey(x.nationality||x.country||"")===nationalCountryKey(c.nationalTeam));
- if(!p){alert("Choose a player from the eligible list for "+c.nationalTeam+".");return;}
- const id=String(p.id||p.playerId||"");if(!id){alert("This database player has no usable ID.");return;}
- if(c.nationalSquad.some(x=>String(x.playerId||x.id)===id)){alert("That player is already in the national squad.");return;}
- c.nationalSquad.push({id:"nt_"+id,playerId:id,name:nationalPlayerLabel(p),position:p.position||p.preferredPosition||"—",club:p.club||"",age:p.age??null,overallRating:p.overallRating??null,nationality:p.nationality||p.country,caps,goals:0});
- saveCareers();nationalSection="squad";renderNationalTeamHub();
-}
-function setNationalLineup(role,id){const c=getCurrentCareer();if(!c)return;if(!c.nationalLineup)c.nationalLineup={};c.nationalLineup[role]=id;saveCareers();}
-function clearNationalLineup(){const c=getCurrentCareer();if(!c)return;c.nationalLineup={};saveCareers();renderNationalTeamHub();}
-function deleteNationalPlayer(id){const c=getCurrentCareer();if(!c)return;const p=(c.nationalSquad||[]).find(x=>String(x.id)===String(id));if(!p||!confirm("Remove "+p.name+" from the national squad?"))return;c.nationalSquad=c.nationalSquad.filter(x=>String(x.id)!==String(id));if(c.nationalLineup)Object.keys(c.nationalLineup).forEach(k=>{if(String(c.nationalLineup[k])===String(id))delete c.nationalLineup[k];});saveCareers();renderNationalTeamHub();}
 function addNationalFixture(event){event.preventDefault();const c=getCurrentCareer();if(!c)return;const date=document.getElementById("ntFixtureDate").value,competition=document.getElementById("ntFixtureCompetition").value.trim(),opponent=document.getElementById("ntFixtureOpponent").value.trim(),venue=document.getElementById("ntFixtureVenue").value.trim();if(!date||!competition||!opponent){alert("Enter the date, competition and opponent.");return;}if(!Array.isArray(c.nationalCalendar))c.nationalCalendar=[];c.nationalCalendar.push({id:createId(),date,competition,opponent,venue});saveCareers();renderNationalTeamHub();}
 function deleteNationalFixture(id){const c=getCurrentCareer();if(!c)return;c.nationalCalendar=(c.nationalCalendar||[]).filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
 function addInternationalMatch(event){
  event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;const date=document.getElementById("ntMatchDate").value,competition=document.getElementById("ntMatchCompetition").value.trim(),opponent=document.getElementById("ntMatchOpponent").value.trim(),gf=Number(document.getElementById("ntGoalsFor").value),ga=Number(document.getElementById("ntGoalsAgainst").value);
  if(!date||!competition||!opponent||!Number.isInteger(gf)||!Number.isInteger(ga)||gf<0||ga<0){alert("Please enter a valid date, competition, opponent and score.");return;}
  if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];c.internationalMatches.push({id:createId(),date,competition,opponent,goalsFor:gf,goalsAgainst:ga});saveCareers();nationalSection="matches";renderNationalTeamHub();
-}
-function deleteInternationalMatch(id){const c=getCurrentCareer();if(!c)return;const m=(c.internationalMatches||[]).find(x=>String(x.id)===String(id));if(!m||!confirm("Delete the international match against "+m.opponent+"?"))return;c.internationalMatches=c.internationalMatches.filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
-
-function addNationalPlayer(event){
- event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;if(!Array.isArray(c.nationalSquad))c.nationalSquad=[];
- const name=document.getElementById("ntPlayerName").value.trim(),position=document.getElementById("ntPlayerPosition").value,club=document.getElementById("ntPlayerClub").value.trim(),age=document.getElementById("ntPlayerAge").value,caps=Number(document.getElementById("ntPlayerCaps").value),goals=Number(document.getElementById("ntPlayerGoals").value);
- if(!name||!position){alert("Enter a player name and position.");return;}if(!Number.isInteger(caps)||caps<0||!Number.isInteger(goals)||goals<0){alert("Caps and goals must be whole numbers of zero or more.");return;}
- c.nationalSquad.push({id:createId(),name,position,club,age:age===""?null:Number(age),caps,goals});saveCareers();renderNationalTeamHub();
-}
-function deleteNationalPlayer(id){const c=getCurrentCareer();if(!c)return;const p=(c.nationalSquad||[]).find(x=>String(x.id)===String(id));if(!p||!confirm("Remove "+p.name+" from the national squad?"))return;c.nationalSquad=c.nationalSquad.filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
-function addInternationalMatch(event){
- event.preventDefault();const c=getCurrentCareer();if(!c||!c.nationalTeam)return;const date=document.getElementById("ntMatchDate").value,competition=document.getElementById("ntMatchCompetition").value.trim(),opponent=document.getElementById("ntMatchOpponent").value.trim(),gf=Number(document.getElementById("ntGoalsFor").value),ga=Number(document.getElementById("ntGoalsAgainst").value);
- if(!date||!competition||!opponent||!Number.isInteger(gf)||!Number.isInteger(ga)||gf<0||ga<0){alert("Please enter a valid date, competition, opponent and score.");return;}
- if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];c.internationalMatches.push({id:createId(),date,competition,opponent,goalsFor:gf,goalsAgainst:ga});saveCareers();renderNationalTeamHub();
 }
 function deleteInternationalMatch(id){const c=getCurrentCareer();if(!c)return;const m=(c.internationalMatches||[]).find(x=>String(x.id)===String(id));if(!m||!confirm("Delete the international match against "+m.opponent+"?"))return;c.internationalMatches=c.internationalMatches.filter(x=>String(x.id)!==String(id));saveCareers();renderNationalTeamHub();}
 
@@ -5577,6 +5557,13 @@ async function loadDatabase(){
         allPlayers=rows.map(convertPlayer);
 
         buildFC27LeagueDatabase();
+
+        // If a database-dependent page was opened before the CSV finished
+        // loading, refresh it so the imported data appears immediately.
+        const activePage=document.querySelector("#careerNavigation .nav-btn.active")?.dataset.page;
+        if(currentCareerId && ["players","national","squad","transfers","calendar","matches","youth","league","competitions","past","trophies","mycareer"].includes(activePage)){
+            showPage(activePage);
+        }
 
         console.log(
             "FC27 players loaded:",
