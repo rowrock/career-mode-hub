@@ -4272,40 +4272,36 @@ Delete
 function editMatch(id){
  const c=getCurrentCareer();if(!c)return;
  const m=(c.matches||[]).find(x=>String(x.id)===String(id));if(!m)return;
- const ask=(label,value)=>prompt(label,value==null?"":String(value));
- const date=ask("Match date (YYYY-MM-DD):",m.date||"");if(date===null)return;
- const competition=ask("Competition:",m.competition||"");if(competition===null)return;
- const opponent=ask("Opponent:",m.opponent||"");if(opponent===null)return;
- const homeAway=ask("Home or Away:",m.homeAway||"Home");if(homeAway===null)return;
- const gf=ask("Your team goals:",m.goalsFor??0);if(gf===null)return;
- const ga=ask("Opponent goals:",m.goalsAgainst??0);if(ga===null)return;
- if(!Number.isFinite(Number(gf))||!Number.isFinite(Number(ga))||Number(gf)<0||Number(ga)<0){alert("Goals must be valid numbers of 0 or more.");return;}
- m.date=date.trim();m.competition=competition.trim();m.opponent=opponent.trim();m.homeAway=/^away$/i.test(homeAway.trim())?"Away":"Home";
- m.goalsFor=Number(gf);m.goalsAgainst=Number(ga);m.result=m.goalsFor>m.goalsAgainst?"W":m.goalsFor<m.goalsAgainst?"L":"D";m.cleanSheet=m.goalsAgainst===0;
- if(Array.isArray(m.players)&&m.players.length){
-  const names=m.players.map((p,i)=>(i+1)+". "+(p.name||"Player")).join("\n");
-  const choice=prompt("Optional: edit a player in this match. Enter their number, or leave blank to skip.\n"+names,"");
-  if(choice!==null&&choice.trim()!==""){
-   const p=m.players[Number(choice)-1];
-   if(!p){alert("Player number not recognised. Match details will still be saved.");}
-   else{
-    const rating=prompt("Rating for "+p.name+" (blank if unknown):",p.rating??"");
-    if(rating!==null){
-     const goals=prompt("Goals:",p.goals??0);
-     if(goals!==null){const assists=prompt("Assists:",p.assists??0);
-      if(assists!==null){const minutes=prompt("Minutes played:",p.minutes??90);
-       if(minutes!==null){const saves=prompt("Saves:",p.saves??0);
-        if(saves!==null){
-         if([goals,assists,minutes,saves].some(v=>!Number.isFinite(Number(v))||Number(v)<0)||(rating.trim()!==""&&!Number.isFinite(Number(rating))))alert("Invalid player stats; match details will still be saved.");
-         else{p.rating=rating.trim()===""?null:Number(rating);p.goals=Number(goals);p.assists=Number(assists);p.minutes=Number(minutes);p.saves=Number(saves);}
-        }
-       }
-      }
-     }
-    }
-   }
-  }
- }
+ renderManagerMatchEdit(m);
+}
+function renderManagerMatchEdit(m){
+ const c=getCurrentCareer();if(!c||!m)return;
+ const competitionOptions=getParticipatingCompetitions(c);
+ if(m.competition&&!competitionOptions.includes(m.competition))competitionOptions.push(m.competition);
+ const teams=[...new Set([...getCompetitionTeams(m.competition||""),m.opponent||""])].filter(Boolean).sort((a,b)=>a.localeCompare(b));
+ const playerNames=Array.from(new Set([...(c.squad||[]).map(p=>typeof p==="string"?p:(p.name||p.playerName||"")), ...allPlayers.map(p=>p.commonName||[p.firstName,p.lastName].filter(Boolean).join(" "))].filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+ const rows=(m.players||[]).map((p,i)=>'<div class="player-entry" data-edit-player-row style="grid-template-columns:minmax(130px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px"><input class="form-input" data-field="name" list="editManagerPlayerOptions" value="'+escapeHTML(p.name||"")+'" placeholder="Player"><input class="form-input" data-field="rating" type="number" min="0" max="10" step=".1" value="'+(p.rating==null?"":escapeHTML(String(p.rating)))+'" placeholder="—"><input class="form-input" data-field="goals" type="number" min="0" value="'+Number(p.goals||0)+'"><input class="form-input" data-field="assists" type="number" min="0" value="'+Number(p.assists||0)+'"><input class="form-input" data-field="minutes" type="number" min="0" max="130" value="'+(p.minutes==null?"":Number(p.minutes))+'" placeholder="—"><input class="form-input" data-field="saves" type="number" min="0" value="'+(p.saves==null?"":Number(p.saves))+'" placeholder="—"><input class="form-input" data-field="yellowCards" type="number" min="0" value="'+Number(p.yellowCards||0)+'"><input class="form-input" data-field="redCards" type="number" min="0" value="'+Number(p.redCards||0)+'"><button type="button" class="remove-player" onclick="this.closest(\'[data-edit-player-row]\').remove()">×</button></div>').join("");
+ document.getElementById("pageContent").innerHTML=careerBanner(c)+'<div class="topbar"><div><div class="page-title">Edit Match</div><div class="page-subtitle">Edit the match and every player performance using the same full-page layout as match entry.</div></div><button class="secondary-btn" onclick="renderMatches()">Cancel</button></div><form id="editManagerMatchForm" class="panel" onsubmit="saveManagerMatchEdit(event,\''+escapeJS(m.id)+'\')"><div class="form-grid"><div class="form-group"><label>Date</label><input class="form-input" name="date" type="date" required value="'+escapeHTML(m.date||"")+'"></div><div class="form-group"><label>Competition</label><select class="form-select" name="competition" id="editManagerCompetition" onchange="populateManagerEditOpponents(\''+escapeJS(m.opponent||"")+'\')" required>'+competitionOptions.map(x=>'<option value="'+escapeHTML(x)+'" '+(x===m.competition?"selected":"")+'>'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="form-group"><label>Home / Away</label><select class="form-select" name="homeAway"><option value="Home" '+((m.homeAway||"Home")==="Home"?"selected":"")+'>Home</option><option value="Away" '+(m.homeAway==="Away"?"selected":"")+'>Away</option></select></div><div class="form-group"><label>Opponent</label><select class="form-select" name="opponent" id="editManagerOpponent" required>'+teams.map(x=>'<option value="'+escapeHTML(x)+'" '+(x===m.opponent?"selected":"")+'>'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="form-group full"><label>Score (your team – opponent)</label><div class="score-inputs"><input class="form-input" name="goalsFor" type="number" min="0" required value="'+Number(m.goalsFor||0)+'"><span>–</span><input class="form-input" name="goalsAgainst" type="number" min="0" required value="'+Number(m.goalsAgainst||0)+'"></div></div></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid #252c35"><div class="panel-title">Player Performance</div><div class="panel-subtitle">Edit, remove, or add player rows. Leave rating or minutes blank if unknown.</div><div class="player-entry player-entry-header" style="grid-template-columns:minmax(130px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px"><div>Player</div><div>Rating</div><div>Goals</div><div>Assists</div><div>Minutes</div><div>Saves</div><div>Yellow</div><div>Red</div><div></div></div><datalist id="editManagerPlayerOptions">'+playerNames.map(n=>'<option value="'+escapeHTML(n)+'"></option>').join("")+'</datalist><div id="editManagerPlayers" class="player-entry-list">'+rows+'</div><button type="button" class="secondary-btn" onclick="addManagerEditPlayer()">+ Add Player</button></div><div class="modal-actions"><button type="button" class="secondary-btn" onclick="renderMatches()">Cancel</button><button type="submit" class="primary-btn">Save Match Changes</button></div></form>';
+}
+function addManagerEditPlayer(){
+ const box=document.getElementById("editManagerPlayers");if(!box)return;
+ const row=document.createElement("div");row.className="player-entry";row.dataset.editPlayerRow="";row.style.gridTemplateColumns="minmax(130px,1.5fr) repeat(7,minmax(58px,.65fr)) 34px";
+ row.innerHTML='<input class="form-input" data-field="name" list="editManagerPlayerOptions" placeholder="Player"><input class="form-input" data-field="rating" type="number" min="0" max="10" step=".1" placeholder="—"><input class="form-input" data-field="goals" type="number" min="0" value="0"><input class="form-input" data-field="assists" type="number" min="0" value="0"><input class="form-input" data-field="minutes" type="number" min="0" max="130" placeholder="—"><input class="form-input" data-field="saves" type="number" min="0" placeholder="—"><input class="form-input" data-field="yellowCards" type="number" min="0" value="0"><input class="form-input" data-field="redCards" type="number" min="0" value="0"><button type="button" class="remove-player" onclick="this.closest(\'[data-edit-player-row]\').remove()">×</button>';
+ box.appendChild(row);
+}
+function populateManagerEditOpponents(current){
+ const c=getCurrentCareer(),competition=document.getElementById("editManagerCompetition")?.value,select=document.getElementById("editManagerOpponent");if(!c||!select)return;
+ const values=[...new Set([...getCompetitionTeams(competition),current||""])].filter(Boolean).filter(x=>x.toLowerCase()!==String(c.clubName||"").toLowerCase()).sort((a,b)=>a.localeCompare(b));
+ select.innerHTML=values.map(x=>'<option value="'+escapeHTML(x)+'" '+(x===current?"selected":"")+'>'+escapeHTML(x)+'</option>').join("");
+}
+function saveManagerMatchEdit(event,id){
+ event.preventDefault();const c=getCurrentCareer();if(!c)return;const m=(c.matches||[]).find(x=>String(x.id)===String(id));if(!m)return;
+ const f=event.target, val=n=>f.elements.namedItem(n)?.value||"", num=n=>Number(val(n)||0);
+ const date=val("date"),competition=val("competition").trim(),opponent=val("opponent").trim(),gf=num("goalsFor"),ga=num("goalsAgainst");
+ if(!date||!competition||!opponent||![gf,ga].every(n=>Number.isFinite(n)&&n>=0)){alert("Please check the date, competition, opponent and score.");return;}
+ const players=[];
+ document.querySelectorAll("#editManagerPlayers [data-edit-player-row]").forEach(row=>{const get=n=>row.querySelector('[data-field="'+n+'"]')?.value??"",name=get("name").trim();if(!name)return;const optional=n=>get(n)===""?null:Number(get(n));players.push({name,rating:optional("rating"),goals:Number(get("goals")||0),assists:Number(get("assists")||0),minutes:optional("minutes"),saves:optional("saves"),yellowCards:Number(get("yellowCards")||0),redCards:Number(get("redCards")||0),cards:Number(get("redCards")||0)>0?"Red":Number(get("yellowCards")||0)>0?"Yellow":null});});
+ m.date=date;m.competition=competition;m.opponent=opponent;m.homeAway=val("homeAway")==="Away"?"Away":"Home";m.goalsFor=gf;m.goalsAgainst=ga;m.result=gf>ga?"W":gf<ga?"L":"D";m.cleanSheet=ga===0;m.players=players;
  saveCareers();renderMatches();
 }
 function deleteMatch(id){
@@ -6279,12 +6275,14 @@ function renderPlayerCareerPage(page){
     const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     const opponents=[...new Set(history.map(m=>m.opponent).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-    html+='<div class="panel"><div class="panel-title">Full History</div><div class="panel-subtitle">Every club and international appearance in one place. Filter by opponent or competition to compare your performances.</div><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter competition</label><select class="form-input" id="fullHistoryCompetition" onchange="filterPlayerFullHistory()"><option value="">All competitions</option>'+competitions.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Filter opponent</label><select class="form-input" id="fullHistoryOpponent" onchange="filterPlayerFullHistory()"><option value="">All opponents</option>'+opponents.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Match type</label><select class="form-input" id="fullHistoryType" onchange="filterPlayerFullHistory()"><option value="">Club + International</option><option value="club">Club only</option><option value="international">International only</option></select></div></div><div id="fullHistoryTable" style="margin-top:14px">'+playerFullHistoryTable(history)+'</div></div>';
+    const seasons=[...new Set(history.map(m=>m.season).filter(Boolean))].sort((a,b)=>String(b).localeCompare(String(a)));
+    html+='<div class="panel"><div class="topbar"><div><div class="panel-title">Full History Dashboard</div><div class="panel-subtitle">Career-wide stats and every match/appearance, with filters that update the totals below.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="form-grid"><div class="setup-section"><label class="setup-label">Season</label><select class="form-input" id="fullHistorySeason" onchange="filterPlayerFullHistory()"><option value="">All seasons</option>'+seasons.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Competition</label><select class="form-input" id="fullHistoryCompetition" onchange="filterPlayerFullHistory()"><option value="">All competitions</option>'+competitions.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Opponent</label><select class="form-input" id="fullHistoryOpponent" onchange="filterPlayerFullHistory()"><option value="">All opponents</option>'+opponents.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Match type</label><select class="form-input" id="fullHistoryType" onchange="filterPlayerFullHistory()"><option value="">Club + International</option><option value="club">Club only</option><option value="international">International only</option></select></div></div><div id="fullHistoryStats" class="match-summary-grid" style="margin-top:16px"></div><div id="fullHistoryTable" style="margin-top:14px">'+playerFullHistoryTable(history)+'</div></div>';
   }else{
     html+='<div class="panel"><div class="panel-title">Player Career</div><p>Choose a section from the sidebar.</p></div>';
   }
   content.innerHTML=html;
   document.querySelectorAll("#careerNavigation .nav-btn").forEach(function(btn){btn.classList.toggle("active",btn.dataset.page===page);});
+  if(page==="fullhistory"){filterPlayerFullHistory();}
 }
 
 function playerMatchesTable(matches){
@@ -6316,7 +6314,7 @@ function playerCareerCompetitionField(c,international){
   return '<select class="form-input" name="competition" required><option value="">Choose competition</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
 }
 function playerCareerCompetitionAddField(){
-  const options=[...new Set([...playerCareerDatabaseValues("league"),"FA Cup","Carabao Cup","Copa del Rey","Coppa Italia","Coupe de France","DFB-Pokal","Spanish Super Cup","Italian Super Cup","German Super Cup","Trophée des Champions","Domestic Cup","National Cup","Continental Cup","Champions League","Europa League","Conference League","Friendly"])].sort((a,b)=>a.localeCompare(b));
+  const options=[...new Set([...playerCareerDatabaseValues("league"),"FA Cup","Carabao Cup","Copa del Rey","Coppa Italia","Coupe de France","DFB-Pokal","Spanish Super Cup","Italian Super Cup","German Super Cup","Trophée des Champions","English League Cup","Spanish Cup","Italian Cup","French Cup","German Cup","Domestic Cup","National Cup","Continental Cup","Champions League","Europa League","Conference League","Friendly"])].sort((a,b)=>a.localeCompare(b));
   return '<select class="form-input" name="competition" required><option value="">Choose competition to add</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
 }
 function addPlayerCareerCompetition(event){
@@ -6360,9 +6358,30 @@ function selectPlayerCareerMatchDropdown(id,value){
 }
 function playerFullHistoryTable(matches){
   if(!matches.length)return '<p style="color:#8d97a3">No matches recorded yet.</p>';
-  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Type</th><th>Team</th><th>Opponent</th><th>Competition</th><th>Score</th><th>Rating</th><th>G</th><th>A</th><th>Min</th><th></th></tr></thead><tbody>';
-  matches.forEach(m=>{html+='<tr data-full-history-row data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-type="'+(m.international?"international":"club")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td><button class="delete-btn" onclick="deletePlayerMatch(\''+escapeJS(m.id)+'\')">Delete</button></td></tr>';});
+  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Type</th><th>Team</th><th>Opponent</th><th>Competition</th><th>Score</th><th>Rating</th><th>G</th><th>A</th><th>Min</th><th>YC</th><th>RC</th><th>Actions</th></tr></thead><tbody>';
+  matches.forEach(m=>{html+='<tr data-full-history-row data-season="'+escapeHTML(m.season||"")+'" data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-type="'+(m.international?"international":"club")+'" data-goals="'+Number(m.goals||0)+'" data-assists="'+Number(m.assists||0)+'" data-minutes="'+Number(m.minutes||0)+'" data-yellow="'+Number(m.yellowCards||0)+'" data-red="'+Number(m.redCards||0)+'" data-rating="'+(m.rating==null?"":Number(m.rating))+'" data-result="'+escapeHTML(m.result||"")+'" data-cs="'+(m.cleanSheet?"1":"0")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td>'+Number(m.yellowCards||0)+'</td><td>'+Number(m.redCards||0)+'</td><td><button class="secondary-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="editPlayerMatch(this.dataset.matchId)">Edit</button> <button class="delete-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="deletePlayerMatch(this.dataset.matchId)">Delete</button></td></tr>';});
   return html+'</tbody></table></div>';
+}
+function updatePlayerFullHistoryStats(){
+ const rows=[...document.querySelectorAll("[data-full-history-row]")].filter(r=>r.style.display!=="none");
+ const sum=k=>rows.reduce((n,r)=>n+Number(r.dataset[k]||0),0),goals=sum("goals"),assists=sum("assists"),minutes=sum("minutes"),yellow=sum("yellow"),red=sum("red");
+ const rated=rows.map(r=>r.dataset.rating).filter(x=>x!==""&&Number.isFinite(Number(x)));
+ const avg=rated.length?(rated.reduce((n,x)=>n+Number(x),0)/rated.length).toFixed(2):"—";
+ const trophies=(getCurrentCareer()?.trophies||[]).filter(t=>{const season=document.getElementById("fullHistorySeason")?.value||"";return (!season||String(t.season||"")===season);});
+ const countAward=pattern=>trophies.filter(t=>pattern.test(String(t.competition||""))).length;
+ const rate=n=>minutes?(n/minutes).toFixed(3):"—";
+ const cards=[["Appearances",rows.length],["Goals",goals],["Assists",assists],["Goals + Assists",goals+assists],["Minutes Played",minutes],["Yellow Cards",yellow],["Red Cards",red],["Average Rating",avg],["MOTM Awards",countAward(/motm|man of the match|player of the match/i)],["Player of Season",countAward(/player of the season|season player/i)],["Player of Month",countAward(/player of the month/i)],["Team of the Year",countAward(/team of the year|toty/i)],["Goals / Minute",rate(goals)],["Assists / Minute",rate(assists)],["G+A / Minute",rate(goals+assists)],["Goals per 90",minutes?(goals*90/minutes).toFixed(2):"—"],["Assists per 90",minutes?(assists*90/minutes).toFixed(2):"—"],["Clean Sheets",rows.filter(r=>r.dataset.cs==="1").length],["Wins",rows.filter(r=>r.dataset.result==="W").length],["Draws",rows.filter(r=>r.dataset.result==="D").length],["Losses",rows.filter(r=>r.dataset.result==="L").length]];
+ const box=document.getElementById("fullHistoryStats");if(box)box.innerHTML=cards.map(x=>playerStatCard(x[0],x[1])).join("");
+}
+function filterPlayerFullHistory(){
+ const season=document.getElementById("fullHistorySeason")?.value||"";
+ const competition=document.getElementById("fullHistoryCompetition")?.value||"";
+ const opponent=document.getElementById("fullHistoryOpponent")?.value||"";
+ const type=document.getElementById("fullHistoryType")?.value||"";
+ document.querySelectorAll("[data-full-history-row]").forEach(row=>{
+  row.style.display=(!season||row.dataset.season===season)&&(!competition||row.dataset.competition===competition)&&(!opponent||row.dataset.opponent===opponent)&&(!type||row.dataset.type===type)?"":"none";
+ });
+ updatePlayerFullHistoryStats();
 }
 function filterPlayerFullHistory(){
   const competition=document.getElementById("fullHistoryCompetition")?.value||"";
@@ -6411,21 +6430,20 @@ function savePlayerMatch(event,international){
 function editPlayerMatch(id){
  const c=getCurrentCareer();if(!c||!Array.isArray(c.matches))return;
  const m=c.matches.find(x=>String(x.id)===String(id));if(!m)return;
- const ask=(label,value)=>prompt(label,value==null?"":String(value));
- const date=ask("Match date (YYYY-MM-DD):",m.date||"");if(date===null)return;
- const opponent=ask("Opponent:",m.opponent||"");if(opponent===null)return;
- const competition=ask("Competition:",m.competition||"");if(competition===null)return;
- const homeAway=ask("Home or Away:",m.homeAway||"Home");if(homeAway===null)return;
- const gf=ask("Your team goals:",m.goalsFor??0);if(gf===null)return;
- const ga=ask("Opponent goals:",m.goalsAgainst??0);if(ga===null)return;
- const rating=ask("Your rating (leave blank if unknown):",m.rating??"");if(rating===null)return;
- const goals=ask("Your goals:",m.goals??0);if(goals===null)return;
- const assists=ask("Your assists:",m.assists??0);if(assists===null)return;
- const minutes=ask("Minutes played:",m.minutes??90);if(minutes===null)return;
- const yellow=ask("Yellow cards:",m.yellowCards??0);if(yellow===null)return;
- const red=ask("Red cards:",m.redCards??0);if(red===null)return;
- if([gf,ga,goals,assists,minutes,yellow,red].some(v=>!Number.isFinite(Number(v))||Number(v)<0)||(rating.trim()!==""&&!Number.isFinite(Number(rating)))){alert("Please enter valid numbers for the match details.");return;}
- m.date=date.trim();m.opponent=opponent.trim();m.competition=competition.trim();m.homeAway=/^away$/i.test(homeAway.trim())?"Away":"Home";m.goalsFor=Number(gf);m.goalsAgainst=Number(ga);m.result=m.goalsFor>m.goalsAgainst?"W":m.goalsFor<m.goalsAgainst?"L":"D";m.rating=rating.trim()===""?null:Number(rating);m.goals=Number(goals);m.assists=Number(assists);m.minutes=Number(minutes);m.yellowCards=Number(yellow);m.redCards=Number(red);
+ const international=!!m.international,p=c.player||{};
+ const competitions=international?["International Friendly","World Cup Qualifiers","World Cup","Continental Championship Qualifiers","Continental Championship","Nations League"]:playerCareerCompetitionOptions(c);
+ if(m.competition&&!competitions.includes(m.competition))competitions.push(m.competition);
+ const opponents=international?getCountryOptions():playerCareerOpponentValues(c,false);
+ if(m.opponent&&!opponents.includes(m.opponent))opponents.push(m.opponent);
+ const page=international?"national":"matches";
+ document.getElementById("pageContent").innerHTML='<div class="topbar"><div><div class="page-title">Edit Match</div><div class="page-subtitle">Update every detail below. This is the same full-page form layout used to add a match.</div></div><button class="secondary-btn" onclick="renderPlayerCareerPage(\''+page+'\')">Cancel</button></div><div class="panel"><form class="form-grid" onsubmit="savePlayerMatchEdit(event,\''+escapeJS(m.id)+'\')"><div class="setup-section"><label class="setup-label">Date *</label><input class="form-input" type="date" name="date" required value="'+escapeHTML(m.date||"")+'"></div><div class="setup-section"><label class="setup-label">Opponent *</label><input class="form-input" name="opponent" list="editPlayerOpponents" required value="'+escapeHTML(m.opponent||"")+'"><datalist id="editPlayerOpponents">'+opponents.map(x=>'<option value="'+escapeHTML(x)+'"></option>').join("")+'</datalist></div><div class="setup-section"><label class="setup-label">Competition *</label><select class="form-input" name="competition" required>'+competitions.map(x=>'<option value="'+escapeHTML(x)+'" '+(x===m.competition?"selected":"")+'>'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Venue</label><select class="form-input" name="homeAway"><option value="Home" '+((m.homeAway||"Home")==="Home"?"selected":"")+'>Home</option><option value="Away" '+(m.homeAway==="Away"?"selected":"")+'>Away</option><option value="Neutral" '+(m.homeAway==="Neutral"?"selected":"")+'>Neutral</option></select></div><div class="setup-section"><label class="setup-label">Your team goals</label><input class="form-input" name="goalsFor" type="number" min="0" value="'+Number(m.goalsFor||0)+'"></div><div class="setup-section"><label class="setup-label">Opponent goals</label><input class="form-input" name="goalsAgainst" type="number" min="0" value="'+Number(m.goalsAgainst||0)+'"></div><div class="setup-section"><label class="setup-label">Player rating (0–10)</label><input class="form-input" name="rating" type="number" min="0" max="10" step="0.1" value="'+(m.rating==null?"":escapeHTML(String(m.rating)))+'" placeholder="e.g. 7.4"></div><div class="setup-section"><label class="setup-label">Minutes played</label><input class="form-input" name="minutes" type="number" min="0" max="130" value="'+Number(m.minutes||0)+'"></div><div class="setup-section"><label class="setup-label">Goals</label><input class="form-input" name="goals" type="number" min="0" value="'+Number(m.goals||0)+'"></div><div class="setup-section"><label class="setup-label">Assists</label><input class="form-input" name="assists" type="number" min="0" value="'+Number(m.assists||0)+'"></div><div class="setup-section"><label class="setup-label">Yellow cards</label><input class="form-input" name="yellowCards" type="number" min="0" value="'+Number(m.yellowCards||0)+'"></div><div class="setup-section"><label class="setup-label">Red cards</label><input class="form-input" name="redCards" type="number" min="0" value="'+Number(m.redCards||0)+'"></div><div class="setup-section"><label class="setup-label">Position played</label><input class="form-input" name="position" value="'+escapeHTML(m.position||p.position||"")+'"></div><div class="setup-section"><label class="setup-label">Clean sheet (goalkeepers)</label><select class="form-input" name="cleanSheet"><option value="false" '+(!m.cleanSheet?"selected":"")+'>No</option><option value="true" '+(m.cleanSheet?"selected":"")+'>Yes</option></select></div><div class="setup-section" style="align-self:end;display:flex;gap:8px"><button class="primary-btn" type="submit">Save Match Changes</button><button class="secondary-btn" type="button" onclick="renderPlayerCareerPage(\''+page+'\')">Cancel</button></div></form></div>';
+}
+function savePlayerMatchEdit(event,id){
+ event.preventDefault();const c=getCurrentCareer();if(!c)return;const m=(c.matches||[]).find(x=>String(x.id)===String(id));if(!m)return;
+ const f=event.target,val=n=>f.elements.namedItem(n)?.value||"",num=n=>Number(val(n)||0),ratingText=val("rating");
+ const gf=num("goalsFor"),ga=num("goalsAgainst"),goals=num("goals"),assists=num("assists"),minutes=num("minutes"),yellow=num("yellowCards"),red=num("redCards");
+ if(!val("date")||!val("opponent").trim()||!val("competition").trim()||[gf,ga,goals,assists,minutes,yellow,red].some(n=>!Number.isFinite(n)||n<0)||(ratingText!==""&&(!Number.isFinite(Number(ratingText))||Number(ratingText)<0||Number(ratingText)>10))){alert("Please check the date and enter valid match statistics.");return;}
+ Object.assign(m,{date:val("date"),opponent:val("opponent").trim(),competition:val("competition").trim(),homeAway:val("homeAway")||"Home",goalsFor:gf,goalsAgainst:ga,result:gf>ga?"W":gf<ga?"L":"D",rating:ratingText===""?null:Number(ratingText),minutes,goals,assists,yellowCards:yellow,redCards:red,position:val("position")||c.player?.position,cleanSheet:val("cleanSheet")==="true"});
  saveCareers();renderPlayerCareerPage(m.international?"national":"matches");
 }
 
