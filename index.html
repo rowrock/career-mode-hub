@@ -6071,8 +6071,7 @@ async function loadCloudCareers(){
     const local=Array.isArray(careers)?careers:[],remote=data&&Array.isArray(data.careers)?data.careers:[];
     if(remote.length){
       const byId=new Map();remote.forEach(c=>byId.set(String(c.id),c));local.forEach(c=>byId.set(String(c.id),c));careers=Array.from(byId.values());
-      localStorage.setItem("careerModeHubCareers",JSON.stringify(careers));if(currentCareerId&&!careers.some(c=>c.id===currentCareerId))currentCareerId=null;showPage(currentCareerId?"mycareer":"dashboard");
-      if(local.length)alert("Cloud saves loaded. Existing careers on this device were kept and merged. If the same career existed in both places, the version on this device was kept.");
+      localStorage.setItem("careerModeHubCareers",JSON.stringify(careers));if(currentCareerId&&!careers.some(c=>c.id===currentCareerId))currentCareerId=null;showPage(document.body.dataset.page||(currentCareerId?"mycareer":"dashboard"));
     }
     cloudReady=true;updateAccountPanel();
     if(remote.length===0&&local.length){
