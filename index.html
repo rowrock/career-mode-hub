@@ -6322,7 +6322,7 @@ function renderPlayerCareerPage(page){
   content.innerHTML=html;
   if(page==="competitions")renderPlayerTrophyCatalogue();
   document.querySelectorAll("#careerNavigation .nav-btn").forEach(function(btn){btn.classList.toggle("active",btn.dataset.page===page);});
-  if(page==="fullhistory"){filterPlayerFullHistory();}
+  if(page==="fullhistory"){try{filterPlayerFullHistory();}catch(err){console.error("Full Career statistics failed:",err);const box=document.getElementById("fullHistoryStats");if(box)box.innerHTML='<p style="color:#fca5a5">Full Career statistics could not load. Please refresh and try again.</p>';}}
 }
 
 function playerMatchesTable(matches){
