@@ -6404,13 +6404,12 @@ function historyMetricCard(label,value,tone){
 }
 function renderPositionPitch(rows){
  const positions=[
-  {name:"CF",label:"Centre Forward",x:37,y:15},{name:"ST",label:"Striker",x:63,y:15},
+  {name:"ST",label:"Striker",x:50,y:15},
   {name:"LW",label:"Left Winger",x:18,y:29},{name:"CAM",label:"Attacking Midfielder",x:50,y:32},{name:"RW",label:"Right Winger",x:82,y:29},
   {name:"LM",label:"Left Midfielder",x:16,y:46},{name:"CM",label:"Central Midfielder",x:50,y:48},{name:"RM",label:"Right Midfielder",x:84,y:46},
   {name:"CDM",label:"Defensive Midfielder",x:50,y:61},
   {name:"LB",label:"Left Back",x:18,y:76},{name:"CB",label:"Centre Back",x:50,y:76},{name:"RB",label:"Right Back",x:82,y:76},
-  {name:"GK",label:"Goalkeeper",x:50,y:91},
-  {name:"LWB",label:"Left Wing Back",x:10,y:62},{name:"RWB",label:"Right Wing Back",x:90,y:62}
+  {name:"GK",label:"Goalkeeper",x:50,y:91}
  ];
  const norm=v=>String(v||"").trim().toLowerCase().replace(/[^a-z]/g,"");
  const aliases={gk:"GK",goalkeeper:"GK",lb:"LB",leftback:"LB",cb:"CB",centreback:"CB",centerback:"CB",rb:"RB",rightback:"RB",lwb:"LWB",leftwingback:"LWB",rwb:"RWB",rightwingback:"RWB",cdm:"CDM",defensivemidfielder:"CDM",cm:"CM",centralmidfielder:"CM",lm:"LM",leftmidfielder:"LM",rm:"RM",rightmidfielder:"RM",lw:"LW",leftwinger:"LW",rw:"RW",rightwinger:"RW",cam:"CAM",attackingmidfielder:"CAM",cf:"CF",centreforward:"CF",centerforward:"CF",st:"ST",striker:"ST"};
