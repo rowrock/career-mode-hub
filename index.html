@@ -6018,6 +6018,25 @@ async function flushCloudSave(){
    Separate saves share the existing backup and cloud-save system.
 ========================================================= */
 
+function playerCareerDropdownOptions(values, placeholder){
+  const clean=[...new Set((values||[]).map(v=>String(v||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  return '<option value="">'+escapeHTML(placeholder)+'</option>'+clean.map(v=>'<option value="'+escapeHTML(v)+'">'+escapeHTML(v)+'</option>').join("");
+}
+function playerCareerDatabaseValues(field){
+  return [...new Set((Array.isArray(allPlayers)?allPlayers:[]).map(p=>p&&p[field]).filter(Boolean).map(v=>String(v).trim()))].sort((a,b)=>a.localeCompare(b));
+}
+function updatePlayerCareerClubOptions(){
+  const league=document.getElementById("pcLeague")?.value||"";
+  const club=document.getElementById("pcClub");
+  if(!club)return;
+  const clubs=(Array.isArray(allPlayers)?allPlayers:[])
+    .filter(p=>!league||String(p.league||"")===league)
+    .map(p=>p.club).filter(Boolean);
+  const previous=club.value;
+  club.innerHTML=playerCareerDropdownOptions(clubs,"Choose team");
+  if(previous&&[...club.options].some(o=>o.value===previous))club.value=previous;
+}
+
 function startNewPlayerCareer(){
   currentCareerId=null;
   updateNavigation();
@@ -6029,14 +6048,14 @@ function startNewPlayerCareer(){
         '<div class="setup-section"><label class="setup-label" for="pcName">Player name *</label><input class="form-input" id="pcName" required maxlength="70" placeholder="e.g. Alex Smith"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcPosition">Position *</label><select class="form-input" id="pcPosition" required><option value="">Choose position</option><option>GK</option><option>RB</option><option>CB</option><option>LB</option><option>RWB</option><option>LWB</option><option>CDM</option><option>CM</option><option>CAM</option><option>RM</option><option>LM</option><option>RW</option><option>LW</option><option>CF</option><option>ST</option></select></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcAge">Age</label><input class="form-input" id="pcAge" type="number" min="15" max="50" value="18"></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcNationality">Nationality</label><input class="form-input" id="pcNationality" placeholder="e.g. Australia"></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcClub">Starting club *</label><input class="form-input" id="pcClub" required placeholder="e.g. Sydney FC"></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcLeague">League / competition</label><input class="form-input" id="pcLeague" placeholder="e.g. A-League Men"></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcNationality">Nationality</label><select class="form-input" id="pcNationality">' + playerCareerDropdownOptions(getCountryOptions(),"Choose nationality") + '</select></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcClub">Starting club *</label><select class="form-input" id="pcClub" required>' + playerCareerDropdownOptions(playerCareerDatabaseValues("club"),"Choose team") + '</select></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcLeague">League / competition</label><select class="form-input" id="pcLeague" onchange="updatePlayerCareerClubOptions()">' + playerCareerDropdownOptions(playerCareerDatabaseValues("league"),"Choose league") + '</select></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcOverall">Starting overall</label><input class="form-input" id="pcOverall" type="number" min="1" max="99" value="65"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcFoot">Preferred foot</label><select class="form-input" id="pcFoot"><option>Right</option><option>Left</option><option>Both</option></select></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcShirt">Shirt number</label><input class="form-input" id="pcShirt" type="number" min="1" max="99" value="9"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcSeason">Starting season</label><input class="form-input" id="pcSeason" value="2026/27" required></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcNationalTeam">National team (optional)</label><input class="form-input" id="pcNationalTeam" placeholder="e.g. Australia"></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcNationalTeam">National team (optional)</label><select class="form-input" id="pcNationalTeam">' + playerCareerDropdownOptions(getCountryOptions(),"No national team") + '</select></div>'+
       '</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px"><button class="primary-btn" type="submit">Create Player Career</button><button class="secondary-btn" type="button" onclick="renderDashboard()">Cancel</button></div>'+
     '</form>';
 }
