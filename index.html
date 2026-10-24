@@ -6427,7 +6427,7 @@ function renderPositionPitch(rows){
  });
  const ratingStyle=d=>{
   if(!d.games||!d.ratingCount)return {color:"#9aa7b8",border:"rgba(148,163,184,.38)",glow:"none",pill:"#374151",text:"#e5e7eb",avg:"—"};
-  const avg=d.ratingTotal/d.ratingCount;
+  const avg=Number((d.ratingTotal/d.ratingCount).toFixed(2));
   if(avg>=8)return {color:"#4ade80",border:"rgba(74,222,128,.95)",glow:"0 0 18px rgba(34,197,94,.15)",pill:"#4ade80",text:"#052e16",avg:avg.toFixed(1)};
   if(avg>=6)return {color:"#fbbf24",border:"rgba(251,191,36,.95)",glow:"0 0 18px rgba(245,158,11,.12)",pill:"#fbbf24",text:"#422006",avg:avg.toFixed(1)};
   return {color:"#fb7185",border:"rgba(251,113,133,.95)",glow:"0 0 18px rgba(244,63,94,.12)",pill:"#fb7185",text:"#4c0519",avg:avg.toFixed(1)};
@@ -6478,7 +6478,7 @@ function updatePlayerFullHistoryStats(){
  box.innerHTML=
   '<section class="history-section"><h3 class="history-section-title">Player Performance</h3><div class="history-stat-grid">'+
   historyMetricCard("Appearances",apps)+historyMetricCard("Goals",goals)+historyMetricCard("Assists",assists)+
-  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg,avg==="—"?"rating-neutral":Number(Number(avg).toFixed(1))>=8?"rating-green":Number(Number(avg).toFixed(1))>=6?"rating-amber":"rating-red")+historyMetricCard("Total Minutes Played",minutes)+
+  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg,avg==="—"?"rating-neutral":Number(avg)>=8?"rating-green":Number(avg)>=6?"rating-amber":"rating-red")+historyMetricCard("Total Minutes Played",minutes)+
   '</div></section>'+
   '<section class="history-section"><h3 class="history-section-title">Match Record</h3><div class="history-stat-grid">'+
   historyMetricCard("Wins",wins,"win")+historyMetricCard("Draws",draws,"draw")+historyMetricCard("Losses",losses,"loss")+
