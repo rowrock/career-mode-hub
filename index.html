@@ -6457,6 +6457,7 @@ function renderPlayerRatingsTrend(c){
  return '<section class="history-section"><h3 class="history-section-title">Ratings Over Time</h3><p class="panel-subtitle">Average match rating by season</p><div style="border:1px solid #252525;border-radius:20px;padding:14px;background:#050505"><svg viewBox="0 0 '+W+' '+H+'" style="display:block;width:100%;height:auto">'+grid+(line?'<polyline points="'+line+'" fill="none" stroke="#2563eb" stroke-width="3"/>':"")+pts+labels+'</svg>'+(v.length?"":'<p style="color:#aaa">Record match ratings to build your graph. No sample data is used.</p>')+'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px"><div><span>Current average</span><br><strong>'+(cur===null?"—":cur.toFixed(2))+'</strong></div><div><span>Best season</span><br><strong>'+(best===null?"—":best.toFixed(2))+'</strong></div><div><span>Trend</span><br><strong style="color:'+(tr.includes("Improving")?"#4ade80":tr.includes("Declining")?"#fb7185":"#fbbf24")+'">'+tr+'</strong></div></div></div></section>';
 }
 function updatePlayerFullHistoryStats(){
+ const c=getCurrentCareer();
  const rows=[...document.querySelectorAll("[data-full-history-row]")].filter(r=>r.style.display!=="none");
  const sum=k=>rows.reduce((n,r)=>n+Number(r.dataset[k]||0),0);
  const goals=sum("goals"),assists=sum("assists"),minutes=sum("minutes"),yellow=sum("yellow"),red=sum("red");
