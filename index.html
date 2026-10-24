@@ -1034,6 +1034,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .history-stat-card.win{border-color:#28533f;background:#14251e}.history-stat-card.win .history-stat-value{color:#75d6a2}
 .history-stat-card.draw{border-color:#665526;background:#292316}.history-stat-card.draw .history-stat-value{color:#f2d16d}
 .history-stat-card.loss{border-color:#66323a;background:#2a171b}.history-stat-card.loss .history-stat-value{color:#ff8e98}
+.history-stat-card.rating-green{border-color:#25834a;background:#10271d}.history-stat-card.rating-green .history-stat-value{color:#4ade80}
+.history-stat-card.rating-amber{border-color:#8a6a1a;background:#2b2412}.history-stat-card.rating-amber .history-stat-value{color:#fbbf24}
+.history-stat-card.rating-red{border-color:#8a3545;background:#2c171d}.history-stat-card.rating-red .history-stat-value{color:#fb7185}
+.history-stat-card.rating-neutral{border-color:#475569;background:#1b2430}.history-stat-card.rating-neutral .history-stat-value{color:#9aa7b8}
 .history-stat-card.yellow{border-color:#665526;background:#292316}.history-stat-card.yellow .history-stat-value{color:#f2d16d}
 .history-stat-card.red{border-color:#66323a;background:#2a171b}.history-stat-card.red .history-stat-value{color:#ff8e98}
 .history-winrate{display:flex;align-items:center;gap:14px;margin-top:16px}
@@ -6474,7 +6478,7 @@ function updatePlayerFullHistoryStats(){
  box.innerHTML=
   '<section class="history-section"><h3 class="history-section-title">Player Performance</h3><div class="history-stat-grid">'+
   historyMetricCard("Appearances",apps)+historyMetricCard("Goals",goals)+historyMetricCard("Assists",assists)+
-  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg)+historyMetricCard("Total Minutes Played",minutes)+
+  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg,avg==="—"?"rating-neutral":Number(avg)>=8?"rating-green":Number(avg)>=6?"rating-amber":"rating-red")+historyMetricCard("Total Minutes Played",minutes)+
   '</div></section>'+
   '<section class="history-section"><h3 class="history-section-title">Match Record</h3><div class="history-stat-grid">'+
   historyMetricCard("Wins",wins,"win")+historyMetricCard("Draws",draws,"draw")+historyMetricCard("Losses",losses,"loss")+
