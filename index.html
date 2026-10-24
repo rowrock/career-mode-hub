@@ -6255,6 +6255,7 @@ function renderPlayerCareerPage(page){
   }else if(page==="competitions"){
     const participating=(c.participatingCompetitions||(c.participatingCompetitions=[]));
     html+='<div class="panel"><div class="panel-title">Competitions I\'m Participating In</div><div class="panel-subtitle">Only competitions listed here appear in the match-entry competition dropdown. Your current league is added automatically.</div><form onsubmit="addPlayerCareerCompetition(event)" class="form-grid"><div class="setup-section"><label class="setup-label">Competition</label>'+playerCareerCompetitionAddField()+'</div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Add Competition</button></div></form><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+participating.map(x=>'<span class="secondary-btn" style="display:inline-flex;gap:8px;align-items:center">'+escapeHTML(x)+' <button type="button" class="delete-btn" onclick="removePlayerCareerCompetition(\''+escapeJS(x)+'\')">×</button></span>').join("")+'</div></div><div class="topbar" style="margin-top:18px"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player\'s career.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
+   html+='<div class="panel" style="margin-top:18px"><div class="panel-title">Competition Trophy Catalogue</div><div class="panel-subtitle">Use the same join competition / mark as won workflow as Manager Career.</div><input id="playerTrophyCatalogueSearch" class="search-input" placeholder="Search competitions..." oninput="renderPlayerTrophyCatalogue()"><div id="playerTrophyCatalogueGrid" class="careers-grid" style="margin-top:14px"></div></div><div class="panel" style="margin-top:18px"><div class="panel-title">Individual Awards</div><div class="panel-subtitle">Record Man of the Match, Team of the Week, Player of the Month, Player of the Year, Ballon d'Or and more.</div><form onsubmit="addPlayerIndividualAward(event)" class="form-grid"><div class="setup-section"><label class="setup-label">Award</label>'+playerAwardTypeField()+'</div><div class="setup-section"><label class="setup-label">Date won *</label><input class="form-input" type="date" name="awardDate" required></div><div class="setup-section"><label class="setup-label">Competition *</label>'+playerCareerCompetitionField(c)+'</div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Individual Award</button></div></form></div>';
   }else if(page==="trophies"){
     html+='<div class="topbar"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player\'s career.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
   }else if(page==="past"){
@@ -6283,6 +6284,7 @@ function renderPlayerCareerPage(page){
     html+='<div class="panel"><div class="panel-title">Player Career</div><p>Choose a section from the sidebar.</p></div>';
   }
   content.innerHTML=html;
+  if(page==="competitions")renderPlayerTrophyCatalogue();
   document.querySelectorAll("#careerNavigation .nav-btn").forEach(function(btn){btn.classList.toggle("active",btn.dataset.page===page);});
   if(page==="fullhistory"){filterPlayerFullHistory();}
 }
@@ -6513,6 +6515,48 @@ function playerClubHistoryTable(c){
   return html+'</tbody></table></div>';
 }
 
+function playerAwardTypeField(){
+ const awards=["Man of the Match","Team of the Week","Player of the Month","Player of the Year","Ballon d'Or","Golden Boot","Golden Glove","Player of the Tournament","Team of the Season","Team of the Year","PFA Player of the Year","Young Player of the Year","FIFA The Best","Puskás Award","Golden Boy","Other Individual Award"];
+ return '<select class="form-input" name="award" required>'+awards.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
+}
+function renderPlayerTrophyCatalogue(){
+ const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const box=document.getElementById("playerTrophyCatalogueGrid");if(!box)return;
+ const q=(document.getElementById("playerTrophyCatalogueSearch")?.value||"").toLowerCase().trim();
+ const names=trophyCatalogueNames(c).filter(n=>n.toLowerCase().includes(q));
+ const active=new Set(playerCareerCompetitionOptions(c).map(n=>n.toLowerCase()));
+ box.innerHTML=names.map(function(n){
+  const joined=active.has(n.toLowerCase());
+  const won=(c.trophies||[]).some(t=>(t.type||"").toLowerCase()==="team trophy"&&String(t.competition||"").toLowerCase()===n.toLowerCase()&&String(t.season||"")===String(c.currentSeason||""));
+  const action=joined?(won?'<button class="secondary-btn" disabled>Already marked won</button>':'<button class="primary-btn" onclick="recordPlayerCompetitionTrophy(\''+escapeJS(n)+'\')">Mark as Won</button>'):'<button class="primary-btn" onclick="joinPlayerCareerCompetition(\''+escapeJS(n)+'\')">Join Competition</button>';
+  return '<div class="career-card trophy-catalogue-card">'+trophyImageMarkup(n)+'<div class="career-name">'+escapeHTML(n)+'</div><div class="career-league">'+(joined?"Participating this season":"Not participating")+'</div>'+action+'</div>';
+ }).join("")||'<div class="empty-state">No competitions match your search.</div>';
+}
+function joinPlayerCareerCompetition(name){
+ const c=getCurrentCareer();if(!c||c.mode!=="player"||!name)return;
+ if(!Array.isArray(c.participatingCompetitions))c.participatingCompetitions=[];
+ if(!c.participatingCompetitions.some(x=>String(x).toLowerCase()===name.toLowerCase()))c.participatingCompetitions.push(name);
+ saveCareers();renderPlayerCareerPage("competitions");
+}
+function recordPlayerCompetitionTrophy(name){
+ const c=getCurrentCareer();if(!c||c.mode!=="player"||!name)return;
+ if(!playerCareerCompetitionOptions(c).some(x=>x.toLowerCase()===name.toLowerCase())){alert("Join this competition before marking its trophy as won.");return;}
+ const team=prompt("Which team won "+name+"?",c.clubName||"");if(team===null||!team.trim())return;
+ const season=prompt("Season won:",c.currentSeason||"");if(season===null||!season.trim())return;
+ if(!Array.isArray(c.trophies))c.trophies=[];
+ if(c.trophies.some(t=>(t.type||"").toLowerCase()==="team trophy"&&String(t.competition||"").toLowerCase()===name.toLowerCase()&&String(t.season||"")===season.trim()&&String(t.team||"")===team.trim())){alert("That trophy is already recorded for this team and season.");return;}
+ c.trophies.push({id:createId(),competition:name,type:"Team Trophy",season:season.trim(),date:todayDate(),team:team.trim(),playerCareer:true});
+ saveCareers();renderPlayerCareerPage("competitions");
+}
+function addPlayerIndividualAward(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const f=event.target,award=String(f.elements.namedItem("award")?.value||"").trim(),date=String(f.elements.namedItem("awardDate")?.value||""),competition=String(f.elements.namedItem("competition")?.value||"").trim();
+ if(!award||!date||!competition){alert("Choose an award, date and competition.");return;}
+ if(!playerCareerCompetitionOptions(c).some(x=>x.toLowerCase()===competition.toLowerCase())){alert("Please join that competition first.");return;}
+ if(!Array.isArray(c.trophies))c.trophies=[];
+ c.trophies.push({id:createId(),award:award,competition:competition,type:"Individual Award",date:date,season:c.currentSeason||"",team:c.clubName||"",playerCareer:true});
+ saveCareers();renderPlayerCareerPage("competitions");
+}
 function addPlayerTrophy(){
   const c=getCurrentCareer();if(!c)return;
   const name=prompt("Award or trophy name:","");if(name===null||!name.trim())return;
@@ -6524,11 +6568,11 @@ function addPlayerTrophy(){
 }
 
 function playerTrophyTable(c){
-  const trophies=(c.trophies||[]).slice().reverse();
-  if(!trophies.length)return '<p style="color:#8d97a3">No awards or trophies recorded yet.</p>';
-  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Award / Trophy</th><th>Type</th><th>Season</th><th>Club / Team</th><th></th></tr></thead><tbody>';
-  trophies.forEach(function(t,index){html+='<tr><td>'+escapeHTML(t.competition||"Trophy")+'</td><td>'+escapeHTML(t.type||"Award")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.team||"—")+'</td><td><button class="delete-btn" onclick="deletePlayerTrophy(\''+escapeJS(t.id)+'\')">Delete</button></td></tr>';});
-  return html+'</tbody></table></div>';
+   const trophies=(c.trophies||[]).slice().reverse();
+   if(!trophies.length)return '<p style="color:#8d97a3">No awards or trophies recorded yet.</p>';
+   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Award / Trophy</th><th>Type</th><th>Date</th><th>Competition</th><th>Season</th><th>Club / Team</th><th></th></tr></thead><tbody>';
+   trophies.forEach(function(t){const title=t.award||t.competition||"Trophy";html+='<tr><td>'+escapeHTML(title)+'</td><td>'+escapeHTML(t.type||"Award")+'</td><td>'+escapeHTML(t.date||"—")+'</td><td>'+escapeHTML(t.competition||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.team||"—")+'</td><td><button class="delete-btn" onclick="deletePlayerTrophy(\''+escapeJS(t.id)+'\')">Delete</button></td></tr>';});
+   return html+'</tbody></table></div>';
 }
 
 function deletePlayerTrophy(id){
