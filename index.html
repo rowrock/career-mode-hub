@@ -6288,7 +6288,7 @@ function renderPlayerCareerPage(page){
   }else if(page==="competitions"){
     const participating=(c.participatingCompetitions||(c.participatingCompetitions=[]));
     html+='<div class="panel"><div class="panel-title">Competitions I\'m Participating In</div><div class="panel-subtitle">Only competitions listed here appear in the match-entry competition dropdown. Your current league is added automatically.</div><form onsubmit="addPlayerCareerCompetition(event)" class="form-grid"><div class="setup-section"><label class="setup-label">Competition</label>'+playerCareerCompetitionAddField()+'</div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Add Competition</button></div></form><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+participating.map(x=>'<span class="secondary-btn" style="display:inline-flex;gap:8px;align-items:center">'+escapeHTML(x)+' <button type="button" class="delete-btn" onclick="removePlayerCareerCompetition(\''+escapeJS(x)+'\')">×</button></span>').join("")+'</div></div><div class="topbar" style="margin-top:18px"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player\'s career.</div></div><button class="primary-btn" onclick="renderPlayerCareerPage(\'competitions\')">Manage Awards & Competitions</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
-   html+='<div class="panel" style="margin-top:18px"><div class="panel-title">Competition Trophy Catalogue</div><div class="panel-subtitle">Use the same join competition / mark as won workflow as Manager Career.</div><input id="playerTrophyCatalogueSearch" class="search-input" placeholder="Search competitions..." oninput="renderPlayerTrophyCatalogue()"><div id="playerTrophyCatalogueGrid" class="careers-grid" style="margin-top:14px"></div></div><div class="panel" style="margin-top:18px"><div class="panel-title">Individual Awards</div><div class="panel-subtitle">Record Man of the Match, Team of the Week, Player of the Month, Player of the Year, Ballon d\'Or and more.</div><form onsubmit="addPlayerIndividualAward(event)" class="form-grid"><div class="setup-section"><label class="setup-label">Award</label>'+playerAwardTypeField()+'</div><div class="setup-section"><label class="setup-label">Date won (optional)</label><input class="form-input" type="date" name="awardDate"></div><div class="setup-section"><label class="setup-label">Competition (optional)</label>'+playerCareerCompetitionField(c)+'</div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Individual Award</button></div></form></div>';
+
    }else if(page==="trophies"){
     const allTrophies=c.trophies||[];
     const teamCount=allTrophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy").length;
@@ -6431,12 +6431,8 @@ function updatePlayerFullHistoryStats(){
   ["Team of the Year",/team of the year|toty/i],
   ["Golden Boot",/golden boot/i],
   ["Golden Glove",/golden glove/i],
-  ["Player of the Year",/player of the year/i],
   ["Player of the Tournament",/player of the tournament/i],
-  ["PFA Player of the Year",/pfa player of the year/i],
-  ["Young Player of the Year",/young player of the year|golden boy/i],
-  ["FIFA The Best",/fifa the best/i],
-  ["Puskás Award",/pusk.s award/i],
+  ["Playmaker of the Season",/playmaker of the season/i],
   ["Other Individual Awards",/other individual award/i]
  ];
  const awardRows=awardNames.map(([name,pattern])=>{
@@ -6601,7 +6597,7 @@ function playerClubHistoryTable(c){
 }
 
 function playerAwardTypeField(){
- const awards=["Man of the Match","Team of the Week","Player of the Month","Player of the Year","Ballon d'Or","Golden Boot","Golden Glove","Player of the Tournament","Team of the Season","Team of the Year","PFA Player of the Year","Young Player of the Year","FIFA The Best","Puskás Award","Golden Boy","Other Individual Award"];
+ const awards=["Man of the Match","Team of the Week","Player of the Month","Player of the Season","Playmaker of the Season","Ballon d'Or","Golden Boot","Golden Glove","Player of the Tournament","Team of the Season","Team of the Year","Golden Boy","Other Individual Award"];
  return '<select class="form-input" name="award" required>'+awards.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+(x==="Golden Boot"?" 👟":"")+'</option>').join("")+'</select>';
 }
 function renderPlayerTrophyCatalogue(){
@@ -6647,7 +6643,7 @@ function addPlayerTrophy(){renderPlayerCareerPage("competitions");}
 
 function playerAwardIcon(award){
  if(/ballon d.?or/i.test(String(award||"")))return '<div class="player-award-art ballon" aria-label="Ballon d’Or award">⚽</div>';
- if(/golden boot/i.test(String(award||"")))return '<div class="player-award-art" aria-label="Golden Boot award">👟</div>';
+ if(/golden boot|playmaker of the season/i.test(String(award||"")))return '<div class="player-award-art" aria-label="Golden Boot or Playmaker award">👟</div>';
  return '<div class="player-award-art" aria-label="Silver individual award trophy">🏆</div>';
 }
 function syncPlayerMotmAwards(c){
