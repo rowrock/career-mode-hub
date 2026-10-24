@@ -6355,7 +6355,7 @@ function playerCareerCompetitionField(c,international){
   return '<select class="form-input" name="competition"><option value="">No competition / individual award</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
 }
 function playerCareerCompetitionAddField(){
-  const options=[...new Set([...playerCareerDatabaseValues("league"),"FA Cup","Carabao Cup","Copa del Rey","Coppa Italia","Coupe de France","DFB-Pokal","Spanish Super Cup","Italian Super Cup","German Super Cup","Trophée des Champions","English League Cup","Spanish Cup","Italian Cup","French Cup","German Cup","Domestic Cup","National Cup","Continental Cup","Champions League","Europa League","Conference League","Friendly"])].sort((a,b)=>a.localeCompare(b));
+  const options=[...new Set([...playerCareerDatabaseValues("league"),"FA Cup","Carabao Cup","Copa del Rey","Coppa Italia","Coupe de France","DFB-Pokal","Spanish Super Cup","Italian Super Cup","German Super Cup","Trophée des Champions","English League Cup","Spanish Cup","Italian Cup","French Cup","German Cup","Domestic Cup","National Cup","Continental Cup","Champions League","Europa League","Friendly"])].sort((a,b)=>a.localeCompare(b));
   return '<select class="form-input" name="competition" required><option value="">Choose competition to add</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
 }
 function addPlayerCareerCompetition(event){
