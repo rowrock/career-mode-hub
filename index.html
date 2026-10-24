@@ -2362,7 +2362,7 @@ function normalizeTrophyCompetitionName(value){
 }
 function trophyCatalogueNames(c){
  var base=[
- "Premier League","EFL Championship","EFL League One","EFL League Two","EFL Championship Play-Off Winner","EFL League One Play-Off Winner","EFL League Two Play-Off Winner","FA Cup","EFL Cup","Community Shield",
+ "Premier League","EFL Championship","EFL League One","EFL League Two","EFL Championship Play-Off Winner","EFL League One Play-Off Winner","EFL League Two Play-Off Winner","FA Cup","Carabao Cup","EFL Cup","Community Shield",
  "LaLiga","LaLiga 2","Copa del Rey","Spanish Super Cup",
  "Serie A","Serie B","Coppa Italia","Italian Super Cup",
  "Bundesliga","2. Bundesliga","DFB-Pokal","German Super Cup",
@@ -6391,16 +6391,20 @@ function editPlayerMatch(id){
  const date=ask("Match date (YYYY-MM-DD):",m.date||"");if(date===null)return;
  const opponent=ask("Opponent:",m.opponent||"");if(opponent===null)return;
  const competition=ask("Competition:",m.competition||"");if(competition===null)return;
+ const homeAway=ask("Home or Away:",m.homeAway||"Home");if(homeAway===null)return;
  const gf=ask("Your team goals:",m.goalsFor??0);if(gf===null)return;
  const ga=ask("Opponent goals:",m.goalsAgainst??0);if(ga===null)return;
  const rating=ask("Your rating (leave blank if unknown):",m.rating??"");if(rating===null)return;
  const goals=ask("Your goals:",m.goals??0);if(goals===null)return;
  const assists=ask("Your assists:",m.assists??0);if(assists===null)return;
  const minutes=ask("Minutes played:",m.minutes??90);if(minutes===null)return;
- if([gf,ga,goals,assists,minutes].some(v=>!Number.isFinite(Number(v))||Number(v)<0)||(rating.trim()!==""&&!Number.isFinite(Number(rating)))){alert("Please enter valid numbers for the match details.");return;}
- m.date=date.trim();m.opponent=opponent.trim();m.competition=competition.trim();m.goalsFor=Number(gf);m.goalsAgainst=Number(ga);m.result=m.goalsFor>m.goalsAgainst?"W":m.goalsFor<m.goalsAgainst?"L":"D";m.rating=rating.trim()===""?null:Number(rating);m.goals=Number(goals);m.assists=Number(assists);m.minutes=Number(minutes);
+ const yellow=ask("Yellow cards:",m.yellowCards??0);if(yellow===null)return;
+ const red=ask("Red cards:",m.redCards??0);if(red===null)return;
+ if([gf,ga,goals,assists,minutes,yellow,red].some(v=>!Number.isFinite(Number(v))||Number(v)<0)||(rating.trim()!==""&&!Number.isFinite(Number(rating)))){alert("Please enter valid numbers for the match details.");return;}
+ m.date=date.trim();m.opponent=opponent.trim();m.competition=competition.trim();m.homeAway=/^away$/i.test(homeAway.trim())?"Away":"Home";m.goalsFor=Number(gf);m.goalsAgainst=Number(ga);m.result=m.goalsFor>m.goalsAgainst?"W":m.goalsFor<m.goalsAgainst?"L":"D";m.rating=rating.trim()===""?null:Number(rating);m.goals=Number(goals);m.assists=Number(assists);m.minutes=Number(minutes);m.yellowCards=Number(yellow);m.redCards=Number(red);
  saveCareers();renderPlayerCareerPage(m.international?"national":"matches");
 }
+
 function deletePlayerMatch(id){
   const c=getCurrentCareer();if(!c)return;
   const m=c.matches.find(x=>String(x.id)===String(id));if(!m)return;
