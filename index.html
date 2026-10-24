@@ -6101,7 +6101,7 @@ function renderPlayerCareerPage(page){
   const stats=playerCareerStats(c,c.currentSeason);
   const allStats=playerCareerStats(c,null);
   const content=document.getElementById("pageContent");
-  const header='<div class="topbar"><div><div class="page-title">'+escapeHTML(p.name||"Player Career")+'</div><div class="page-subtitle">'+escapeHTML(c.clubName||"No club")+' · '+escapeHTML(p.position||"Position not set")+' · Season '+escapeHTML(c.currentSeason||"")+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary-btn" onclick="showPage(\\'dashboard\\')">All Saves</button><button class="secondary-btn" onclick="editPlayerProfile()">Edit Profile</button></div></div>';
+  const header='<div class="topbar"><div><div class="page-title">'+escapeHTML(p.name||"Player Career")+'</div><div class="page-subtitle">'+escapeHTML(c.clubName||"No club")+' · '+escapeHTML(p.position||"Position not set")+' · Season '+escapeHTML(c.currentSeason||"")+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary-btn" onclick="showPage(\'dashboard\')">All Saves</button><button class="secondary-btn" onclick="editPlayerProfile()">Edit Profile</button></div></div>';
   let html=header;
   if(page==="mycareer"||page==="dashboard"){
     html+='<div class="match-summary-grid">'+playerStatCard("Season",c.currentSeason)+playerStatCard("Club Appearances",stats.appearances)+playerStatCard("Goals",stats.goals)+playerStatCard("Assists",stats.assists)+playerStatCard("Average Rating",stats.average)+playerStatCard("Overall",p.overall||"—")+'</div>'+
@@ -6170,7 +6170,7 @@ function playerMatchesTable(matches){
   if(!matches.length)return '<p style="color:#8d97a3">No matches recorded yet.</p>';
   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Opponent</th><th>Competition</th><th>Score</th><th>Rating</th><th>G</th><th>A</th><th>Min</th><th></th></tr></thead><tbody>';
   matches.forEach(function(m){
-    html+='<tr><td>'+escapeHTML(m.date||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+escapeHTML(String(m.goalsFor??0))+'–'+escapeHTML(String(m.goalsAgainst??0))+'</td><td>'+escapeHTML(m.rating===null||m.rating===undefined?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td><button class="delete-btn" onclick="deletePlayerMatch(\\''+escapeJS(m.id)+'\\')">Delete</button></td></tr>';
+    html+='<tr><td>'+escapeHTML(m.date||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+escapeHTML(String(m.goalsFor??0))+'–'+escapeHTML(String(m.goalsAgainst??0))+'</td><td>'+escapeHTML(m.rating===null||m.rating===undefined?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td><button class="delete-btn" onclick="deletePlayerMatch(\''+escapeJS(m.id)+'\')">Delete</button></td></tr>';
   });
   return html+'</tbody></table></div>';
 }
@@ -6179,7 +6179,7 @@ function playerCalendarTable(events){
   if(!events.length)return '<p style="color:#8d97a3">No fixtures yet. Add one above.</p>';
   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Opponent</th><th>Competition</th><th>Venue</th><th>Notes</th><th></th></tr></thead><tbody>';
   events.forEach(function(e){
-    html+='<tr><td>'+escapeHTML(e.date||"—")+'</td><td>'+escapeHTML(e.opponent||"—")+'</td><td>'+escapeHTML(e.competition||"—")+'</td><td>'+escapeHTML(e.homeAway||"—")+'</td><td>'+escapeHTML(e.notes||"")+'</td><td><button class="delete-btn" onclick="deletePlayerCalendarEvent(\\''+escapeJS(e.id)+'\\')">Delete</button></td></tr>';
+    html+='<tr><td>'+escapeHTML(e.date||"—")+'</td><td>'+escapeHTML(e.opponent||"—")+'</td><td>'+escapeHTML(e.competition||"—")+'</td><td>'+escapeHTML(e.homeAway||"—")+'</td><td>'+escapeHTML(e.notes||"")+'</td><td><button class="delete-btn" onclick="deletePlayerCalendarEvent(\''+escapeJS(e.id)+'\')">Delete</button></td></tr>';
   });
   return html+'</tbody></table></div>';
 }
@@ -6294,7 +6294,7 @@ function playerTrophyTable(c){
   const trophies=(c.trophies||[]).slice().reverse();
   if(!trophies.length)return '<p style="color:#8d97a3">No awards or trophies recorded yet.</p>';
   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Award / Trophy</th><th>Type</th><th>Season</th><th>Club / Team</th><th></th></tr></thead><tbody>';
-  trophies.forEach(function(t,index){html+='<tr><td>'+escapeHTML(t.competition||"Trophy")+'</td><td>'+escapeHTML(t.type||"Award")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.team||"—")+'</td><td><button class="delete-btn" onclick="deletePlayerTrophy(\\''+escapeJS(t.id)+'\\')">Delete</button></td></tr>';});
+  trophies.forEach(function(t,index){html+='<tr><td>'+escapeHTML(t.competition||"Trophy")+'</td><td>'+escapeHTML(t.type||"Award")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.team||"—")+'</td><td><button class="delete-btn" onclick="deletePlayerTrophy(\''+escapeJS(t.id)+'\')">Delete</button></td></tr>';});
   return html+'</tbody></table></div>';
 }
 
