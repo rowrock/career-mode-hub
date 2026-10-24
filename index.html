@@ -6478,7 +6478,7 @@ function updatePlayerFullHistoryStats(){
  box.innerHTML=
   '<section class="history-section"><h3 class="history-section-title">Player Performance</h3><div class="history-stat-grid">'+
   historyMetricCard("Appearances",apps)+historyMetricCard("Goals",goals)+historyMetricCard("Assists",assists)+
-  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg,avg==="—"?"rating-neutral":Number(avg)>=8?"rating-green":Number(avg)>=6?"rating-amber":"rating-red")+historyMetricCard("Total Minutes Played",minutes)+
+  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg,avg==="—"?"rating-neutral":Number(Number(avg).toFixed(1))>=8?"rating-green":Number(Number(avg).toFixed(1))>=6?"rating-amber":"rating-red")+historyMetricCard("Total Minutes Played",minutes)+
   '</div></section>'+
   '<section class="history-section"><h3 class="history-section-title">Match Record</h3><div class="history-stat-grid">'+
   historyMetricCard("Wins",wins,"win")+historyMetricCard("Draws",draws,"draw")+historyMetricCard("Losses",losses,"loss")+
