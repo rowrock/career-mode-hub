@@ -1023,6 +1023,38 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(max-width:700px){.sidebar{width:180px;padding:14px 8px}.main{margin-left:180px;padding:20px 12px}.logo{font-size:17px;padding-left:8px}.nav-btn{font-size:12px;padding:9px 8px;min-height:37px}.account-panel{margin:0 2px 18px}.page-title{font-size:24px}.topbar{align-items:flex-start;gap:13px}.panel{padding:15px}}
 @media(max-width:480px){.sidebar{width:150px;padding:12px 6px}.main{margin-left:150px;padding:17px 9px}.logo{font-size:15px;padding:6px 5px 18px}.nav-btn{font-size:11px;padding:8px 6px}.nav-title{padding-left:6px}.account-status{font-size:10px}.account-btn{font-size:11px;padding:8px 4px}.match-summary-grid{gap:7px}.match-stat{padding:11px}.match-stat-number{font-size:22px}.page-title{font-size:21px}.page-subtitle{font-size:12px}.career-banner-row{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Player Career history and awards */
+.history-section{margin-top:18px;background:#11161d;border:1px solid #252c35;border-radius:12px;padding:20px}
+.history-section-title{font-size:17px;font-weight:800;margin:0 0 14px}
+.history-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.history-stat-card{background:#171d25;border:1px solid #2a323d;border-radius:10px;padding:15px;min-width:0}
+.history-stat-label{color:#8d97a3;font-size:11px;text-transform:uppercase;letter-spacing:.45px;line-height:1.35}
+.history-stat-value{font-size:24px;font-weight:800;margin-top:8px;overflow-wrap:anywhere}
+.history-stat-card.win{border-color:#28533f;background:#14251e}.history-stat-card.win .history-stat-value{color:#75d6a2}
+.history-stat-card.draw{border-color:#665526;background:#292316}.history-stat-card.draw .history-stat-value{color:#f2d16d}
+.history-stat-card.loss{border-color:#66323a;background:#2a171b}.history-stat-card.loss .history-stat-value{color:#ff8e98}
+.history-stat-card.yellow{border-color:#665526;background:#292316}.history-stat-card.yellow .history-stat-value{color:#f2d16d}
+.history-stat-card.red{border-color:#66323a;background:#2a171b}.history-stat-card.red .history-stat-value{color:#ff8e98}
+.history-winrate{display:flex;align-items:center;gap:14px;margin-top:16px}
+.history-winrate-track{height:10px;flex:1;min-width:60px;background:#28313b;border-radius:999px;overflow:hidden}
+.history-winrate-fill{height:100%;background:linear-gradient(90deg,#3ba977,#75d6a2);border-radius:999px;transition:width .2s}
+.history-winrate-label{font-weight:800;font-size:16px;min-width:54px;text-align:right}
+.award-count-list{display:flex;flex-direction:column;gap:8px}
+.award-count-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;background:#171d25;border:1px solid #2a323d;border-radius:8px}
+.award-count-name{color:#dce2e9}.award-count-value{font-weight:800;color:#fff;min-width:26px;text-align:right}
+.player-award-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px;margin-top:14px}
+.player-award-card{background:#171d25;border:1px solid #303844;border-radius:11px;padding:17px;display:flex;gap:13px;align-items:flex-start;min-width:0}
+.player-award-art{width:58px;height:58px;flex:0 0 58px;border-radius:12px;background:linear-gradient(145deg,#dfe4eb,#929ba8);display:flex;align-items:center;justify-content:center;font-size:31px;filter:grayscale(1);box-shadow:inset 0 0 0 1px #ffffff26}
+.player-award-art.ballon{filter:none;background:radial-gradient(circle at 35% 25%,#fff4a8,#d9a52f 62%,#7f5616);font-size:32px}
+.player-award-info{min-width:0;flex:1}.player-award-title{font-weight:800;font-size:16px;line-height:1.35;overflow-wrap:anywhere}
+.player-award-subtitle{font-size:12px;color:#8d97a3;margin-top:5px;line-height:1.45}
+.player-award-meta{font-size:12px;color:#c4ccd6;margin-top:10px;line-height:1.65}
+.player-award-meta strong{color:#8d97a3;font-weight:600}
+.player-award-delete{margin-top:10px}
+@media(max-width:1000px){.history-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.history-stat-grid{grid-template-columns:1fr}.history-section{padding:15px}.history-winrate{gap:9px}.player-award-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -6203,6 +6235,7 @@ function renderPlayerCareerPage(page){
   if(!Array.isArray(c.matches))c.matches=[];
   if(!Array.isArray(c.calendar))c.calendar=[];
   if(!Array.isArray(c.trophies))c.trophies=[];
+  if(syncPlayerMotmAwards(c))saveCareers();
   if(!Array.isArray(c.clubHistory))c.clubHistory=[];
   if(!Array.isArray(c.seasons))c.seasons=[];
   if(!Array.isArray(c.participatingCompetitions))c.participatingCompetitions=c.league?[c.league]:[];
@@ -6367,18 +6400,64 @@ function playerFullHistoryTable(matches){
   matches.forEach(m=>{const team=m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"";html+='<tr data-full-history-row data-date="'+escapeHTML(m.date||"")+'" data-season="'+escapeHTML(m.season||"")+'" data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-team="'+escapeHTML(team)+'" data-type="'+(m.international?"international":"club")+'" data-goals="'+Number(m.goals||0)+'" data-assists="'+Number(m.assists||0)+'" data-minutes="'+Number(m.minutes||0)+'" data-yellow="'+Number(m.yellowCards||0)+'" data-red="'+Number(m.redCards||0)+'" data-rating="'+(m.rating==null?"":Number(m.rating))+'" data-result="'+escapeHTML(m.result||"")+'" data-cs="'+(m.cleanSheet?"1":"0")+'" data-motm="'+(m.manOfTheMatch?"1":"0")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(team||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td>'+Number(m.yellowCards||0)+'</td><td>'+Number(m.redCards||0)+'</td><td><button class="secondary-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="editPlayerMatch(this.dataset.matchId)">Edit</button> <button class="delete-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="deletePlayerMatch(this.dataset.matchId)">Delete</button></td></tr>';});
   return html+'</tbody></table></div>';
 }
+function historyMetricCard(label,value,tone){
+ const cls="history-stat-card"+(tone?" "+tone:"");
+ return '<div class="'+cls+'"><div class="history-stat-label">'+escapeHTML(label)+'</div><div class="history-stat-value">'+escapeHTML(String(value))+'</div></div>';
+}
 function updatePlayerFullHistoryStats(){
  const rows=[...document.querySelectorAll("[data-full-history-row]")].filter(r=>r.style.display!=="none");
- const sum=k=>rows.reduce((n,r)=>n+Number(r.dataset[k]||0),0),goals=sum("goals"),assists=sum("assists"),minutes=sum("minutes"),yellow=sum("yellow"),red=sum("red");
+ const sum=k=>rows.reduce((n,r)=>n+Number(r.dataset[k]||0),0);
+ const goals=sum("goals"),assists=sum("assists"),minutes=sum("minutes"),yellow=sum("yellow"),red=sum("red");
  const rated=rows.map(r=>r.dataset.rating).filter(x=>x!==""&&Number.isFinite(Number(x)));
  const avg=rated.length?(rated.reduce((n,x)=>n+Number(x),0)/rated.length).toFixed(2):"—";
- const trophies=(getCurrentCareer()?.trophies||[]).filter(t=>{const season=document.getElementById("fullHistorySeason")?.value||"";return (!season||String(t.season||"")===season);});
- const countAward=pattern=>trophies.filter(t=>pattern.test(String(t.competition||""))).length;
- const rate=n=>rows.length?(n/rows.length).toFixed(2):"—";
- const wins=rows.filter(r=>r.dataset.result==="W").length,draws=rows.filter(r=>r.dataset.result==="D").length,losses=rows.filter(r=>r.dataset.result==="L").length;
- const cards=[["Appearances",rows.length],["Goals",goals],["Assists",assists],["Goals + Assists",goals+assists],["Minutes Played",minutes],["Yellow Cards",yellow],["Red Cards",red],["Average Rating",avg],["MOTM Awards",rows.filter(r=>r.dataset.motm==="1").length+countAward(/motm|man of the match|player of the match/i)],["Player of the Season",countAward(/player of the season|season player/i)],["Player of the Month",countAward(/player of the month/i)],["Team of the Year / TOTY",countAward(/team of the year|toty|team of season|best xi/i)],["Goals per Appearance",rate(goals)],["Assists per Appearance",rate(assists)],["Clean Sheets",rows.filter(r=>r.dataset.cs==="1").length],["Win Rate",rows.length?(wins/rows.length*100).toFixed(1)+"%":"—"],["Wins",wins],["Draws",draws],["Losses",losses]];
- const box=document.getElementById("fullHistoryStats");if(box)box.innerHTML=cards.map(x=>playerStatCard(x[0],x[1])).join("");
+ const wins=rows.filter(r=>r.dataset.result==="W").length;
+ const draws=rows.filter(r=>r.dataset.result==="D").length;
+ const losses=rows.filter(r=>r.dataset.result==="L").length;
+ const apps=rows.length,winRate=apps?(wins/apps*100):0;
+ const perApp=n=>apps?(n/apps).toFixed(2):"—";
+ const per90=n=>minutes?(n/minutes*90).toFixed(2):"—";
+ const season=document.getElementById("fullHistorySeason")?.value||"";
+ const trophies=(getCurrentCareer()?.trophies||[]).filter(t=>!season||String(t.season||"")===season);
+ const awardNames=[
+  ["Man of the Match",/man of the match|motm|player of the match/i],
+  ["Player of the Month",/player of the month/i],
+  ["Player of the Season",/player of the season|season player/i],
+  ["Ballon d’Or",/ballon d.?or/i],
+  ["Team of the Week",/team of the week|totw/i],
+  ["Team of the Season",/team of the season|tots|best xi/i],
+  ["Team of the Year",/team of the year|toty/i],
+  ["Golden Boot",/golden boot/i],
+  ["Golden Glove",/golden glove/i],
+  ["Player of the Year",/player of the year/i],
+  ["Player of the Tournament",/player of the tournament/i],
+  ["PFA Player of the Year",/pfa player of the year/i],
+  ["Young Player of the Year",/young player of the year|golden boy/i],
+  ["FIFA The Best",/fifa the best/i],
+  ["Puskás Award",/pusk.s award/i],
+  ["Other Individual Awards",/other individual award/i]
+ ];
+ const awardRows=awardNames.map(([name,pattern])=>{
+  const count=trophies.filter(t=>(t.type||"").toLowerCase()!=="team trophy"&&pattern.test(String(t.award||t.competition||""))).length;
+  return '<div class="award-count-row"><span class="award-count-name">'+escapeHTML(name)+'</span><span class="award-count-value">'+count+'</span></div>';
+ }).join("");
+ const box=document.getElementById("fullHistoryStats");
+ if(!box)return;
+ box.innerHTML=
+  '<section class="history-section"><h3 class="history-section-title">Player Performance</h3><div class="history-stat-grid">'+
+  historyMetricCard("Appearances",apps)+historyMetricCard("Goals",goals)+historyMetricCard("Assists",assists)+
+  historyMetricCard("G + A",goals+assists)+historyMetricCard("Average Rating",avg)+historyMetricCard("Total Minutes Played",minutes)+
+  '</div></section>'+
+  '<section class="history-section"><h3 class="history-section-title">Match Record</h3><div class="history-stat-grid">'+
+  historyMetricCard("Wins",wins,"win")+historyMetricCard("Draws",draws,"draw")+historyMetricCard("Losses",losses,"loss")+
+  '</div><div class="history-winrate"><div class="history-stat-label">Win rate</div><div class="history-winrate-track" role="img" aria-label="Win rate '+winRate.toFixed(1)+' percent"><div class="history-winrate-fill" style="width:'+Math.max(0,Math.min(100,winRate))+'%"></div></div><div class="history-winrate-label">'+(apps?winRate.toFixed(1)+"%":"—")+'</div></div></section>'+
+  '<section class="history-section"><h3 class="history-section-title">Performance Metrics</h3><div class="history-stat-grid">'+
+  historyMetricCard("Goals per Appearance",perApp(goals))+historyMetricCard("Assists per Appearance",perApp(assists))+historyMetricCard("G + A per Appearance",perApp(goals+assists))+
+  historyMetricCard("Goals per 90 Minutes",per90(goals))+historyMetricCard("Assists per 90 Minutes",per90(assists))+historyMetricCard("G + A per 90 Minutes",per90(goals+assists))+
+  historyMetricCard("Yellow Cards",yellow,"yellow")+historyMetricCard("Red Cards",red,"red")+historyMetricCard("Clean Sheets",rows.filter(r=>r.dataset.cs==="1").length)+
+  '</div></section>'+
+  '<section class="history-section"><h3 class="history-section-title">Personal Awards</h3><div class="award-count-list">'+awardRows+'</div></section>';
 }
+
 function filterPlayerFullHistory(){
  const value=id=>document.getElementById(id)?.value||"";
  const season=value("fullHistorySeason"),competition=value("fullHistoryCompetition"),opponent=value("fullHistoryOpponent"),team=value("fullHistoryTeam"),type=value("fullHistoryType"),result=value("fullHistoryResult"),from=value("fullHistoryFrom"),to=value("fullHistoryTo");
@@ -6420,6 +6499,7 @@ function savePlayerMatch(event,international){
     if(!c.participatingCompetitions.includes(match.competition)){alert("Please add this competition in Awards & Competitions before recording the match.");return;}
   }
   c.matches.push(match);
+  syncPlayerMotmAwards(c);
   if(international){
     if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];
     c.internationalMatches.push(match.id);
@@ -6446,6 +6526,7 @@ function savePlayerMatchEdit(event,id){
  const gf=num("goalsFor"),ga=num("goalsAgainst"),goals=num("goals"),assists=num("assists"),minutes=num("minutes"),yellow=num("yellowCards"),red=num("redCards");
  if(!val("date")||!val("opponent").trim()||!val("competition").trim()||[gf,ga,goals,assists,minutes,yellow,red].some(n=>!Number.isFinite(n)||n<0)||(ratingText!==""&&(!Number.isFinite(Number(ratingText))||Number(ratingText)<0||Number(ratingText)>10))){alert("Please check the date and enter valid match statistics.");return;}
  Object.assign(m,{date:val("date"),opponent:val("opponent").trim(),competition:val("competition").trim(),homeAway:val("homeAway")||"Home",goalsFor:gf,goalsAgainst:ga,result:gf>ga?"W":gf<ga?"L":"D",rating:ratingText===""?null:Number(ratingText),minutes,goals,assists,yellowCards:yellow,redCards:red,position:val("position")||c.player?.position,cleanSheet:val("cleanSheet")==="true",manOfTheMatch:!!f.elements.namedItem("manOfTheMatch")?.checked});
+ syncPlayerMotmAwards(c);
  saveCareers();renderPlayerCareerPage(m.international?"national":"matches");window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -6560,12 +6641,53 @@ function addPlayerIndividualAward(event){
 }
 function addPlayerTrophy(){renderPlayerCareerPage("competitions");}
 
+function playerAwardIcon(award){
+ return /ballon d.?or/i.test(String(award||""))?'<div class="player-award-art ballon" aria-label="Ballon d’Or award">⚽</div>':'<div class="player-award-art" aria-label="Silver individual award trophy">🏆</div>';
+}
+function syncPlayerMotmAwards(c){
+ if(!c||c.mode!=="player")return false;
+ if(!Array.isArray(c.trophies))c.trophies=[];
+ const matches=Array.isArray(c.matches)?c.matches:[];
+ const matchIds=new Set(matches.map(m=>String(m.id)));
+ let changed=false;
+ matches.forEach(m=>{
+  if(!m.id)return;
+  const index=c.trophies.findIndex(t=>String(t.linkedMatchId||"")===String(m.id));
+  if(m.manOfTheMatch){
+   if(index<0){
+    c.trophies.push({id:createId(),award:"Man of the Match",competition:m.competition||"Match award",type:"Individual Award",date:m.date||"",season:m.season||c.currentSeason||"",team:m.clubName||(m.international?(m.nationalTeam||"National Team"):c.clubName)||c.clubName||"",playerCareer:true,linkedMatchId:m.id,awardReason:"Awarded Man of the Match"});
+    changed=true;
+   }else{
+    const t=c.trophies[index];
+    const next={award:"Man of the Match",competition:m.competition||"Match award",type:"Individual Award",date:m.date||"",season:m.season||c.currentSeason||"",team:m.clubName||(m.international?(m.nationalTeam||"National Team"):c.clubName)||c.clubName||"",awardReason:"Awarded Man of the Match"};
+    Object.keys(next).forEach(k=>{if(t[k]!==next[k]){t[k]=next[k];changed=true;}});
+   }
+  }else if(index>=0){
+   c.trophies.splice(index,1);changed=true;
+  }
+ });
+ const before=c.trophies.length;
+ c.trophies=c.trophies.filter(t=>!t.linkedMatchId||matchIds.has(String(t.linkedMatchId)));
+ if(c.trophies.length!==before)changed=true;
+ return changed;
+}
 function playerTrophyTable(c){
-   const trophies=(c.trophies||[]).slice().reverse();
-   if(!trophies.length)return '<p style="color:#8d97a3">No awards or trophies recorded yet.</p>';
-   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Award / Trophy</th><th>Type</th><th>Date</th><th>Competition</th><th>Season</th><th>Club / Team</th><th></th></tr></thead><tbody>';
-   trophies.forEach(function(t){const title=t.award||t.competition||"Trophy";html+='<tr><td>'+escapeHTML(title)+'</td><td>'+escapeHTML(t.type||"Award")+'</td><td>'+escapeHTML(t.date||"—")+'</td><td>'+escapeHTML(t.competition||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.team||"—")+'</td><td><button class="delete-btn" onclick="deletePlayerTrophy(\''+escapeJS(t.id)+'\')">Delete</button></td></tr>';});
-   return html+'</tbody></table></div>';
+ const trophies=(c.trophies||[]).slice().reverse();
+ const teamTrophies=trophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy");
+ const individual=trophies.filter(t=>String(t.type||"").toLowerCase()!=="team trophy");
+ const card=t=>{
+  const isTeam=String(t.type||"").toLowerCase()==="team trophy";
+  const title=t.award||t.competition||"Award";
+  const competition=t.competition||"Not specified";
+  const team=t.team||c.clubName||"Team not recorded";
+  const season=t.season||"Season not recorded";
+  const date=t.date||"Date not recorded";
+  const icon=isTeam?trophyImageMarkup(competition):playerAwardIcon(title);
+  const reason=t.awardReason||(/man of the match/i.test(title)?"Recognised as the best player in this match":(/ballon d.?or/i.test(title)?"Recognised as the outstanding player of the year":title+" award"));
+  return '<article class="player-award-card">'+icon+'<div class="player-award-info"><div class="player-award-title">'+escapeHTML(title)+'</div><div class="player-award-subtitle">'+escapeHTML(reason)+'</div><div class="player-award-meta"><div><strong>For:</strong> '+escapeHTML(competition)+'</div><div><strong>Won:</strong> '+escapeHTML(date)+'</div><div><strong>Team:</strong> '+escapeHTML(team)+'</div><div><strong>Season:</strong> '+escapeHTML(season)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\\''+escapeJS(t.id)+'\\')">Remove Award</button></div></article>';
+ };
+ return '<section class="history-section"><h3 class="history-section-title">Team Trophy Cabinet</h3><div class="panel-subtitle">Team competitions and trophies won with each club.</div>'+(teamTrophies.length?'<div class="player-award-grid">'+teamTrophies.map(card).join("")+'</div>':'<p style="color:#8d97a3">No team trophies recorded yet.</p>')+'</section>'+
+ '<section class="history-section"><h3 class="history-section-title">Individual Awards</h3><div class="panel-subtitle">Personal awards, including Man of the Match. Awards are shown with the date, team and competition.</div>'+(individual.length?'<div class="player-award-grid">'+individual.map(card).join("")+'</div>':'<p style="color:#8d97a3">No individual awards recorded yet. Tick Man of the Match when saving a match to add it automatically.</p>')+'</section>';
 }
 
 function deletePlayerTrophy(id){
