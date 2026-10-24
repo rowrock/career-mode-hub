@@ -6109,7 +6109,7 @@ function renderPlayerCareerPage(page){
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Recent Matches</div>'+playerMatchesTable(c.matches.filter(m=>!m.international).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,5))+'</div>';
   }else if(page==="calendar"){
     const events=c.calendar.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-    html+='<div class="panel"><div class="panel-title">Player Calendar</div><div class="panel-subtitle">Add fixtures and keep track of upcoming matches. Calendar screenshot AI is not required.</div><form onsubmit="savePlayerCalendarEvent(event)" class="form-grid">'+
+    html+='<div class="panel"><div class="panel-title">Player Calendar</div><div class="panel-subtitle">Add fixtures manually or use the same screenshot AI as Manager Career.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><label class="secondary-btn" style="cursor:pointer">Analyse Calendar Screenshot<input type="file" accept="image/png,image/jpeg,image/webp" multiple style="display:none" onchange="analysePlayerCalendarFiles(this.files)"></label></div><form onsubmit="savePlayerCalendarEvent(event)" class="form-grid">'+
       '<div class="setup-section"><label class="setup-label">Date *</label><input class="form-input" type="date" name="date" required></div>'+
       '<div class="setup-section"><label class="setup-label">Opponent *</label><input class="form-input" name="opponent" required placeholder="Opponent"></div>'+
       '<div class="setup-section"><label class="setup-label">Competition</label><input class="form-input" name="competition" placeholder="League / Cup / Friendly"></div>'+
@@ -6118,7 +6118,7 @@ function renderPlayerCareerPage(page){
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Fixtures ('+events.length+')</div>'+playerCalendarTable(events)+'</div>';
   }else if(page==="matches"){
     const clubMatches=c.matches.filter(m=>!m.international).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-    html+='<div class="panel"><div class="panel-title">Log Player Match</div><div class="panel-subtitle">Enter your individual performance and the team result. Statistics update automatically.</div>'+
+    html+='<div class="panel"><div class="panel-title">Log Player Match</div><div class="panel-subtitle">Enter your individual performance manually, or import your performance from a Match Facts screenshot.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><label class="secondary-btn" style="cursor:pointer">Analyse Match Facts Screenshot<input type="file" accept="image/png,image/jpeg,image/webp" multiple style="display:none" onchange="analysePlayerMatchFiles(this.files)"></label></div>'+
       '<form onsubmit="savePlayerMatch(event,false)" class="form-grid">'+
       '<div class="setup-section"><label class="setup-label">Date *</label><input class="form-input" type="date" name="date" required></div>'+
       '<div class="setup-section"><label class="setup-label">Opponent *</label><input class="form-input" name="opponent" required placeholder="Opponent"></div>'+
@@ -6330,6 +6330,99 @@ function finishPlayerSeason(){
   c.seasonNumber=(Number(c.seasonNumber)||1)+1;
   if(!c.seasons.some(s=>s.season===c.currentSeason))c.seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league,completed:false});
   saveCareers();renderPlayerCareerPage("past");
+}
+
+
+
+/* PLAYER CAREER SCREENSHOT AI — reuses the existing secure Worker and OpenRouter connection */
+async function analysePlayerCalendarFiles(fileList){
+  const files=Array.from(fileList||[]);
+  if(!files.length)return;
+  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+  try{
+    const data=await analyseCareerScreenshots("calendar",files);
+    const events=Array.isArray(data.events)?data.events:[];
+    if(!events.length){alert("The AI couldn't confidently read any fixtures. Try a clearer screenshot.");return;}
+    const preview=events.slice(0,12).map((e,i)=>(i+1)+". "+(e.date||"Date unclear")+" — "+(e.opponent||"Opponent unclear")+" ("+(e.competition||"Competition unclear")+")").join("\n");
+    if(!confirm("Review the detected fixtures carefully. Nothing is saved until you confirm.\n\n"+preview+"\n\nImport "+events.length+" fixture(s)?"))return;
+    let added=0,skipped=0;
+    if(!Array.isArray(c.calendar))c.calendar=[];
+    const keys=new Set(c.calendar.map(e=>[e.date,e.opponent,e.competition].map(x=>String(x||"").toLowerCase()).join("|")));
+    for(const e of events){
+      let date=typeof e.date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)?e.date:"";
+      let opponent=String(e.opponent||"").trim();
+      if(!opponent){skipped++;continue;}
+      if(!date){
+        const entered=prompt("Enter the date for fixture against "+opponent+" (YYYY-MM-DD), or leave blank to skip:");
+        if(!entered){skipped++;continue;}
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(entered)){alert("Invalid date for "+opponent+". That fixture was skipped.");skipped++;continue;}
+        date=entered;
+      }
+      const competition=String(e.competition||"").trim();
+      const key=[date,opponent,competition].map(x=>String(x||"").toLowerCase()).join("|");
+      if(keys.has(key)){skipped++;continue;}
+      keys.add(key);
+      c.calendar.push({id:createId(),date,opponent,competition,homeAway:e.homeAway||"",notes:"Imported from screenshot; please verify details.",season:c.currentSeason,source:"ai"});
+      added++;
+    }
+    saveCareers();renderPlayerCareerPage("calendar");
+    alert("Imported "+added+" fixture(s)."+(skipped?" "+skipped+" fixture(s) were skipped or were duplicates.":"")+" Please check the calendar for accuracy.");
+  }catch(error){
+    alert("Player calendar AI failed: "+(error.message||"Please try again."));
+  }
+}
+
+async function analysePlayerMatchFiles(fileList){
+  const files=Array.from(fileList||[]);
+  if(!files.length)return;
+  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+  try{
+    const data=await analyseCareerScreenshots("match",files);
+    const p=c.player||{};
+    const norm=v=>String(v||"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+    const playerNames=[p.name].map(norm);
+    const extracted=Array.isArray(data.players)?data.players:[];
+    const found=extracted.find(x=>playerNames.includes(norm(x.name||x.playerName||x.player||x.commonName)));
+    const home=String(data.homeTeam||"").trim(),away=String(data.awayTeam||"").trim();
+    const club=String(c.clubName||"").trim();
+    let opponent="",goalsFor=null,goalsAgainst=null,venue="Home";
+    const hs=data.homeScore??data.homeGoals,as=data.awayScore??data.awayGoals;
+    if(home&&norm(home)===norm(club)){opponent=away;venue="Home";goalsFor=hs;goalsAgainst=as;}
+    else if(away&&norm(away)===norm(club)){opponent=home;venue="Away";goalsFor=as;goalsAgainst=hs;}
+    else{opponent=String(data.opponent||away||home||"").trim();goalsFor=data.goalsFor??null;goalsAgainst=data.goalsAgainst??null;}
+    if(!opponent)opponent=prompt("The AI couldn't identify the opposition. Enter the opponent:","")||"";
+    if(!opponent){alert("No opponent was identified. Nothing was saved.");return;}
+    const date=prompt("Enter the match date (YYYY-MM-DD). The date must be entered manually:","");
+    if(!date||!/^\d{4}-\d{2}-\d{2}$/.test(date)){alert("A valid match date is required. Nothing was saved.");return;}
+    const competition=String(data.competition||"").trim()||prompt("Competition (e.g. League / Cup):","")||"";
+    if(goalsFor==null||goalsAgainst==null){
+      const score=prompt("Confirm the final score from your team's perspective (your goals-opponent goals):","");
+      const m=String(score||"").match(/^\s*(\d+)\s*[-–:]\s*(\d+)\s*$/);
+      if(!m){alert("A valid final score is required. Nothing was saved.");return;}
+      goalsFor=Number(m[1]);goalsAgainst=Number(m[2]);
+    }
+    const rating=found?(found.rating??found.playerRating??null):null;
+    const goals=found?Number(found.goals??found.goalsScored??0):0;
+    const assists=found?Number(found.assists??found.assistsMade??0):0;
+    const minutes=found?Number(found.minutes??found.minutesPlayed??90):90;
+    const yellowCards=found?Number(found.yellowCards??found.yellow??0):0;
+    const redCards=found?Number(found.redCards??found.red??0):0;
+    const cleanSheet=String(p.position||"").toUpperCase()==="GK"&&Number(goalsAgainst)===0;
+    const summary="Player: "+p.name+"\nClub: "+club+"\nOpponent: "+opponent+"\nCompetition: "+(competition||"Not detected")+"\nScore: "+goalsFor+"–"+goalsAgainst+" ("+venue+")\nRating: "+(rating==null?"Not detected":rating)+"\nGoals: "+goals+"\nAssists: "+assists+"\nMinutes: "+minutes+"\nYellow / red cards: "+yellowCards+" / "+redCards+"\n\nPlease verify the screenshot extraction. Save this match?";
+    if(!confirm(summary)){alert("Cancelled. Nothing was saved.");return;}
+    c.matches.push({
+      id:createId(),mode:"player",date,opponent,competition,homeAway:venue,
+      goalsFor:Number(goalsFor),goalsAgainst:Number(goalsAgainst),
+      result:Number(goalsFor)>Number(goalsAgainst)?"W":Number(goalsFor)<Number(goalsAgainst)?"L":"D",
+      rating:rating==null||rating===""?null:Number(rating),minutes,goals,assists,yellowCards,redCards,
+      position:p.position,cleanSheet,season:c.currentSeason,clubName:club,international:false,
+      entryMethod:"ai",screenshots:files.map(f=>f.name)
+    });
+    saveCareers();renderPlayerCareerPage("matches");
+    alert("Match saved. Please double-check the imported statistics against the screenshot.");
+  }catch(error){
+    alert("Player match AI failed: "+(error.message||"Please try again."));
+  }
 }
 
 setTimeout(initSupabaseAuth,0);
