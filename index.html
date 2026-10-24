@@ -1095,6 +1095,10 @@ Trophy Cabinet
 National Team
 </button>
 
+<button class="nav-btn disabled" data-page="fullhistory" onclick="showPage('fullhistory')" style="display:none">
+Full History
+</button>
+
 </div>
 </aside>
 
@@ -1296,7 +1300,7 @@ function updateNavigation(){
       squad:"Player Stats",players:"Player Profile",youth:"Youth Academy",
       transfers:"Club History",competitions:"Awards & Competitions",
       league:"League Centre",past:"Season History",trophies:"Trophy Cabinet",
-      national:"International Career"
+      national:"International Career",fullhistory:"Full History"
     };
     const managerLabels={
       mycareer:"My Career",calendar:"Calendar",matches:"Matches",squad:"Squad",
@@ -1307,7 +1311,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=(playerMode&&(page==="youth"||page==="league"))?"none":"";
+      btn.style.display=page==="fullhistory"?(playerMode?"":"none"):(playerMode&&(page==="youth"||page==="league")?"none":"");
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
@@ -6023,18 +6027,51 @@ function playerCareerDropdownOptions(values, placeholder){
   return '<option value="">'+escapeHTML(placeholder)+'</option>'+clean.map(v=>'<option value="'+escapeHTML(v)+'">'+escapeHTML(v)+'</option>').join("");
 }
 function playerCareerDatabaseValues(field){
-  return [...new Set((Array.isArray(allPlayers)?allPlayers:[]).map(p=>p&&p[field]).filter(Boolean).map(v=>String(v).trim()))].sort((a,b)=>a.localeCompare(b));
+  const aliases={club:["club","team","teamName","team_name","clubName"],league:["league","leagueName","league_name","competition"],nationality:["nationality","country"]};
+  const keys=aliases[field]||[field];
+  return [...new Set((Array.isArray(allPlayers)?allPlayers:[]).map(p=>{for(const k of keys){if(p&&p[k])return p[k];}return "";}).filter(Boolean).map(v=>String(v).trim()))].sort((a,b)=>a.localeCompare(b));
+}
+function playerCareerTeamValues(){
+  const league=(document.getElementById("pcLeague")?.value||"").trim();
+  const aliases={club:["club","team","teamName","team_name","clubName"],league:["league","leagueName","league_name","competition"]};
+  const clubs=(Array.isArray(allPlayers)?allPlayers:[]).filter(p=>{
+    if(!league)return true;
+    const value=(aliases.league.map(k=>p&&p[k]).find(Boolean)||"").toString().trim();
+    return value===league;
+  }).map(p=>(aliases.club.map(k=>p&&p[k]).find(Boolean)||"").toString().trim()).filter(Boolean);
+  return [...new Set(clubs)].sort((a,b)=>a.localeCompare(b));
+}
+function playerCareerDropdownValues(id){
+  if(id==="pcNationality"||id==="pcNationalTeam")return getCountryOptions();
+  if(id==="pcLeague")return playerCareerDatabaseValues("league");
+  if(id==="pcClub")return playerCareerTeamValues();
+  return [];
+}
+function renderPlayerCareerDropdownResults(id,query){
+  const input=document.getElementById(id), box=document.getElementById(id+"Results");
+  if(!input||!box)return;
+  const q=String(query||"").toLowerCase().trim();
+  const values=playerCareerDropdownValues(id).filter(v=>String(v).toLowerCase().includes(q)).slice(0,100);
+  box.innerHTML=values.map(v=>'<div class="search-option" onmousedown="selectPlayerCareerDropdown(\''+id+'\',\''+escapeJS(v)+'\')">'+escapeHTML(v)+'</div>').join("")||'<div class="search-option" style="color:#8d97a3">No matches found</div>';
+  box.classList.add("open");
+}
+function selectPlayerCareerDropdown(id,value){
+  const input=document.getElementById(id),box=document.getElementById(id+"Results");
+  if(input)input.value=value;
+  if(box)box.classList.remove("open");
+  if(id==="pcLeague")updatePlayerCareerClubOptions();
+}
+function playerCareerDropdownMarkup(id,placeholder){
+  return '<div class="search-select"><input class="search-input" id="'+id+'" autocomplete="off" placeholder="'+escapeHTML(placeholder)+'" onclick="renderPlayerCareerDropdownResults(\''+id+'\',this.value)" oninput="renderPlayerCareerDropdownResults(\''+id+'\',this.value)"><div class="search-results" id="'+id+'Results"></div></div>';
 }
 function updatePlayerCareerClubOptions(){
-  const league=document.getElementById("pcLeague")?.value||"";
   const club=document.getElementById("pcClub");
   if(!club)return;
-  const clubs=(Array.isArray(allPlayers)?allPlayers:[])
-    .filter(p=>!league||String(p.league||"")===league)
-    .map(p=>p.club).filter(Boolean);
-  const previous=club.value;
-  club.innerHTML=playerCareerDropdownOptions(clubs,"Choose team");
-  if(previous&&[...club.options].some(o=>o.value===previous))club.value=previous;
+  const current=club.value;
+  const values=playerCareerTeamValues();
+  if(current&&!values.includes(current))club.value="";
+  const box=document.getElementById("pcClubResults");
+  if(box&&box.classList.contains("open"))renderPlayerCareerDropdownResults("pcClub",club.value);
 }
 
 function startNewPlayerCareer(){
@@ -6048,14 +6085,14 @@ function startNewPlayerCareer(){
         '<div class="setup-section"><label class="setup-label" for="pcName">Player name *</label><input class="form-input" id="pcName" required maxlength="70" placeholder="e.g. Alex Smith"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcPosition">Position *</label><select class="form-input" id="pcPosition" required><option value="">Choose position</option><option>GK</option><option>RB</option><option>CB</option><option>LB</option><option>RWB</option><option>LWB</option><option>CDM</option><option>CM</option><option>CAM</option><option>RM</option><option>LM</option><option>RW</option><option>LW</option><option>CF</option><option>ST</option></select></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcAge">Age</label><input class="form-input" id="pcAge" type="number" min="15" max="50" value="18"></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcNationality">Nationality</label><select class="form-input" id="pcNationality">' + playerCareerDropdownOptions(getCountryOptions(),"Choose nationality") + '</select></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcClub">Starting club *</label><select class="form-input" id="pcClub" required>' + playerCareerDropdownOptions(playerCareerDatabaseValues("club"),"Choose team") + '</select></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcLeague">League / competition</label><select class="form-input" id="pcLeague" onchange="updatePlayerCareerClubOptions()">' + playerCareerDropdownOptions(playerCareerDatabaseValues("league"),"Choose league") + '</select></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcNationality">Nationality</label>' + playerCareerDropdownMarkup("pcNationality","Search nationality...") + '</div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcClub">Starting club *</label>' + playerCareerDropdownMarkup("pcClub","Search team...") + '</div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcLeague">League / competition</label>' + playerCareerDropdownMarkup("pcLeague","Search league...") + '</div>'+
         '<div class="setup-section"><label class="setup-label" for="pcOverall">Starting overall</label><input class="form-input" id="pcOverall" type="number" min="1" max="99" value="65"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcFoot">Preferred foot</label><select class="form-input" id="pcFoot"><option>Right</option><option>Left</option><option>Both</option></select></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcShirt">Shirt number</label><input class="form-input" id="pcShirt" type="number" min="1" max="99" value="9"></div>'+
         '<div class="setup-section"><label class="setup-label" for="pcSeason">Starting season</label><input class="form-input" id="pcSeason" value="2026/27" required></div>'+
-        '<div class="setup-section"><label class="setup-label" for="pcNationalTeam">National team (optional)</label><select class="form-input" id="pcNationalTeam">' + playerCareerDropdownOptions(getCountryOptions(),"No national team") + '</select></div>'+
+        '<div class="setup-section"><label class="setup-label" for="pcNationalTeam">National team (optional)</label>' + playerCareerDropdownMarkup("pcNationalTeam","Search national team...") + '</div>'+
       '</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px"><button class="primary-btn" type="submit">Create Player Career</button><button class="secondary-btn" type="button" onclick="renderDashboard()">Cancel</button></div>'+
     '</form>';
 }
@@ -6081,6 +6118,7 @@ function createPlayerCareer(event){
     id:createId(),mode:"player",managerName:name,player:player,
     clubName:club,league:(document.getElementById("pcLeague")?.value||"").trim(),
     currentSeason:season,seasonNumber:1,matches:[],calendar:[],
+    participatingCompetitions:(document.getElementById("pcLeague")?.value||"").trim()?[(document.getElementById("pcLeague")?.value||"").trim()]:[],
     transfers:[],clubHistory:[{club:club,league:(document.getElementById("pcLeague")?.value||"").trim(),fromSeason:season,toSeason:null}],
     trophies:[],seasons:[],internationalMatches:[],nationalTeam:player.nationalTeam||null
   };
@@ -6116,6 +6154,7 @@ function renderPlayerCareerPage(page){
   if(!Array.isArray(c.trophies))c.trophies=[];
   if(!Array.isArray(c.clubHistory))c.clubHistory=[];
   if(!Array.isArray(c.seasons))c.seasons=[];
+  if(!Array.isArray(c.participatingCompetitions))c.participatingCompetitions=c.league?[c.league]:[];
   const p=c.player||{};
   const stats=playerCareerStats(c,c.currentSeason);
   const allStats=playerCareerStats(c,null);
@@ -6140,8 +6179,8 @@ function renderPlayerCareerPage(page){
     html+='<div class="panel"><div class="panel-title">Log Player Match</div><div class="panel-subtitle">Enter your individual performance manually, or import your performance from a Match Facts screenshot.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><label class="secondary-btn" style="cursor:pointer">Analyse Match Facts Screenshot<input type="file" accept="image/png,image/jpeg,image/webp" multiple style="display:none" onchange="analysePlayerMatchFiles(this.files)"></label></div>'+
       '<form onsubmit="savePlayerMatch(event,false)" class="form-grid">'+
       '<div class="setup-section"><label class="setup-label">Date *</label><input class="form-input" type="date" name="date" required></div>'+
-      '<div class="setup-section"><label class="setup-label">Opponent *</label><input class="form-input" name="opponent" required placeholder="Opponent"></div>'+
-      '<div class="setup-section"><label class="setup-label">Competition</label><input class="form-input" name="competition" placeholder="League / Cup"></div>'+
+      '<div class="setup-section"><label class="setup-label">Opponent *</label>'+playerCareerMatchDropdownMarkup("pcClubOpponent",playerCareerOpponentValues(c,false),"Search opponent...","opponent")+'</div>'+
+      '<div class="setup-section"><label class="setup-label">Competition *</label>'+playerCareerCompetitionField(c)+'</div>'+
       '<div class="setup-section"><label class="setup-label">Venue</label><select class="form-input" name="homeAway"><option>Home</option><option>Away</option><option>Neutral</option></select></div>'+
       '<div class="setup-section"><label class="setup-label">Your team goals</label><input class="form-input" name="goalsFor" type="number" min="0" value="0"></div>'+
       '<div class="setup-section"><label class="setup-label">Opponent goals</label><input class="form-input" name="goalsAgainst" type="number" min="0" value="0"></div>'+
@@ -6161,16 +6200,19 @@ function renderPlayerCareerPage(page){
     html+='<div class="panel"><div class="panel-title">Player Profile</div><div class="match-summary-grid">'+playerStatCard("Name",p.name)+playerStatCard("Age",p.age)+playerStatCard("Position",p.position)+playerStatCard("Overall",p.overall)+playerStatCard("Nationality",p.nationality||"—")+playerStatCard("Preferred Foot",p.preferredFoot||"Right")+'</div><p style="color:#9ca5b1">Club: '+escapeHTML(c.clubName)+' · League: '+escapeHTML(c.league||"Not set")+' · Shirt number: '+escapeHTML(String(p.shirtNumber||"—"))+'</p><button class="primary-btn" onclick="editPlayerProfile()">Edit Player Profile</button></div>';
   }else if(page==="transfers"){
     html+='<div class="topbar"><div><div class="panel-title">Club History & Transfers</div><div class="panel-subtitle">Record moves and keep previous clubs in your career history.</div></div><button class="primary-btn" onclick="addPlayerClubMove()">+ Record Club Move</button></div><div class="panel"><div class="panel-title">Clubs</div>'+playerClubHistoryTable(c)+'</div>';
-  }else if(page==="competitions"||page==="trophies"){
-    html+='<div class="topbar"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player&#39;s career.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
+  }else if(page==="competitions"){
+    const participating=(c.participatingCompetitions||(c.participatingCompetitions=[]));
+    html+='<div class="panel"><div class="panel-title">Competitions I\'m Participating In</div><div class="panel-subtitle">Only competitions listed here appear in the match-entry competition dropdown. Your current league is added automatically.</div><form onsubmit="addPlayerCareerCompetition(event)" class="form-grid"><div class="setup-section"><label class="setup-label">Competition</label>'+playerCareerCompetitionAddField()+'</div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Add Competition</button></div></form><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+participating.map(x=>'<span class="secondary-btn" style="display:inline-flex;gap:8px;align-items:center">'+escapeHTML(x)+' <button type="button" class="delete-btn" onclick="removePlayerCareerCompetition(\''+escapeJS(x)+'\')">×</button></span>').join("")+'</div></div><div class="topbar" style="margin-top:18px"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player\'s career.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
+  }else if(page==="trophies"){
+    html+='<div class="topbar"><div><div class="panel-title">Awards & Trophy Cabinet</div><div class="panel-subtitle">Track individual awards and team trophies won during your player\'s career.</div></div><button class="primary-btn" onclick="addPlayerTrophy()">+ Add Award / Trophy</button></div><div class="match-summary-grid">'+playerStatCard("Awards & Trophies",c.trophies.length)+'</div><div class="panel" style="margin-top:18px">'+playerTrophyTable(c)+'</div>';
   }else if(page==="past"){
     html+='<div class="topbar"><div><div class="panel-title">Season History</div><div class="panel-subtitle">Finish a season to save a summary before moving to the next season.</div></div><button class="primary-btn" onclick="finishPlayerSeason()">Finish Season & Start Next</button></div><div class="panel">'+playerSeasonStatsTable(c)+'</div>';
   }else if(page==="national"){
     const ints=c.matches.filter(m=>m.international).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     html+='<div class="panel"><div class="panel-title">International Career</div><div class="panel-subtitle">National team: '+escapeHTML(p.nationalTeam||"Not set")+'</div><form onsubmit="savePlayerMatch(event,true)" class="form-grid">'+
       '<div class="setup-section"><label class="setup-label">Date *</label><input class="form-input" type="date" name="date" required></div>'+
-      '<div class="setup-section"><label class="setup-label">Opponent *</label><input class="form-input" name="opponent" required placeholder="Opponent country"></div>'+
-      '<div class="setup-section"><label class="setup-label">Competition</label><input class="form-input" name="competition" placeholder="International friendly / qualifier"></div>'+
+      '<div class="setup-section"><label class="setup-label">Opponent *</label>'+playerCareerMatchDropdownMarkup("pcInternationalOpponent",getCountryOptions().filter(x=>x.toLowerCase()!==(p.nationalTeam||"").toLowerCase()),"Search opponent country...","opponent")+'</div>'+
+      '<div class="setup-section"><label class="setup-label">Competition *</label>'+playerCareerCompetitionField(c,true)+'</div>'+
       '<div class="setup-section"><label class="setup-label">Your team goals</label><input class="form-input" name="goalsFor" type="number" min="0" value="0"></div>'+
       '<div class="setup-section"><label class="setup-label">Opponent goals</label><input class="form-input" name="goalsAgainst" type="number" min="0" value="0"></div>'+
       '<div class="setup-section"><label class="setup-label">Rating</label><input class="form-input" name="rating" type="number" min="0" max="10" step="0.1" placeholder="e.g. 7.4"></div>'+
@@ -6178,6 +6220,11 @@ function renderPlayerCareerPage(page){
       '<div class="setup-section"><label class="setup-label">Goals</label><input class="form-input" name="goals" type="number" min="0" value="0"></div>'+
       '<div class="setup-section"><label class="setup-label">Assists</label><input class="form-input" name="assists" type="number" min="0" value="0"></div>'+
       '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save International Match</button></div></form></div><div class="panel" style="margin-top:18px"><div class="panel-title">International Appearances ('+ints.length+')</div>'+playerMatchesTable(ints)+'</div>';
+  }else if(page==="fullhistory"){
+    const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const opponents=[...new Set(history.map(m=>m.opponent).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    html+='<div class="panel"><div class="panel-title">Full History</div><div class="panel-subtitle">Every club and international appearance in one place. Filter by opponent or competition to compare your performances.</div><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter competition</label><select class="form-input" id="fullHistoryCompetition" onchange="filterPlayerFullHistory()"><option value="">All competitions</option>'+competitions.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Filter opponent</label><select class="form-input" id="fullHistoryOpponent" onchange="filterPlayerFullHistory()"><option value="">All opponents</option>'+opponents.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Match type</label><select class="form-input" id="fullHistoryType" onchange="filterPlayerFullHistory()"><option value="">Club + International</option><option value="club">Club only</option><option value="international">International only</option></select></div></div><div id="fullHistoryTable" style="margin-top:14px">'+playerFullHistoryTable(history)+'</div></div>';
   }else{
     html+='<div class="panel"><div class="panel-title">Player Career</div><p>Choose a section from the sidebar.</p></div>';
   }
@@ -6203,6 +6250,74 @@ function playerCalendarTable(events){
   return html+'</tbody></table></div>';
 }
 
+function playerCareerCompetitionOptions(c){
+  const defaults=["League","Domestic Cup","Continental Cup","Friendly"];
+  const chosen=Array.isArray(c.participatingCompetitions)?c.participatingCompetitions:[];
+  const league=String(c.league||"").trim();
+  return [...new Set([...chosen,...(league?[league]:[])].map(x=>String(x||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function playerCareerCompetitionField(c,international){
+  const options=international?["International Friendly","World Cup Qualifiers","World Cup","Continental Championship Qualifiers","Continental Championship","Nations League"]:playerCareerCompetitionOptions(c);
+  return '<select class="form-input" name="competition" required><option value="">Choose competition</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
+}
+function playerCareerCompetitionAddField(){
+  const options=[...new Set([...playerCareerDatabaseValues("league"),"Domestic Cup","National Cup","Continental Cup","Champions League","Europa League","Conference League","Friendly"])].sort((a,b)=>a.localeCompare(b));
+  return '<select class="form-input" name="competition" required><option value="">Choose competition to add</option>'+options.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select>';
+}
+function addPlayerCareerCompetition(event){
+  event.preventDefault();const c=getCurrentCareer();if(!c)return;
+  const form=event.target;const value=String(form.elements.namedItem("competition")?.value||"").trim();
+  if(!value)return;
+  if(!Array.isArray(c.participatingCompetitions))c.participatingCompetitions=[];
+  if(!c.participatingCompetitions.includes(value))c.participatingCompetitions.push(value);
+  saveCareers();renderPlayerCareerPage("competitions");
+}
+function removePlayerCareerCompetition(value){
+  const c=getCurrentCareer();if(!c)return;
+  if(!confirm("Remove "+value+" from your participating competitions? Existing matches will stay in Full History."))return;
+  c.participatingCompetitions=(c.participatingCompetitions||[]).filter(x=>x!==value);
+  saveCareers();renderPlayerCareerPage("competitions");
+}
+function playerCareerOpponentValues(c,international){
+  if(international)return getCountryOptions().filter(x=>x.toLowerCase()!==(c.player?.nationalTeam||c.nationalTeam||"").toLowerCase());
+  const league=String(c.league||"").trim();
+  const aliases={club:["club","team","teamName","team_name","clubName"],league:["league","leagueName","league_name","competition"]};
+  const clubs=(Array.isArray(allPlayers)?allPlayers:[]).filter(p=>{
+    if(!league)return true;
+    return String(aliases.league.map(k=>p&&p[k]).find(Boolean)||"").trim()===league;
+  }).map(p=>String(aliases.club.map(k=>p&&p[k]).find(Boolean)||"").trim()).filter(Boolean);
+  return [...new Set(clubs)].filter(x=>x.toLowerCase()!==(c.clubName||"").toLowerCase()).sort((a,b)=>a.localeCompare(b));
+}
+function playerCareerMatchDropdownMarkup(id,values,placeholder,fieldName){
+  return '<div class="search-select"><input class="search-input" name="'+fieldName+'" id="'+id+'" required autocomplete="off" placeholder="'+escapeHTML(placeholder)+'" oninput="filterPlayerCareerMatchDropdown(\''+id+'\',this.value)" onclick="filterPlayerCareerMatchDropdown(\''+id+'\',this.value)"><div class="search-results" id="'+id+'Results" data-values="'+escapeHTML(JSON.stringify(values||[]))+'"></div></div>';
+}
+function filterPlayerCareerMatchDropdown(id,query){
+  const box=document.getElementById(id+"Results");if(!box)return;
+  let values=[];try{values=JSON.parse(box.dataset.values||"[]");}catch(e){}
+  const q=String(query||"").toLowerCase().trim();
+  const matches=values.filter(x=>String(x).toLowerCase().includes(q)).slice(0,100);
+  box.innerHTML=matches.map(x=>'<div class="search-option" onmousedown="selectPlayerCareerMatchDropdown(\''+id+'\',\''+escapeJS(x)+'\')">'+escapeHTML(x)+'</div>').join("")||'<div class="search-option" style="color:#8d97a3">No matches found</div>';
+  box.classList.add("open");
+}
+function selectPlayerCareerMatchDropdown(id,value){
+  const input=document.getElementById(id),box=document.getElementById(id+"Results");
+  if(input)input.value=value;if(box)box.classList.remove("open");
+}
+function playerFullHistoryTable(matches){
+  if(!matches.length)return '<p style="color:#8d97a3">No matches recorded yet.</p>';
+  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Type</th><th>Team</th><th>Opponent</th><th>Competition</th><th>Score</th><th>Rating</th><th>G</th><th>A</th><th>Min</th><th></th></tr></thead><tbody>';
+  matches.forEach(m=>{html+='<tr data-full-history-row data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-type="'+(m.international?"international":"club")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td><button class="delete-btn" onclick="deletePlayerMatch(\''+escapeJS(m.id)+'\')">Delete</button></td></tr>';});
+  return html+'</tbody></table></div>';
+}
+function filterPlayerFullHistory(){
+  const competition=document.getElementById("fullHistoryCompetition")?.value||"";
+  const opponent=document.getElementById("fullHistoryOpponent")?.value||"";
+  const type=document.getElementById("fullHistoryType")?.value||"";
+  document.querySelectorAll("[data-full-history-row]").forEach(row=>{
+    row.style.display=(!competition||row.dataset.competition===competition)&&(!opponent||row.dataset.opponent===opponent)&&(!type||row.dataset.type===type)?"":"none";
+  });
+}
+
 function savePlayerMatch(event,international){
   event.preventDefault();
   const c=getCurrentCareer();if(!c||c.mode!=="player")return;
@@ -6220,9 +6335,15 @@ function savePlayerMatch(event,international){
     redCards:number("redCards"),position:val("position")||c.player.position,
     cleanSheet:val("cleanSheet")==="true",season:c.currentSeason,
     clubName:international?(c.player.nationalTeam||c.nationalTeam||"National Team"):c.clubName,
+    nationalTeam:international?(c.player.nationalTeam||c.nationalTeam||"National Team"):null,
     international:!!international
   };
-  if(!match.opponent){alert("Please enter an opponent.");return;}
+  if(!match.opponent){alert("Please select an opponent from the dropdown.");return;}
+  if(!match.competition){alert("Please select a competition.");return;}
+  if(!international){
+    if(!Array.isArray(c.participatingCompetitions))c.participatingCompetitions=[];
+    if(!c.participatingCompetitions.includes(match.competition)){alert("Please add this competition in Awards & Competitions before recording the match.");return;}
+  }
   c.matches.push(match);
   if(international){
     if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];
