@@ -6598,7 +6598,7 @@ function playerClubHistoryTable(c){
 
 function playerAwardTypeField(){
  const awards=["Man of the Match","Team of the Week","Player of the Month","Player of the Season","Playmaker of the Season","Ballon d'Or","Golden Boot","Golden Glove","Player of the Tournament","Team of the Season","Team of the Year","Golden Boy","Other Individual Award"];
- return '<select class="form-input" name="award" required>'+awards.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+(x==="Golden Boot"?" 👟":"")+'</option>').join("")+'</select>';
+ return '<select class="form-input" name="award" required>'+awards.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+(["Golden Boot","Playmaker of the Season"].includes(x)?" 👟":"")+'</option>').join("")+'</select>';
 }
 function renderPlayerTrophyCatalogue(){
  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
