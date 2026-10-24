@@ -4282,6 +4282,30 @@ function editMatch(id){
  if(!Number.isFinite(Number(gf))||!Number.isFinite(Number(ga))||Number(gf)<0||Number(ga)<0){alert("Goals must be valid numbers of 0 or more.");return;}
  m.date=date.trim();m.competition=competition.trim();m.opponent=opponent.trim();m.homeAway=/^away$/i.test(homeAway.trim())?"Away":"Home";
  m.goalsFor=Number(gf);m.goalsAgainst=Number(ga);m.result=m.goalsFor>m.goalsAgainst?"W":m.goalsFor<m.goalsAgainst?"L":"D";m.cleanSheet=m.goalsAgainst===0;
+ if(Array.isArray(m.players)&&m.players.length){
+  const names=m.players.map((p,i)=>(i+1)+". "+(p.name||"Player")).join("\n");
+  const choice=prompt("Optional: edit a player in this match. Enter their number, or leave blank to skip.\n"+names,"");
+  if(choice!==null&&choice.trim()!==""){
+   const p=m.players[Number(choice)-1];
+   if(!p){alert("Player number not recognised. Match details will still be saved.");}
+   else{
+    const rating=prompt("Rating for "+p.name+" (blank if unknown):",p.rating??"");
+    if(rating!==null){
+     const goals=prompt("Goals:",p.goals??0);
+     if(goals!==null){const assists=prompt("Assists:",p.assists??0);
+      if(assists!==null){const minutes=prompt("Minutes played:",p.minutes??90);
+       if(minutes!==null){const saves=prompt("Saves:",p.saves??0);
+        if(saves!==null){
+         if([goals,assists,minutes,saves].some(v=>!Number.isFinite(Number(v))||Number(v)<0)||(rating.trim()!==""&&!Number.isFinite(Number(rating))))alert("Invalid player stats; match details will still be saved.");
+         else{p.rating=rating.trim()===""?null:Number(rating);p.goals=Number(goals);p.assists=Number(assists);p.minutes=Number(minutes);p.saves=Number(saves);}
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
  saveCareers();renderMatches();
 }
 function deleteMatch(id){
