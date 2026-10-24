@@ -6395,12 +6395,43 @@ function selectPlayerCareerMatchDropdown(id,value){
 function playerFullHistoryTable(matches){
   if(!matches.length)return '<p style="color:#8d97a3">No matches recorded yet.</p>';
   let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Type</th><th>Team</th><th>Opponent</th><th>Competition</th><th>Score</th><th>Rating</th><th>G</th><th>A</th><th>Min</th><th>YC</th><th>RC</th><th>Actions</th></tr></thead><tbody>';
-  matches.forEach(m=>{const team=m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"";html+='<tr data-full-history-row data-date="'+escapeHTML(m.date||"")+'" data-season="'+escapeHTML(m.season||"")+'" data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-team="'+escapeHTML(team)+'" data-type="'+(m.international?"international":"club")+'" data-goals="'+Number(m.goals||0)+'" data-assists="'+Number(m.assists||0)+'" data-minutes="'+Number(m.minutes||0)+'" data-yellow="'+Number(m.yellowCards||0)+'" data-red="'+Number(m.redCards||0)+'" data-rating="'+(m.rating==null?"":Number(m.rating))+'" data-result="'+escapeHTML(m.result||"")+'" data-cs="'+(m.cleanSheet?"1":"0")+'" data-motm="'+(m.manOfTheMatch?"1":"0")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(team||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td>'+Number(m.yellowCards||0)+'</td><td>'+Number(m.redCards||0)+'</td><td><button class="secondary-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="editPlayerMatch(this.dataset.matchId)">Edit</button> <button class="delete-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="deletePlayerMatch(this.dataset.matchId)">Delete</button></td></tr>';});
+  matches.forEach(m=>{const team=m.clubName||(m.international?(m.nationalTeam||"National Team"):getCurrentCareer()?.clubName)||"";html+='<tr data-full-history-row data-date="'+escapeHTML(m.date||"")+'" data-season="'+escapeHTML(m.season||"")+'" data-competition="'+escapeHTML(m.competition||"")+'" data-opponent="'+escapeHTML(m.opponent||"")+'" data-team="'+escapeHTML(team)+'" data-type="'+(m.international?"international":"club")+'" data-goals="'+Number(m.goals||0)+'" data-assists="'+Number(m.assists||0)+'" data-minutes="'+Number(m.minutes||0)+'" data-yellow="'+Number(m.yellowCards||0)+'" data-red="'+Number(m.redCards||0)+'" data-rating="'+(m.rating==null?"":Number(m.rating))+'" data-result="'+escapeHTML(m.result||"")+'" data-cs="'+(m.cleanSheet?"1":"0")+'" data-motm="'+(m.manOfTheMatch?"1":"0")+'" data-position="'+escapeHTML(m.position||m.positionPlayed||m.positionPlayedAt||"")+'"><td>'+escapeHTML(m.date||"—")+'</td><td>'+(m.international?"International":"Club")+'</td><td>'+escapeHTML(team||"—")+'</td><td>'+escapeHTML(m.opponent||"—")+'</td><td>'+escapeHTML(m.competition||"—")+'</td><td>'+Number(m.goalsFor||0)+'–'+Number(m.goalsAgainst||0)+'</td><td>'+escapeHTML(m.rating==null?"—":String(m.rating))+'</td><td>'+Number(m.goals||0)+'</td><td>'+Number(m.assists||0)+'</td><td>'+Number(m.minutes||0)+'</td><td>'+Number(m.yellowCards||0)+'</td><td>'+Number(m.redCards||0)+'</td><td><button class="secondary-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="editPlayerMatch(this.dataset.matchId)">Edit</button> <button class="delete-btn" data-match-id="'+escapeHTML(m.id)+'" onclick="deletePlayerMatch(this.dataset.matchId)">Delete</button></td></tr>';});
   return html+'</tbody></table></div>';
 }
 function historyMetricCard(label,value,tone){
  const cls="history-stat-card"+(tone?" "+tone:"");
  return '<div class="'+cls+'"><div class="history-stat-label">'+escapeHTML(label)+'</div><div class="history-stat-value">'+escapeHTML(String(value))+'</div></div>';
+}
+function renderPositionPitch(rows){
+ const positions=[
+  {name:"GK",label:"Goalkeeper",x:50,y:91},
+  {name:"LB",label:"Left Back",x:15,y:76},{name:"CB",label:"Centre Back",x:39,y:78},{name:"CB",label:"Centre Back",x:61,y:78},{name:"RB",label:"Right Back",x:85,y:76},
+  {name:"LWB",label:"Left Wing Back",x:12,y:62},{name:"CDM",label:"Defensive Midfielder",x:37,y:63},{name:"CDM",label:"Defensive Midfielder",x:63,y:63},{name:"RWB",label:"Right Wing Back",x:88,y:62},
+  {name:"LM",label:"Left Midfielder",x:15,y:47},{name:"CM",label:"Central Midfielder",x:39,y:48},{name:"CM",label:"Central Midfielder",x:61,y:48},{name:"RM",label:"Right Midfielder",x:85,y:47},
+  {name:"LW",label:"Left Winger",x:18,y:28},{name:"CAM",label:"Attacking Midfielder",x:50,y:33},{name:"RW",label:"Right Winger",x:82,y:28},
+  {name:"CF",label:"Centre Forward",x:37,y:15},{name:"ST",label:"Striker",x:63,y:15}
+ ];
+ const norm=v=>String(v||"").trim().toLowerCase().replace(/[^a-z]/g,"");
+ const aliases={
+  gk:"gk",goalkeeper:"gk",lb:"lb",leftback:"lb",cb:"cb",centreback:"cb",centerback:"cb",rb:"rb",rightback:"rb",
+  lwb:"lwb",leftwingback:"lwb",rwb:"rwb",rightwingback:"rwb",cdm:"cdm",defensivemidfielder:"cdm",
+  cm:"cm",centralmidfielder:"cm",lm:"lm",leftmidfielder:"lm",rm:"rm",rightmidfielder:"rm",
+  lw:"lw",leftwinger:"lw",rw:"rw",rightwinger:"rw",cam:"cam",attackingmidfielder:"cam",cf:"cf",centreforward:"cf",centerforward:"cf",st:"st",striker:"st"
+ };
+ const grouped={};
+ positions.forEach(p=>{const key=p.name; if(!grouped[key])grouped[key]={games:0,goals:0,assists:0,label:p.label};});
+ rows.forEach(r=>{
+  const key=aliases[norm(r.dataset.position)]||norm(r.dataset.position);
+  if(!grouped[key])return;
+  grouped[key].games++;
+  grouped[key].goals+=Number(r.dataset.goals||0);
+  grouped[key].assists+=Number(r.dataset.assists||0);
+ });
+ const pitch=positions.map(p=>{
+  const d=grouped[p.name]||{games:0,goals:0,assists:0};
+  return '<div title="'+escapeHTML(p.label)+'" style="position:absolute;left:'+p.x+'%;top:'+p.y+'%;transform:translate(-50%,-50%);width:clamp(48px,11%,88px);padding:5px 2px;border-radius:7px;text-align:center;background:rgba(10,24,24,.88);border:1px solid rgba(255,255,255,.32);color:#fff;box-sizing:border-box;line-height:1.25"><div style="font-weight:800;font-size:12px">'+p.name+'</div><div style="font-size:10px;white-space:nowrap">'+d.games+' apps</div><div style="font-size:10px;white-space:nowrap">'+d.goals+' G · '+d.assists+' A</div></div>';
+ }).join("");
+ return '<section class="history-section"><h3 class="history-section-title">Position Map</h3><p style="color:#8d97a3;font-size:13px;margin:0 0 12px">Appearances, goals and assists from your recorded matches, grouped by position played.</p><div style="position:relative;width:100%;max-width:760px;margin:0 auto;aspect-ratio:4/5;border:2px solid rgba(255,255,255,.72);border-radius:10px;overflow:hidden;background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0,rgba(255,255,255,.045) 1px,transparent 1px,transparent 12.5%),linear-gradient(135deg,#176b43,#125537)"><div style="position:absolute;inset:0;border:1px solid rgba(255,255,255,.45);pointer-events:none"></div><div style="position:absolute;left:0;right:0;top:50%;border-top:1px solid rgba(255,255,255,.65)"></div><div style="position:absolute;left:50%;top:50%;width:28%;aspect-ratio:1;border:1px solid rgba(255,255,255,.65);border-radius:50%;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:25%;top:0;width:50%;height:14%;border:1px solid rgba(255,255,255,.65);border-top:0"></div><div style="position:absolute;left:25%;bottom:0;width:50%;height:14%;border:1px solid rgba(255,255,255,.65);border-bottom:0"></div><div style="position:absolute;left:40%;top:0;width:20%;height:4%;border:1px solid rgba(255,255,255,.65);border-top:0"></div><div style="position:absolute;left:40%;bottom:0;width:20%;height:4%;border:1px solid rgba(255,255,255,.65);border-bottom:0"></div>'+pitch+'</div><p style="color:#8d97a3;font-size:12px;margin-top:10px">Position data is based on the position saved with each match. Matches without a recorded position are not assigned to a position.</p></section>';
 }
 function updatePlayerFullHistoryStats(){
  const rows=[...document.querySelectorAll("[data-full-history-row]")].filter(r=>r.style.display!=="none");
@@ -6456,7 +6487,8 @@ function updatePlayerFullHistoryStats(){
   historyMetricCard("Champions Leagues",trophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy"&&/champions league/i.test(String(t.competition||""))).length)+
   historyMetricCard("World Cups",trophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy"&&/world cup/i.test(String(t.competition||""))).length)+
   historyMetricCard("Golden Boots",trophies.filter(t=>/golden boot/i.test(String(t.award||""))).length)+
-  '</div></section>';
+  '</div></section>'+
+  renderPositionPitch(rows);
 }
 
 function filterPlayerFullHistory(){
