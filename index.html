@@ -6343,6 +6343,12 @@ function renderPlayerCareerPage(page){
   if(page==="mycareer"||page==="dashboard"){
     html+='<div class="match-summary-grid">'+playerStatCard("Season",c.currentSeason)+playerStatCard("Club Appearances",stats.appearances)+playerStatCard("Goals",stats.goals)+playerStatCard("Assists",stats.assists)+playerStatCard("Average Rating",stats.average)+playerStatCard("Overall",p.overall||"—")+playerStatCard("Transfer Value",formatTransferValue(p.transferValue,p.transferCurrency))+'</div>'+
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Player Career Overview</div><div class="panel-subtitle">Your career statistics update when you save match records.</div><div class="match-summary-grid">'+playerStatCard("Career Apps",allStats.appearances)+playerStatCard("Career Goals",allStats.goals)+playerStatCard("Career Assists",allStats.assists)+playerStatCard("Minutes",allStats.minutes)+playerStatCard("W-D-L",allStats.wins+"-"+allStats.draws+"-"+allStats.losses)+playerStatCard("Trophies",c.trophies.length)+'</div><p style="color:#9ca5b1;margin-top:18px">Nationality: '+escapeHTML(p.nationality||"Not set")+' · Preferred foot: '+escapeHTML(p.preferredFoot||"Right")+' · Shirt number: '+escapeHTML(String(p.shirtNumber||"—"))+' · National team: '+escapeHTML(p.nationalTeam||"Not set")+'</p></div>'+
+      '<div class="panel" style="margin-top:18px"><div class="panel-title">Start-of-Season Rating & Transfer Value</div><div class="panel-subtitle">Record your overall rating and transfer value at the start of any season. These values are saved against that season and used for your season FIFA card.</div><form onsubmit="savePlayerSeasonStartValues(event)" class="form-grid" style="margin-top:14px">'+
+      '<div class="setup-section"><label class="setup-label">Season</label><select class="form-input" name="season" required>'+playerCareerSeasonList(c).map(season=>'<option value="'+escapeHTML(season)+'" '+(season===(c.currentSeason||"")?'selected':'')+'>'+escapeHTML(season)+'</option>').join("")+'</select></div>'+
+      '<div class="setup-section"><label class="setup-label">Starting Overall Rating (1–99)</label><input class="form-input" type="number" name="overall" min="1" max="99" step="1" value="'+escapeHTML(String((c.seasonOverallRatings||{})[c.currentSeason]??p.overall??""))+'" required placeholder="e.g. 82"></div>'+
+      '<div class="setup-section"><label class="setup-label">Starting Transfer Value</label><input class="form-input" name="transferValue" value="'+escapeHTML(String((c.seasonTransferValues||{})[c.currentSeason]??p.transferValue??""))+'" required placeholder="e.g. 45m or 45000000"></div>'+
+      '<div class="setup-section"><label class="setup-label">Currency</label><select class="form-input" name="transferCurrency"><option value="EUR" '+((c.seasonTransferCurrencies||{})[c.currentSeason]||p.transferCurrency||"EUR")==="EUR"?"selected":"")+' >EUR (€)</option><option value="GBP" '+((c.seasonTransferCurrencies||{})[c.currentSeason]||p.transferCurrency)==="GBP"?"selected":"")+' >GBP (£)</option><option value="USD" '+((c.seasonTransferCurrencies||{})[c.currentSeason]||p.transferCurrency)==="USD"?"selected":"")+' >USD ($)</option><option value="AUD" '+((c.seasonTransferCurrencies||{})[c.currentSeason]||p.transferCurrency)==="AUD"?"selected":"")+' >AUD ($)</option></select></div>'+
+      '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Season Start Values</button></div></form></div>'+
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Recent Matches</div>'+playerMatchesTable(c.matches.filter(m=>!m.international).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,5))+'</div>';
   }else if(page==="calendar"){
     const events=c.calendar.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
@@ -6711,6 +6717,27 @@ function deletePlayerCalendarEvent(id){
 }
 
 function editPlayerProfile(){renderPlayerCareerPage("players");requestAnimationFrame(()=>{const form=document.getElementById("playerProfileEditForm");if(form){form.scrollIntoView({behavior:"smooth",block:"start"});const first=form.querySelector("input,select,textarea");if(first)first.focus({preventScroll:true});}});}
+function savePlayerSeasonStartValues(event){
+ event.preventDefault();
+ const c=getCurrentCareer(),f=event.target;
+ if(!c||!c.player)return;
+ const season=String(f.elements.namedItem("season")?.value||"").trim();
+ const overall=Number(f.elements.namedItem("overall")?.value);
+ const transferValue=cleanTransferValue(f.elements.namedItem("transferValue")?.value||"");
+ const currency=String(f.elements.namedItem("transferCurrency")?.value||"EUR");
+ if(!season||!Number.isInteger(overall)||overall<1||overall>99||!transferValue){alert("Choose a season, enter an overall rating from 1 to 99, and enter a transfer value.");return;}
+ if(!c.seasonOverallRatings)c.seasonOverallRatings={};
+ if(!c.seasonTransferValues)c.seasonTransferValues={};
+ if(!c.seasonTransferCurrencies)c.seasonTransferCurrencies={};
+ c.seasonOverallRatings[season]=overall;
+ c.seasonTransferValues[season]=transferValue;
+ c.seasonTransferCurrencies[season]=currency;
+ if(season===(c.currentSeason||"2026/27")){
+  c.player.overall=overall;c.player.transferValue=transferValue;c.player.transferCurrency=currency;
+ }
+ saveCareers();
+ renderPlayerCareerPage("mycareer");
+}
 function savePlayerProfileForm(event){event.preventDefault();const c=getCurrentCareer();if(!c||!c.player)return;const f=event.target,p=c.player,val=n=>String(f.elements.namedItem(n)?.value||"").trim();p.name=val("name")||p.name;p.position=val("position")||p.position;p.age=Math.max(15,Math.min(50,Number(val("age"))||p.age));p.nationality=val("nationality");p.overall=Math.max(1,Math.min(99,Number(val("overall"))||p.overall));p.transferValue=cleanTransferValue(val("transferValue"));p.transferCurrency=val("transferCurrency")||detectTransferCurrency(p.transferValue,p.transferCurrency);if(!c.seasonTransferValues)c.seasonTransferValues={};if(!c.seasonTransferCurrencies)c.seasonTransferCurrencies={};if(p.transferValue){c.seasonTransferValues[c.currentSeason||"2026/27"]=p.transferValue;c.seasonTransferCurrencies[c.currentSeason||"2026/27"]=p.transferCurrency;}p.preferredFoot=val("preferredFoot")||"Right";p.shirtNumber=Math.max(1,Math.min(99,Number(val("shirtNumber"))||p.shirtNumber));p.nationalTeam=val("nationalTeam");c.managerName=p.name;c.nationalTeam=p.nationalTeam||null;saveCareers();renderPlayerCareerPage("players");}
 
 function addPlayerClubMove(){
