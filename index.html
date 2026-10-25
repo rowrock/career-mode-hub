@@ -6564,7 +6564,7 @@ function updatePlayerFullHistoryStats(){
  const wins=rows.filter(r=>r.dataset.result==="W").length;
  const draws=rows.filter(r=>r.dataset.result==="D").length;
  const losses=rows.filter(r=>r.dataset.result==="L").length;
- const apps=rows.length,winRate=apps?(wins/apps*100):0;
+ const apps=rows.length,winRate=apps?(wins/apps*100):0,drawRate=apps?(draws/apps*100):0;
  const perApp=n=>apps?(n/apps).toFixed(2):"—";
  const per90=n=>minutes?(n/minutes*90).toFixed(2):"—";
  const season=document.getElementById("fullHistorySeason")?.value||"";
@@ -6596,7 +6596,7 @@ function updatePlayerFullHistoryStats(){
   '</div></section>'+
   '<section class="history-section"><h3 class="history-section-title">Match Record</h3><div class="history-stat-grid">'+
   historyMetricCard("Wins",wins,"win")+historyMetricCard("Draws",draws,"draw")+historyMetricCard("Losses",losses,"loss")+
-  '</div><div class="history-winrate"><div class="history-stat-label">Win rate</div><div class="history-winrate-track" role="img" aria-label="Win rate '+winRate.toFixed(1)+' percent"><div class="history-winrate-fill" style="width:'+Math.max(0,Math.min(100,winRate))+'%"></div></div><div class="history-winrate-label">'+(apps?winRate.toFixed(1)+"%":"—")+'</div></div></section>'+
+  '</div><div class="history-winrate"><div class="history-stat-label">Win rate</div><div class="history-winrate-track" role="img" aria-label="Wins '+winRate.toFixed(1)+' percent, draws '+drawRate.toFixed(1)+' percent"><div style="display:flex;width:100%;height:100%"><div class="history-winrate-fill" style="width:'+Math.max(0,Math.min(100,winRate))+'%;flex-shrink:0"></div><div style="height:100%;width:'+Math.max(0,Math.min(100,drawRate))+'%;background:#f2d16d;flex-shrink:0"></div></div></div><div class="history-winrate-label">'+(apps?winRate.toFixed(1)+"%":"—")+'</div></div></section>'+
   '<section class="history-section"><h3 class="history-section-title">Performance Metrics</h3><div class="history-stat-grid">'+
   historyMetricCard("Goals per Appearance",perApp(goals))+historyMetricCard("Assists per Appearance",perApp(assists))+historyMetricCard("G + A per Appearance",perApp(goals+assists))+
   historyMetricCard("Goals per 90 Minutes",per90(goals))+historyMetricCard("Assists per 90 Minutes",per90(assists))+historyMetricCard("G + A per 90 Minutes",per90(goals+assists))+
