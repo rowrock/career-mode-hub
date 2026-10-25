@@ -6654,7 +6654,7 @@ function deletePlayerCalendarEvent(id){
   saveCareers();renderPlayerCareerPage("calendar");
 }
 
-function editPlayerProfile(){renderPlayerCareerPage("mycareer");setTimeout(()=>document.getElementById("playerProfileEditForm")?.scrollIntoView({behavior:"smooth",block:"start"}),50);}
+function editPlayerProfile(){renderPlayerCareerPage("players");requestAnimationFrame(()=>{const form=document.getElementById("playerProfileEditForm");if(form){form.scrollIntoView({behavior:"smooth",block:"start"});const first=form.querySelector("input,select,textarea");if(first)first.focus({preventScroll:true});}});}
 function savePlayerProfileForm(event){event.preventDefault();const c=getCurrentCareer();if(!c||!c.player)return;const f=event.target,p=c.player,val=n=>String(f.elements.namedItem(n)?.value||"").trim();p.name=val("name")||p.name;p.position=val("position")||p.position;p.age=Math.max(15,Math.min(50,Number(val("age"))||p.age));p.nationality=val("nationality");p.overall=Math.max(1,Math.min(99,Number(val("overall"))||p.overall));p.transferValue=val("transferValue");if(!c.seasonTransferValues)c.seasonTransferValues={};if(p.transferValue)c.seasonTransferValues[c.currentSeason||"2026/27"]=p.transferValue;p.preferredFoot=val("preferredFoot")||"Right";p.shirtNumber=Math.max(1,Math.min(99,Number(val("shirtNumber"))||p.shirtNumber));p.nationalTeam=val("nationalTeam");c.managerName=p.name;c.nationalTeam=p.nationalTeam||null;saveCareers();renderPlayerCareerPage("players");}
 
 function addPlayerClubMove(){
