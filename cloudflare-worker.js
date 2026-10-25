@@ -21,7 +21,7 @@ function instructions(task, clubName, careerData) {
     "Create 3 to 5 plausible in-game career headlines with short article text and 3 press-conference questions with suggested answers. Use hypothetical framing for speculation.",
     "Return exactly one JSON object, no Markdown, with this shape: " + JSON.stringify({prediction:{summary:"",expectedAppearances:0,expectedGoals:0,expectedAssists:0,targetAverageRating:0,recommendedObjective:"",reasoning:"",clubAssessment:"",playerAssessment:"",confidence:"low|medium|high"},agentAdvice:[""],news:[{category:"",headline:"",story:""}],pressConference:[{question:"",answer:""}]}),
     "Saved career data: " + JSON.stringify(careerData || {})
-  ].join("\\n");
+  ].join("\n");
   const common = "You analyse EA SPORTS FC 27 Career Mode screenshots.\nCurrent club: " +
     (clubName || "Unknown") + ".\nReturn exactly one valid JSON object without Markdown or commentary.\n" +
     "Only report visible information. Never guess. Use null when unreadable. Preserve visible spelling.\n";
