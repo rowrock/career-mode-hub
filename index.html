@@ -5938,6 +5938,35 @@ document.addEventListener("click",function(event){
 
 
 /* =========================================================
+   VISIBLE STARTUP ERROR REPORTING
+   Keep the app from appearing silently blank if a runtime error occurs.
+========================================================= */
+window.addEventListener("error",function(event){
+  try{
+    let box=document.getElementById("appRuntimeError");
+    if(!box){
+      box=document.createElement("div");
+      box.id="appRuntimeError";
+      box.style.cssText="position:fixed;z-index:99999;left:12px;right:12px;top:12px;padding:14px 16px;background:#421c22;color:#fff;border:1px solid #ff7b86;border-radius:10px;font:14px/1.5 Arial,sans-serif;white-space:pre-wrap;box-shadow:0 8px 30px #0009";
+      document.body.appendChild(box);
+    }
+    box.textContent="Career Mode Hub hit an error while loading. Please send this message to ChatGPT:\\n"+String(event.message||"Unknown JavaScript error")+"\\nFile: "+String(event.filename||"unknown")+"\\nLine: "+String(event.lineno||"?");
+  }catch(ignore){}
+});
+window.addEventListener("unhandledrejection",function(event){
+  try{
+    let box=document.getElementById("appRuntimeError");
+    if(!box){
+      box=document.createElement("div");
+      box.id="appRuntimeError";
+      box.style.cssText="position:fixed;z-index:99999;left:12px;right:12px;top:12px;padding:14px 16px;background:#421c22;color:#fff;border:1px solid #ff7b86;border-radius:10px;font:14px/1.5 Arial,sans-serif;white-space:pre-wrap;box-shadow:0 8px 30px #0009";
+      document.body.appendChild(box);
+    }
+    box.textContent="Career Mode Hub hit an async loading error. Please send this message to ChatGPT:\\n"+String(event.reason?.message||event.reason||"Unknown async error");
+  }catch(ignore){}
+});
+
+/* =========================================================
    START
 ========================================================= */
 
