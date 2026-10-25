@@ -6281,7 +6281,8 @@ function renderPlayerTransferPredictor(c){
  const leagueData=leagues.find(x=>x.re.test(league))||leagues[0],allClubs=[...new Map(leagues.flatMap(x=>x.clubs).map(x=>[x[0].toLowerCase(),x])).values()];
  const interested=Array.isArray(c.transferPredictorInterested)?c.transferPredictorInterested:[],isInterested=name=>interested.some(x=>String(x).toLowerCase()===String(name).toLowerCase());
  const normClub=name=>String(name||"").toLowerCase().replace(/[^a-z0-9]/g,"");
- const sameClub=(a,b)=>normClub(a)===normClub(b)||(normClub(a)==="brighton"&&normClub(b)==="brightonandhovealbion")||(normClub(b)==="brighton"&&normClub(a)==="brightonandhovealbion");
+ const clubKey=name=>{const n=normClub(name);if(["brighton","brightonhovealbion","brightonandhovealbion"].includes(n))return "brightonandhovealbion";if(["manutd","manchesterunited"].includes(n))return "manchesterunited";if(["psg","parissaintgermain"].includes(n))return "parissaintgermain";return n;};
+ const sameClub=(a,b)=>clubKey(a)===clubKey(b);
  interested.forEach(name=>{if(!allClubs.some(x=>x[0].toLowerCase()===String(name).toLowerCase()))allClubs.push([name,78]);});
  const youthClubs=["Borussia Dortmund","Ajax","PSV Eindhoven","Feyenoord","AZ Alkmaar","Benfica","Sporting CP","Porto","Red Bull Salzburg","Brighton & Hove Albion","RB Leipzig","Bayer Leverkusen","Monaco"];
  const eliteClubs=["Real Madrid","Barcelona","Manchester City","Bayern Munich","Paris Saint-Germain","Liverpool","Arsenal"];
