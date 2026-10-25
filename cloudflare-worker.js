@@ -11,7 +11,17 @@ const CORS = {
 function reply(data, status = 200) {
   return new Response(JSON.stringify(data), { status: status, headers: CORS });
 }
-function instructions(task, clubName) {
+function instructions(task, clubName, careerData) {
+  if (task === "career_assist") return [
+    "You are the career adviser, football journalist and season-planning assistant inside a personal EA SPORTS FC 27 Player Career tracker.",
+    "Use only supplied saved career data. Do not claim access to live football news, real negotiations, hidden game data or actual game simulation. Distinguish estimates from recorded facts.",
+    "Assess club strength against other teams in the same league if supplied data permits, and assess the player against their club using overall, position, age, minutes, recent form and previous-season output. If comparison data is missing, say so.",
+    "Generate realistic expected appearances, goals, assists, target average rating, a recommended objective and clear reasoning. Projections are not guarantees.",
+    "Give practical agent/contract advice based on age, squad role, expiry, wage if provided, playing time and performance trend. Never pretend a transfer offer exists.",
+    "Create 3 to 5 plausible in-game career headlines with short article text and 3 press-conference questions with suggested answers. Use hypothetical framing for speculation.",
+    "Return exactly one JSON object, no Markdown, with this shape: " + JSON.stringify({prediction:{summary:"",expectedAppearances:0,expectedGoals:0,expectedAssists:0,targetAverageRating:0,recommendedObjective:"",reasoning:"",clubAssessment:"",playerAssessment:"",confidence:"low|medium|high"},agentAdvice:[""],news:[{category:"",headline:"",story:""}],pressConference:[{question:"",answer:""}]}),
+    "Saved career data: " + JSON.stringify(careerData || {})
+  ].join("\\n");
   const common = "You analyse EA SPORTS FC 27 Career Mode screenshots.\nCurrent club: " +
     (clubName || "Unknown") + ".\nReturn exactly one valid JSON object without Markdown or commentary.\n" +
     "Only report visible information. Never guess. Use null when unreadable. Preserve visible spelling.\n";
@@ -86,8 +96,9 @@ function parseAnswer(answer) {
 }
 function validateData(task, data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("The AI response was not a JSON object.");
-  const keys = { calendar: "events", match: "players", league: "rows", transfer: "transfers", youth: "players" };
-  if (!keys[task] || !Array.isArray(data[keys[task]])) throw new Error("The AI returned incomplete " + task + " data.");
+  const keys = { calendar: "events", match: "players", league: "rows", transfer: "transfers", youth: "players", career_assist: null };
+  if (!(task in keys) || (keys[task] && !Array.isArray(data[keys[task]]))) throw new Error("The AI returned incomplete " + task + " data.");
+  if (task === "career_assist" && (!data.prediction || !Array.isArray(data.agentAdvice) || !Array.isArray(data.news) || !Array.isArray(data.pressConference))) throw new Error("The AI returned incomplete career advice. Please try again.");
   if (task === "calendar") {
     data.events = data.events.map(event => ({
       date: typeof event.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(event.date) ? event.date : null,
@@ -139,13 +150,13 @@ export default {
       body = JSON.parse(raw);
     } catch (_) { return reply({ ok: false, error: "Invalid request. Reload Career Mode Hub and try again." }, 400); }
     const task = body.task;
-    if (!["match", "calendar", "league", "transfer", "youth"].includes(task)) return reply({ ok: false, error: "Unknown analysis task." }, 400);
-    if (!Array.isArray(body.images) || body.images.length < 1 || body.images.length > 4) return reply({ ok: false, error: "Upload between one and four screenshots at a time." }, 400);
+    if (!["match", "calendar", "league", "transfer", "youth", "career_assist"].includes(task)) return reply({ ok: false, error: "Unknown analysis task." }, 400);
+    if (task !== "career_assist" && (!Array.isArray(body.images) || body.images.length < 1 || body.images.length > 4)) return reply({ ok: false, error: "Upload between one and four screenshots at a time." }, 400);
     let images;
-    try { images = body.images.map(normalizeImage); }
+    try { images = task === "career_assist" ? [] : body.images.map(normalizeImage); }
     catch (error) { return reply({ ok: false, error: error.message }, 400); }
     try {
-      const result = await analyse(env.OPENROUTER_API_KEY, instructions(task, body.clubName), images, task);
+      const result = await analyse(env.OPENROUTER_API_KEY, instructions(task, body.clubName, body.careerData), images, task);
       return reply({ ok: true, data: result.data, model: result.model });
     } catch (error) { return reply({ ok: false, error: error.message || "AI analysis failed." }, 502); }
   }
