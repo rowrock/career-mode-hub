@@ -6372,6 +6372,32 @@ function pcPress(c){const s=playerCareerStats(c,c.currentSeason),o=(c.seasonObje
 function savePlayerContract(e){e.preventDefault();const c=getCurrentCareer();if(!c)return;const f=new FormData(e.target);c.contract={expiry:String(f.get("expiry")||"").trim(),wage:f.get("wage")?Number(f.get("wage")):null,currency:String(f.get("currency")||"EUR"),role:String(f.get("role")||"Not set"),agent:String(f.get("agent")||"").trim(),goal:String(f.get("goal")||"").trim()};saveCareers();renderPlayerCareerPage("contract");}
 function savePCObjectives(e){e.preventDefault();const c=getCurrentCareer();if(!c)return;const f=new FormData(e.target);if(!c.seasonObjectives)c.seasonObjectives={};c.seasonObjectives[c.currentSeason]={objective:String(f.get("objective")||"").trim(),apps:f.get("apps")===""?null:Number(f.get("apps")),goals:f.get("goals")===""?null:Number(f.get("goals")),assists:f.get("assists")===""?null:Number(f.get("assists")),rating:f.get("rating")===""?null:Number(f.get("rating"))};saveCareers();renderPlayerCareerPage("objectives");}
 
+
+function pcCareerPayload(c){
+ const p=c.player||{},season=c.currentSeason,st=playerCareerStats(c,season),prev=pcPrev(c),strength=pcStrength(c);
+ const matches=(c.matches||[]).filter(x=>!x.international).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12);
+ return {player:{name:p.name||"",age:pcAge(c),position:p.position||"",overall:Number(p.overall)||Number((c.seasonOverallRatings||{})[season])||null,transferValue:p.transferValue??null},club:{name:c.clubName||"",league:c.league||"",season:season||"",strengthEstimate:strength},currentSeasonStats:st,previousSeasonStats:prev,contract:c.contract||{},seasonObjectives:(c.seasonObjectives||{})[season]||{},recentMatches:matches.map(m=>({date:m.date||null,opponent:m.opponent||null,competition:m.competition||null,score:m.goalsFor!=null?String(m.goalsFor)+"-"+String(m.goalsAgainst??"?"):null,goals:Number(m.goals)||0,assists:Number(m.assists)||0,rating:m.rating??null,minutes:m.minutes??null,manOfTheMatch:!!m.manOfTheMatch})),trophies:(c.trophies||[]).slice(-12).map(t=>({name:t.name||t.trophy||t.title||"",season:t.season||"",competition:t.competition||""}))};
+}
+async function requestPlayerCareerAI(kind){
+ const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const button=document.querySelector('[data-kind="'+kind+'"]');if(button){button.disabled=true;button.textContent="AI is thinking…";}
+ try{
+  const response=await fetch(CAREER_AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"career_assist",clubName:c.clubName||"",careerData:pcCareerPayload(c)})});
+  let result;try{result=await response.json();}catch(e){throw new Error("The AI server returned an unreadable response.");}
+  if(!response.ok||!result.ok)throw new Error(result.error||("AI request failed ("+response.status+")."));
+  if(!result.data||!result.data.prediction)throw new Error("The AI did not return usable career advice.");
+  c.aiCareerInsights={generatedAt:new Date().toISOString(),model:result.model||"OpenRouter",prediction:result.data.prediction,agentAdvice:result.data.agentAdvice||[],news:result.data.news||[],pressConference:result.data.pressConference||[]};
+  saveCareers();renderPlayerCareerPage(kind==="news"?"media":kind==="agent"?"contract":"objectives");
+ }catch(e){alert("Player Career AI failed: "+(e.message||"Unknown error")+". If the Worker reports an unknown task, update and deploy cloudflare-worker.js in your existing career-mode-ai Worker.");if(button){button.disabled=false;button.textContent=kind==="news"?"Generate AI News & Press Conference":kind==="agent"?"Get AI Agent Advice":"Generate AI Predictions & Objectives";}}
+}
+function pcAIResults(c,kind){
+ const a=c.aiCareerInsights;if(!a)return '<p style="color:#9ca5b1;margin-top:12px">Generate personalised AI advice using your saved career data.</p>';
+ const date=a.generatedAt?new Date(a.generatedAt).toLocaleString():"Saved";
+ if(kind==="objectives"){const p=a.prediction||{};return '<div style="margin-top:14px"><div style="font-size:12px;color:#8dd5ff">AI report · '+escapeHTML(date)+'</div><h3>'+escapeHTML(p.summary||"Season outlook")+'</h3><div class="match-summary-grid">'+playerStatCard("AI Appearances",p.expectedAppearances??"—")+playerStatCard("AI Goals",p.expectedGoals??"—")+playerStatCard("AI Assists",p.expectedAssists??"—")+playerStatCard("Target Rating",p.targetAverageRating??"—")+'</div><p style="color:#c5ced8;line-height:1.7"><b>Recommended objective:</b> '+escapeHTML(p.recommendedObjective||"—")+'</p><p style="color:#c5ced8;line-height:1.7">'+escapeHTML(p.reasoning||"")+'</p><p style="color:#aab3bf;line-height:1.7"><b>Club assessment:</b> '+escapeHTML(p.clubAssessment||"Not enough comparison data.")+'<br><b>Player assessment:</b> '+escapeHTML(p.playerAssessment||"")+'<br><b>Confidence:</b> '+escapeHTML(p.confidence||"unspecified")+'</p></div>';}
+ if(kind==="agent")return '<div style="margin-top:14px"><div style="font-size:12px;color:#8dd5ff">AI agent report · '+escapeHTML(date)+'</div><ul style="line-height:1.8;color:#c5ced8">'+(a.agentAdvice||[]).map(x=>'<li>'+escapeHTML(x)+'</li>').join("")+'</ul></div>';
+ return '<div style="margin-top:14px"><div style="font-size:12px;color:#8dd5ff">AI-generated in-game stories · '+escapeHTML(date)+'</div>'+(a.news||[]).map(n=>'<article style="padding:12px 0;border-bottom:1px solid #303946"><div style="font-size:11px;color:#8dd5ff;font-weight:800">'+escapeHTML(n.category||"CAREER NEWS")+'</div><h3 style="margin:7px 0">'+escapeHTML(n.headline||"Career update")+'</h3><p style="color:#bdc6d1;line-height:1.7">'+escapeHTML(n.story||"")+'</p></article>').join("")+'<h3 style="margin-top:18px">AI Press Conference</h3>'+(a.pressConference||[]).map(n=>'<div style="padding:10px 0;border-bottom:1px solid #303946"><b>'+escapeHTML(n.question||"")+'</b><p style="color:#aab3bf">Suggested answer: '+escapeHTML(n.answer||"")+'</p></div>').join("")+'</div>';
+}
+
 function renderPlayerCareerPage(page){
   const c=getCurrentCareer();
   if(!c||c.mode!=="player"){renderDashboard();return;}
@@ -6471,7 +6497,7 @@ function renderPlayerCareerPage(page){
     '<div class="setup-section"><label class="setup-label">Squad role</label><select class="form-input" name="role">'+["Crucial","Important","Rotation","Sporadic","Prospect","Not set"].map(x=>'<option '+((ct.role||"Not set")===x?"selected":"")+'>'+x+'</option>').join("")+'</select></div>'+
     '<div class="setup-section"><label class="setup-label">Agent name</label><input class="form-input" name="agent" value="'+escapeHTML(ct.agent||"")+'"></div>'+
     '<div class="setup-section"><label class="setup-label">Career goal</label><input class="form-input" name="goal" value="'+escapeHTML(ct.goal||"")+'" placeholder="e.g. Become a crucial player"></div>'+
-    '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Contract</button></div></form></div><div class="panel" style="margin-top:16px"><div class="panel-title">Agent Advice</div>'+pcAgentAdvice(c)+'</div>';
+    '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Contract</button></div></form></div><div class="panel" style="margin-top:16px"><div class="panel-title">Agent Advice</div>'+pcAgentAdvice(c)+'<div style="margin-top:14px"><button class="primary-btn" data-kind="agent" onclick="requestPlayerCareerAI(this.dataset.kind)">Get AI Agent Advice</button>'+pcAIResults(c,"agent")+'</div></div>';
   }else if(page==="journey"){
     html+='<div class="panel"><div class="panel-title">Career Journey Map</div><div class="panel-subtitle">A timeline of your saved club history, trophies and standout performances.</div>'+pcJourney(c)+'</div>';
   }else if(page==="records"){
@@ -6484,9 +6510,9 @@ function renderPlayerCareerPage(page){
     '<div class="setup-section"><label class="setup-label">Target goals</label><input class="form-input" name="goals" type="number" min="0" value="'+escapeHTML(String(o.goals??""))+'"></div>'+
     '<div class="setup-section"><label class="setup-label">Target assists</label><input class="form-input" name="assists" type="number" min="0" value="'+escapeHTML(String(o.assists??""))+'"></div>'+
     '<div class="setup-section"><label class="setup-label">Target average rating</label><input class="form-input" name="rating" type="number" min="0" max="10" step="0.1" value="'+escapeHTML(String(o.rating??""))+'"></div>'+
-    '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Objectives</button></div></form><div class="panel" style="margin-top:16px"><div class="panel-title">Progress</div>'+pcProgress(c,o)+'</div></div>';
+    '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Objectives</button></div></form><div class="panel" style="margin-top:16px"><div class="panel-title">Progress</div>'+pcProgress(c,o)+'</div><div class="panel" style="margin-top:16px"><button class="primary-btn" data-kind="objectives" onclick="requestPlayerCareerAI(this.dataset.kind)">Generate AI Predictions & Objectives</button>'+pcAIResults(c,"objectives")+'</div></div>';
   }else if(page==="media"){
-    html+='<div class="panel"><div class="panel-title">Player Career News & Media Centre</div><div class="panel-subtitle">Career headlines are generated from your saved stats, not real external news reports.</div>'+pcNews(c)+'</div><div class="panel" style="margin-top:16px"><div class="panel-title">Press Conference Talking Points</div>'+pcPress(c)+'</div>';
+    html+='<div class="panel"><div class="panel-title">Player Career News & Media Centre</div><div class="panel-subtitle">Career headlines are generated from your saved stats, not real external news reports.</div>'+pcNews(c)+'<div style="margin-top:14px"><button class="primary-btn" data-kind="news" onclick="requestPlayerCareerAI(this.dataset.kind)">Generate AI News & Press Conference</button>'+pcAIResults(c,"news")+'</div></div><div class="panel" style="margin-top:16px"><div class="panel-title">Press Conference Talking Points</div>'+pcPress(c)+'</div>';
   }else if(page==="fullhistory"){
     const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
