@@ -1,7 +1,7 @@
 // Career Mode Hub Cloudflare Worker.
 // Keep OPENROUTER_API_KEY configured as a Cloudflare secret.
 const ALLOWED_ORIGIN = "https://rowrock.github.io";
-const MODEL = "qwen/qwen2.5-vl-32b-instruct:free";
+const MODEL = "openrouter/free";
 const CORS = {
   "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
