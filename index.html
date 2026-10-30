@@ -6321,6 +6321,8 @@ function renderPlayerTransferPredictor(c){
  const results=allClubs.filter(x=>!sameClub(x[0],club)).map(([name,strength])=>{
   const gap=strength-level,interest=isInterested(name),youth=youthClubs.includes(name),elite=eliteClubs.includes(name);
   let chance=gap<=-5?18+Math.min(7,(-gap-5)*0.7):gap<=0?18+gap*0.8:gap<=4?15-gap*1.7:gap<=8?8-(gap-5)*1.5:Math.max(0.3,3.5-(gap-8)*0.65);
+  const rivalryHate=pcRivalryScore(c,name);
+  chance-=Math.min(15,rivalryHate*0.15);
   chance+=Math.min(7,Math.max(0,(form-35)/9));
   if(now.apps>=15&&now.goals>=10)chance+=3;
   if(now.apps&&now.minutes/now.apps<35)chance-=3;
@@ -6335,6 +6337,7 @@ function renderPlayerTransferPredictor(c){
   chance=Math.max(0.2,Math.min(interest?35:28,chance));
   const move=gap>9?"Major step up":gap>4?"Ambitious step up":gap>0?"Step up":gap>=-5?"Comparable level":"Potential route to more minutes";
   let reason=interest?"You marked this club as interested, so that information raises its estimate. "+(gap>8?"It is still a major step up at your current rating; a gradual integration or loan may be more realistic.":gap>3?"A step up is plausible if there is a clear plan for first-team minutes.":"The squad level looks attainable, though the actual offer and role are unknown."):gap>10?"This is a substantial jump from your current level. A move this early would usually need exceptional scouting interest, a major fee or a clear development plan.":youth&&age<=21?"This club has a reputation for recruiting and developing young players, making it a more credible youth pathway than a direct move to an established superclub.":gap>4?"A sizeable step up; your goal return helps, but first-team minutes and squad depth remain obstacles.":gap>=-3?"A realistic level match that could balance development and senior football, depending on squad depth.":"A slightly lower squad-strength target may offer a clearer route to starts and continued development.";
+  if(rivalryHate>=60)reason+=" Your current rivalry/hostility score is "+rivalryHate+"%, which makes this destination less likely to pursue you unless the rivalry itself becomes a major transfer story.";
   if(["ST","CF"].includes(position)&&!interest)reason+=" Striker competition still matters.";
   return{name,strength,score:chance,move,reason,interested:interest};
  }).sort((a,b)=>b.score-a.score);
@@ -6397,6 +6400,7 @@ function pcRivalryBase(a,b){
 }
 function pcRivalryCandidates(c){
  const names=new Set(PC_RIVALRIES.flatMap(r=>r.slice(0,2)));
+ try{Object.values(fc27ClubsByLeague||{}).flat(2).forEach(x=>{const n=typeof x==="string"?x:(x&&(x.name||x.club||x.team||x.clubName));if(n)names.add(String(n));});}catch(e){}
  (c.matches||[]).filter(m=>!m.international&&m.opponent).forEach(m=>names.add(m.opponent));
  (c.clubHistory||[]).forEach(x=>names.add(x.club||x.clubName||x.team||""));
  (c.transferPredictorInterested||[]).forEach(x=>names.add(x));
@@ -6418,6 +6422,7 @@ function pcPressQuestion(c){
   const rivals=pcTopRivals(c),s=playerCareerStats(c,c.currentSeason),p=c.player||{};
   const r=rivals[0];
   const pool=[
+   ...(allPlayers.length?[{question:"You have been compared with "+(allPlayers[Math.floor(Math.random()*allPlayers.length)].commonName||allPlayers[Math.floor(Math.random()*allPlayers.length)].name||"another player")+". Do you think you are better?",topic:"player"}]:[]),
    {question:"You have been linked with a move away. Are you committed to "+(c.clubName||"your club")+"?",topic:"future"},
    {question:"Which player in world football do you think gets far more credit than they deserve?",topic:"player"},
    {question:"Which club do you enjoy beating the most, and why?",topic:"rivalry"},
