@@ -1335,7 +1335,7 @@ function updateNavigation(){
     const c=getCurrentCareer();
     const playerMode=!!(c&&c.mode==="player");
     const playerLabels={
-      mycareer:"Player Overview",calendar:"Calendar",matches:"Matches",
+      mycareer:"Player Overview",matches:"Matches",
       squad:"Player Stats",players:"Player Profile",youth:"Youth Academy",
       transfers:"Club History",competitions:"Awards & Competitions",
       league:"League Centre",past:"Season History",trophies:"Trophy Cabinet",
@@ -1350,7 +1350,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=["fullhistory","contract","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="youth"||page==="league")?"none":"");
+      btn.style.display=["fullhistory","contract","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":"");
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
@@ -2336,7 +2336,7 @@ function renderLeagueCentre(){
  var c=getCurrentCareer();if(!c){renderDashboard();return;}
  var imported=c.leagueTableImport&&c.leagueTableImport.season===c.currentSeason?c.leagueTableImport.rows:null;
  var computed=buildLeagueTable(c),rows=imported&&imported.length?imported:computed.map(function(r,i){return {place:i+1,team:r.team,points:r.pts,wins:r.w,draws:r.d,losses:r.l,gf:r.gf,ga:r.ga,gd:r.gd};});
- var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">League Centre</div><div class="page-subtitle">'+escapeHTML(c.league)+' · '+escapeHTML(c.currentSeason)+'</div></div><button class="secondary-btn" onclick="openSeasonSetup(false)">Edit League Teams</button></div><div class="info-box">Upload a league table screenshot to import all teams at once, or upload a knockout bracket to save rounds and fixtures. You do not need to enter every other team match manually.</div><div class="panel"><div class="panel-title">Import table or knockout bracket</div><div class="form-grid"><div class="form-group"><label>Screenshot type</label><select id="leagueScreenshotType" class="form-select"><option value="table">League table</option><option value="bracket">Knockout bracket</option></select></div><div class="form-group"><label>Season</label><div class="form-input" style="display:flex;align-items:center">'+escapeHTML(c.currentSeason)+'</div></div><div class="form-group full"><label>Screenshot(s)</label><input id="leagueScreenshotFiles" class="form-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></div></div><button class="primary-btn" style="margin-top:12px" onclick="analyseLeagueCentreScreenshots()">Analyse Screenshot(s)</button></div>';
+ var h=careerBanner(c)+'<div class="topbar"><div><div class="page-title">League Centre</div><div class="page-subtitle">'+escapeHTML(c.league)+' · '+escapeHTML(c.currentSeason)+'</div></div><button class="secondary-btn" onclick="openSeasonSetup(false)">Edit League Teams</button></div><div class="info-box">Upload a league table screenshot to import all teams at once, or upload a knockout bracket to save rounds and fixtures. You do not need to enter every other team match manually.</div><div class="panel"><div class="panel-title">Import table or knockout bracket</div><div class="form-grid"><div class="form-group"><label>Screenshot type</label><select id="leagueScreenshotType" class="form-select"><option value="table">League table</option><option value="bracket">Knockout bracket</option></select></div><div class="form-group"><label>Season</label><div class="form-input" style="display:flex;align-items:center">'+escapeHTML(c.currentSeason)+'</div></div><div class="form-group"><label>Competition name</label><input id="leagueCompetitionName" class="form-input" placeholder="e.g. Premier League, LaLiga, Champions League" value="'+escapeHTML(c.league||"")+'"></div><div class="form-group full"><label>Screenshot(s)</label><input id="leagueScreenshotFiles" class="form-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></div></div><button class="primary-btn" style="margin-top:12px" onclick="analyseLeagueCentreScreenshots()">Analyse Screenshot(s)</button></div>';
  if(c.leagueBracketImport&&c.leagueBracketImport.season===c.currentSeason){
   h+='<div class="panel"><div class="panel-title">Imported Knockout Bracket</div><div class="panel-subtitle">'+escapeHTML(c.leagueBracketImport.competition||c.league)+' · '+escapeHTML(c.currentSeason)+'</div>';
   (c.leagueBracketImport.rounds||[]).forEach(function(round){h+='<div style="margin:12px 0"><strong>'+escapeHTML(round.name||"Round")+'</strong><div class="calendar-list">'+(round.matches||[]).map(function(m){var score=m.score||((m.homeScore!=null?m.homeScore:"")+(m.homeScore!=null||m.awayScore!=null?"–":"")+(m.awayScore!=null?m.awayScore:""));return '<div class="calendar-match"><div class="calendar-top"><span>'+escapeHTML(m.home||m.homeTeam||"Team")+'</span><strong>'+escapeHTML(score||"—")+'</strong><span>'+escapeHTML(m.away||m.awayTeam||"Team")+'</span></div></div>';}).join("")+'</div></div>';});
@@ -2360,7 +2360,7 @@ async function analyseLeagueCentreScreenshots(){
    if(!rows.length){alert("The AI could not identify a usable table. Try a clearer screenshot or upload one screenshot at a time.");return;}
    var preview=rows.slice(0,5).map(function(r){return r.place+". "+r.team+" — "+r.points+" pts";}).join("\n");
    if(!confirm("I found "+rows.length+" teams. First rows:\n\n"+preview+"\n\nImport this table?"))return;
-   c.leagueTableImport={season:c.currentSeason,rows:rows,source:"screenshot",date:todayDate()};
+   const competition=String(document.getElementById("leagueCompetitionName")?.value||data.competition||c.league||"Competition").trim();if(!c.competitionLeagueTables)c.competitionLeagueTables={};c.competitionLeagueTables[competition]={season:c.currentSeason,competition:competition,rows:rows,source:"screenshot",date:todayDate()};c.leagueTableImport=c.competitionLeagueTables[competition];
   }else{
    var rounds=Array.isArray(data.rounds)?data.rounds:(Array.isArray(data.bracket)?data.bracket:[]);
    if(!rounds.length&&Array.isArray(data.matches))rounds=[{name:data.round||"Knockout bracket",matches:data.matches}];
@@ -6241,6 +6241,9 @@ function createPlayerCareer(event){
   enterCareer(career.id);
 }
 
+function pcFansColor(v){v=Math.max(0,Math.min(100,Number(v)||0));return v<=10?"#dc2626":v<=25?"#f97316":v<=50?"#eab308":v<=75?"#a3a51c":"#14532d";}
+function pcFansRating(c){const s=playerCareerStats(c,c.currentSeason),p=c.player||{},age=pcAge(c),ovr=Number(p.overall||p.overallRating)||70,recent=(s.matches||[]).slice(-5).map(m=>Number(m.rating)).filter(Number.isFinite),avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:(Number(s.average)||6.5),expected=5.6+ovr*.012,form=(avg-expected)*13,ageBoost=age===null?0:age<=20?7:age<=23?4:age<=27?1:age<=30?-2:-4,total=s.wins+s.draws+s.losses,winRate=total?s.wins/total:0.5,winEffect=(winRate-.5)*24;return Math.round(Math.max(0,Math.min(100,52+form+ageBoost+winEffect)));}
+
 function playerCareerStats(c, filter){
   const matches=(c.matches||[]).filter(m=>!m.international&&(!filter||m.season===filter));
   const goals=matches.reduce((n,m)=>n+(Number(m.goals)||0),0);
@@ -6525,7 +6528,7 @@ function renderPlayerCareerPage(page){
   const header='<div class="topbar"><div><div class="page-title">'+escapeHTML(p.name||"Player Career")+'</div><div class="page-subtitle">'+escapeHTML(c.clubName||"No club")+' · '+escapeHTML(p.position||"Position not set")+' · Season '+escapeHTML(c.currentSeason||"")+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary-btn" onclick="showPage(\'dashboard\')">All Saves</button><button class="secondary-btn" onclick="renderPlayerCareerPage(\'predictor\')">Transfer Predictor</button><button class="secondary-btn" onclick="editPlayerProfile()">Edit Profile</button></div></div>';
   let html=header;
   if(page==="mycareer"||page==="dashboard"){
-    html+='<div class="match-summary-grid">'+playerStatCard("Season",c.currentSeason)+playerStatCard("Club Appearances",stats.appearances)+playerStatCard("Goals",stats.goals)+playerStatCard("Assists",stats.assists)+playerStatCard("Average Rating",stats.average)+playerStatCard("Overall",p.overall||"—")+playerStatCard("Transfer Value",formatTransferValue(p.transferValue,p.transferCurrency))+'</div>'+
+    html+='<div class="match-summary-grid">'+playerStatCard("Season",c.currentSeason)+playerStatCard("Club Appearances",stats.appearances)+playerStatCard("Goals",stats.goals)+playerStatCard("Assists",stats.assists)+playerStatCard("Average Rating",stats.average)+playerStatCard("Overall",p.overall||"—")+playerStatCard("Transfer Value",formatTransferValue(p.transferValue,p.transferCurrency))+playerStatCard("Your Team Fans Rating",pcFansRating(c)+"%")+'</div>'+
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Player Career Overview</div><div class="panel-subtitle">Your career statistics update when you save match records.</div><div class="match-summary-grid">'+playerStatCard("Career Apps",allStats.appearances)+playerStatCard("Career Goals",allStats.goals)+playerStatCard("Career Assists",allStats.assists)+playerStatCard("Minutes",allStats.minutes)+playerStatCard("W-D-L",allStats.wins+"-"+allStats.draws+"-"+allStats.losses)+playerStatCard("Trophies",c.trophies.length)+'</div><p style="color:#9ca5b1;margin-top:18px">Nationality: '+escapeHTML(p.nationality||"Not set")+' · Preferred foot: '+escapeHTML(p.preferredFoot||"Right")+' · Shirt number: '+escapeHTML(String(p.shirtNumber||"—"))+' · National team: '+escapeHTML(p.nationalTeam||"Not set")+'</p></div>'+
       '<div class="panel" style="margin-top:18px"><div class="panel-title">Start-of-Season Rating & Transfer Value</div><div class="panel-subtitle">Record your overall rating and transfer value at the start of any season. These values are saved against that season and used for your season FIFA card.</div><form onsubmit="savePlayerSeasonStartValues(event)" class="form-grid" style="margin-top:14px">'+
       '<div class="setup-section"><label class="setup-label">Season</label><select class="form-input" name="season" required>'+playerCareerSeasonList(c).map(season=>'<option value="'+escapeHTML(season)+'" '+(season===(c.currentSeason||"")?'selected':'')+'>'+escapeHTML(season)+'</option>').join("")+'</select></div>'+
@@ -6956,8 +6959,8 @@ function addPlayerClubMove(){
   const history=c.clubHistory||(c.clubHistory=[]);
   const previous=history[history.length-1];
   if(previous&&!previous.toSeason)previous.toSeason=season;
-  history.push({club:newClub.trim(),league:league.trim(),fromSeason:season,toSeason:null});
-  c.transfers.push({id:createId(),player:c.player.name,fromClub:oldClub,toClub:newClub.trim(),date:new Date().toISOString().slice(0,10),season:season,type:"Player move"});
+  const fee=prompt("Transfer fee (optional, e.g. £12m):","");if(fee===null)return;const moveType=prompt("Move type / reason (e.g. Permanent, loan, free transfer):","Permanent");if(moveType===null)return;history.push({club:newClub.trim(),league:league.trim(),fromSeason:season,toSeason:null,joinedFrom:oldClub,fee:fee.trim(),moveType:moveType.trim()});
+  c.transfers.push({id:createId(),player:c.player.name,fromClub:oldClub,toClub:newClub.trim(),date:new Date().toISOString().slice(0,10),season:season,type:moveType.trim(),fee:fee.trim()});
   c.clubName=newClub.trim();c.league=league.trim();c.currentSeason=season;
   if(!c.seasons.some(x=>x.season===season))c.seasons.push({season:season,clubName:c.clubName,league:c.league,completed:false});
   saveCareers();updateNavigation();renderPlayerCareerPage("transfers");
@@ -6966,8 +6969,8 @@ function addPlayerClubMove(){
 function playerClubHistoryTable(c){
   const history=(c.clubHistory||[]).slice().reverse();
   if(!history.length)return '<p style="color:#8d97a3">No club history recorded.</p>';
-  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Club</th><th>League</th><th>From</th><th>To</th><th>Status</th></tr></thead><tbody>';
-  history.forEach(function(h){html+='<tr><td>'+escapeHTML(h.club||"—")+'</td><td>'+escapeHTML(h.league||"—")+'</td><td>'+escapeHTML(h.fromSeason||"—")+'</td><td>'+escapeHTML(h.toSeason||"Present")+'</td><td>'+(h.toSeason?"Previous club":"Current club")+'</td></tr>';});
+  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Club</th><th>League</th><th>Joined from</th><th>Joined</th><th>Left</th><th>Transfer fee</th><th>Move type</th><th>Status</th></tr></thead><tbody>';
+  history.forEach(function(h){html+='<tr><td>'+escapeHTML(h.club||"—")+'</td><td>'+escapeHTML(h.league||"—")+'</td><td>'+escapeHTML(h.joinedFrom||"—")+'</td><td>'+escapeHTML(h.fromSeason||"—")+'</td><td>'+escapeHTML(h.toSeason||"Present")+'</td><td>'+escapeHTML(h.fee||"—")+'</td><td>'+escapeHTML(h.moveType||"—")+'</td><td>'+(h.toSeason?"Previous club":"Current club")+'</td></tr>';});
   return html+'</tbody></table></div>';
 }
 
