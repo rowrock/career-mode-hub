@@ -1132,10 +1132,8 @@ National Team
 </button>
 
 <button class="nav-btn disabled" data-page="contract" onclick="showPage('contract')" style="display:none">Contract & Agent</button>
-<button class="nav-btn disabled" data-page="journey" onclick="showPage('journey')" style="display:none">Career Journey Map</button>
-<button class="nav-btn disabled" data-page="records" onclick="showPage('records')" style="display:none">Records & Milestones</button>
 <button class="nav-btn disabled" data-page="objectives" onclick="showPage('objectives')" style="display:none">Season Predictions & Objectives</button>
-<button class="nav-btn disabled" data-page="media" onclick="showPage('media')" style="display:none">News & Media Centre</button>
+<button class="nav-btn disabled" data-page="media" onclick="showPage('media')" style="display:none">Press</button>
 <button class="nav-btn disabled" data-page="fullhistory" onclick="showPage('fullhistory')" style="display:none">
 Full History
 </button>
@@ -1341,7 +1339,7 @@ function updateNavigation(){
       squad:"Player Stats",players:"Player Profile",youth:"Youth Academy",
       transfers:"Club History",competitions:"Awards & Competitions",
       league:"League Centre",past:"Season History",trophies:"Trophy Cabinet",
-      national:"International Career",fullhistory:"Full Career",contract:"Contract & Agent",journey:"Career Journey Map",records:"Records & Milestones",objectives:"Season Predictions & Objectives",media:"News & Media Centre"
+      national:"International Career",fullhistory:"Full Career",contract:"Contract & Agent",objectives:"Season Predictions & Objectives",media:"Press"
     };
     const managerLabels={
       mycareer:"My Career",calendar:"Calendar",matches:"Matches",squad:"Squad",
@@ -1352,7 +1350,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=["fullhistory","contract","journey","records","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="youth"||page==="league")?"none":"");
+      btn.style.display=["fullhistory","contract","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="youth"||page==="league")?"none":"");
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
@@ -6365,6 +6363,99 @@ function pcStrength(c){if(!allPlayers.length)return null;const club=String(c.clu
 function pcAgentAdvice(c){const s=playerCareerStats(c,c.currentSeason),p=pcPrev(c),age=pcAge(c),t=c.contract||{},a=[];a.push(t.expiry?"Your tracked contract expires in "+t.expiry+".":"Add your contract expiry to plan ahead.");if(s.appearances<5)a.push("Your current sample is small; aim for a consistent run of appearances.");else if(p&&Number(s.average)>Number(p.average)+.3)a.push("Your average rating is up on last season. Consider discussing a larger role or renewal.");else if(p&&Number(s.average)<Number(p.average)-.3)a.push("Your average rating is down on last season. Focus on consistent performances.");if(["Prospect","Sporadic"].includes(t.role))a.push("Your recorded role is "+t.role+". Check whether your minutes match your development goals.");if(age!==null&&age<23)a.push("At "+age+", regular minutes and development may matter more than an immediate wage increase.");if(!t.wage)a.push("Add your weekly wage to complete your contract tracker.");return '<ul style="line-height:1.8;color:#c5ced8">'+a.map(x=>'<li>'+escapeHTML(x)+'</li>').join("")+'</ul>';}
 function pcJourney(c){const a=[];(c.clubHistory||[]).forEach(x=>a.push({date:x.date||x.season||"",title:x.club||x.clubName||x.team||"Club history",detail:x.note||x.notes||x.league||"Club history entry"}));(c.trophies||[]).forEach(x=>a.push({date:x.date||x.season||"",title:x.name||x.trophy||x.title||"Trophy won",detail:[x.competition,x.type].filter(Boolean).join(" · ")||"Recorded trophy"}));(c.matches||[]).filter(x=>x.manOfTheMatch||Number(x.goals)>0||Number(x.assists)>0).forEach(x=>a.push({date:x.date||"",title:x.manOfTheMatch?"Man of the Match":Number(x.goals)>0?"Scoring performance":"Assist recorded",detail:(x.opponent?"vs "+x.opponent:"Match")+" · "+(Number(x.goals)||0)+" goals · "+(Number(x.assists)||0)+" assists"}));a.sort((x,y)=>String(x.date).localeCompare(String(y.date)));return a.length?'<div style="border-left:2px solid #394554;margin:18px 0;padding-left:20px">'+a.map(x=>'<div style="padding:0 0 20px"><div style="font-size:12px;color:#8dd5ff">'+escapeHTML(x.date?formatDate(x.date):"Career")+'</div><b>'+escapeHTML(x.title)+'</b><div style="color:#aab3bf;font-size:13px;margin-top:4px">'+escapeHTML(x.detail)+'</div></div>').join("")+'</div>':'<p style="color:#aab3bf">Your timeline will fill as you record club history, matches and trophies.</p>';}
 function pcRecords(c){const s=playerCareerStats(c,null),m=c.matches||[],g=m.reduce((a,x)=>a+(Number(x.goals)||0),0),as=m.reduce((a,x)=>a+(Number(x.assists)||0),0),r=m.map(x=>Number(x.rating)).filter(x=>x>0),motm=m.filter(x=>x.manOfTheMatch).length,ms=[["First appearance",s.appearances>=1],["10 appearances",s.appearances>=10],["50 appearances",s.appearances>=50],["100 appearances",s.appearances>=100],["First goal",g>=1],["10 goals",g>=10],["25 goals",g>=25],["50 goals",g>=50],["First assist",as>=1],["First Man of the Match",motm>=1],["First trophy",(c.trophies||[]).length>=1]];return '<div class="match-summary-grid">'+playerStatCard("Appearances",s.appearances)+playerStatCard("Goals",g)+playerStatCard("Assists",as)+playerStatCard("Best rating",r.length?Math.max(...r).toFixed(1):"—")+playerStatCard("Man of the Match",motm)+playerStatCard("Trophies",(c.trophies||[]).length)+'</div><h3 style="margin-top:22px">Milestones</h3><div class="form-grid">'+ms.map(([n,ok])=>'<div style="padding:12px;border:1px solid '+(ok?'#28654f':'#303946')+';border-radius:10px"><b style="color:'+(ok?'#6ee7b7':'#aab3bf')+'">'+(ok?'✓ ':'○ ')+n+'</b><div style="font-size:12px;color:#8d97a3;margin-top:5px">'+(ok?'Unlocked':'Not reached')+'</div></div>').join("")+'</div>';}
+
+function pcRecordTracker(c){
+ const matches=(c.matches||[]).filter(m=>!m.international),p=c.player||{};
+ const comp=(m)=>String(m.competition||"").toLowerCase();
+ const pl=matches.filter(m=>/premier league|english premier league|\bepl\b/.test(comp(m)));
+ const ucl=matches.filter(m=>/champions league|uefa champions league|\bucl\b/.test(comp(m)));
+ const sum=(a,k)=>a.reduce((n,m)=>n+(Number(m[k])||0),0);
+ const catalog=[
+  {name:"Premier League all-time goals",holder:"Alan Shearer",record:260,value:sum(pl,"goals"),unit:"goals",scope:"Premier League"},
+  {name:"Premier League all-time assists",holder:"Ryan Giggs",record:162,value:sum(pl,"assists"),unit:"assists",scope:"Premier League"},
+  {name:"Premier League appearances",holder:"James Milner",record:653,value:pl.length,unit:"appearances",scope:"Premier League"},
+  {name:"Champions League all-time goals",holder:"Cristiano Ronaldo",record:140,value:sum(ucl,"goals"),unit:"goals",scope:"UEFA Champions League"},
+  {name:"Champions League all-time assists",holder:"Cristiano Ronaldo",record:42,value:sum(ucl,"assists"),unit:"assists",scope:"UEFA Champions League"}
+ ];
+ const held=catalog.filter(x=>x.value>=x.record);
+ const closest=catalog.filter(x=>x.value<x.record).map(x=>({...x,pct:Math.min(100,x.value/x.record*100),remaining:x.record-x.value})).sort((a,b)=>b.pct-a.pct).slice(0,5);
+ const metric=(x)=>x.value.toLocaleString()+" / "+x.record.toLocaleString()+" "+x.unit;
+ return '<div class="panel" style="margin-top:18px"><div class="panel-title">Records you hold</div><div class="panel-subtitle">Official competition records are checked against the matches you have logged. Only recorded competition stats count.</div>'+
+ (held.length?held.map(x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">Record holder: '+escapeHTML(x.holder)+' · '+metric(x)+'</div></div>').join(""):'<p style="color:#aab3bf">You do not currently hold any of the tracked all-time records. Keep logging your matches to track your progress.</p>')+
+ '</div><div class="panel" style="margin-top:16px"><div class="panel-title">The 5 records you are closest to</div><div class="panel-subtitle">Ranked by your progress towards the all-time benchmark, using your recorded Premier League and Champions League matches.</div>'+
+ (closest.length?closest.map((x,i)=>'<div style="padding:13px 0;border-bottom:1px solid #303946"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+(i+1)+'. '+escapeHTML(x.name)+'</b><b style="color:#8dd5ff">'+x.pct.toFixed(1)+'%</b></div><div style="height:7px;background:#29323e;border-radius:8px;margin:9px 0"><div style="height:100%;width:'+x.pct+'%;background:#60a5fa;border-radius:8px"></div></div><div style="font-size:12px;color:#aab3bf">'+metric(x)+' · '+x.remaining.toLocaleString()+' to go · Record holder: '+escapeHTML(x.holder)+'</div></div>').join(""):'<p style="color:#aab3bf">No tracked competitions found yet. Add match competition names such as Premier League or UEFA Champions League.</p>')+
+ '<p style="font-size:11px;color:#8290a0;margin-top:12px">These are benchmark comparisons, not a claim that your save contains every historical match. Missing or unlogged matches will affect the totals.</p></div>';
+}
+const PC_RIVALRIES=[
+ ["Brighton & Hove Albion","Crystal Palace",92],["Barcelona","Real Madrid",98],["Atlético Madrid","Real Madrid",88],["Sevilla","Real Betis",94],["Arsenal","Tottenham Hotspur",95],["Manchester United","Manchester City",94],["Liverpool","Everton",90],["Chelsea","Tottenham Hotspur",80],["Newcastle United","Sunderland",96],["Celtic","Rangers",99],["Inter","AC Milan",96],["Roma","Lazio",97],["Juventus","Inter",86],["Borussia Dortmund","Bayern Munich",82],["Schalke 04","Borussia Dortmund",95],["PSG","Marseille",91],["Ajax","Feyenoord",94],["Benfica","Sporting CP",91],["Porto","Benfica",91],["Galatasaray","Fenerbahçe",99],["Fenerbahçe","Beşiktaş",88],["Boca Juniors","River Plate",99],["Flamengo","Fluminense",92],["Club América","Chivas",96],["LA Galaxy","Los Angeles FC",90],["Portsmouth","Southampton",96],["Aston Villa","Birmingham City",95],["Nottingham Forest","Derby County",92],["Manchester United","Liverpool",84],["Real Madrid","Barcelona",98]
+];
+function pcClubKey(v){return String(v||"").toLowerCase().replace(/\b(fc|cf|afc|sc|club|football club)\b/g,"").replace(/[^a-z0-9]/g,"");}
+function pcRivalryBase(a,b){
+ const x=pcClubKey(a),y=pcClubKey(b);
+ for(const r of PC_RIVALRIES)if((pcClubKey(r[0])===x&&pcClubKey(r[1])===y)||(pcClubKey(r[0])===y&&pcClubKey(r[1])===x))return r[2];
+ return 0;
+}
+function pcRivalryCandidates(c){
+ const names=new Set(PC_RIVALRIES.flatMap(r=>r.slice(0,2)));
+ (c.matches||[]).filter(m=>!m.international&&m.opponent).forEach(m=>names.add(m.opponent));
+ (c.clubHistory||[]).forEach(x=>names.add(x.club||x.clubName||x.team||""));
+ (c.transferPredictorInterested||[]).forEach(x=>names.add(x));
+ return [...names].filter(x=>x&&pcClubKey(x)!==pcClubKey(c.clubName));
+}
+function pcRivalryScore(c,club){
+ const key=pcClubKey(club),current=c.clubName||"",manual=(c.pressRivalries||{})[key]||0;
+ let score=pcRivalryBase(current,club)+manual;
+ const against=(c.matches||[]).filter(m=>!m.international&&pcClubKey(m.opponent)===key);
+ score+=Math.min(24,against.reduce((n,m)=>n+(Number(m.goals)||0)*4,0));
+ score+=Math.min(12,against.filter(m=>m.result==="W").length*3);
+ const old=(c.clubHistory||[]).some(x=>pcClubKey(x.club||x.clubName||x.team)===key);
+ if(old&&pcRivalryBase(current,club)>=70)score+=32;
+ return Math.max(0,Math.min(100,Math.round(score)));
+}
+function pcTopRivals(c){return pcRivalryCandidates(c).map(club=>({club,score:pcRivalryScore(c,club)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.club.localeCompare(b.club)).slice(0,10);}
+function pcPressQuestion(c){
+ if(!c.currentPressQuestion){
+  const rivals=pcTopRivals(c),s=playerCareerStats(c,c.currentSeason),p=c.player||{};
+  const r=rivals[0];
+  const pool=[
+   {question:"You have been linked with a move away. Are you committed to "+(c.clubName||"your club")+"?",topic:"future"},
+   {question:"Which player in world football do you think gets far more credit than they deserve?",topic:"player"},
+   {question:"Which club do you enjoy beating the most, and why?",topic:"rivalry"},
+   {question:"Do you think "+(p.name||"you")+" is already one of the best players in the league?",topic:"confidence"},
+   {question:"Your recent form has been strong: "+s.goals+" goals and "+s.assists+" assists this season. Is the team built around you?",topic:"team"},
+   {question:r?"The rivalry with "+r.club+" is getting personal. Do you actually dislike them?":"Which club would you most like to beat in a big match?",topic:"rivalry",club:r&&r.club}
+  ];
+  const chosen=pool[Math.floor(Math.random()*pool.length)];
+  c.currentPressQuestion={...chosen,createdAt:new Date().toISOString()};
+ }
+ return c.currentPressQuestion;
+}
+function pcPress(c){
+ const q=pcPressQuestion(c),rivals=pcTopRivals(c),clubs=pcRivalryCandidates(c).sort((a,b)=>a.localeCompare(b));
+ const statements={respectful:"I respect them. The rivalry is part of football, but I keep it on the pitch.",confident:"We back ourselves against anyone. I look forward to proving it on the pitch.",controversial:"I don't rate them. They talk a lot, and I want to make sure they hear about it when we beat them."};
+ return '<div class="panel"><div class="panel-title">Press conference</div><div class="panel-subtitle">Questions react to your form, opponents, rivalries, transfers and previous answers. Your responses shape how other clubs and their supporters see you.</div><div style="padding:18px;background:#121a24;border:1px solid #344253;border-radius:12px;margin-top:14px"><div style="font-size:11px;color:#8dd5ff;font-weight:800;letter-spacing:.08em">JOURNALIST QUESTION</div><h3 style="line-height:1.5;margin:10px 0 18px">'+escapeHTML(q.question)+'</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary-btn" onclick="answerPressQuestion(\'respectful\')">Respectful answer</button><button class="secondary-btn" onclick="answerPressQuestion(\'confident\')">Confident answer</button><button class="primary-btn" onclick="answerPressQuestion(\'controversial\')">Controversial answer</button></div><p style="font-size:12px;color:#8492a2;margin:12px 0 0">Your statement: '+escapeHTML(statements.confident)+'</p><button class="secondary-btn" style="margin-top:12px" onclick="generatePressQuestion()">Next question</button></div>'+
+ '<div style="margin-top:18px"><div class="panel-title">Start a rivalry</div><div class="panel-subtitle">Call out any club. Existing football rivalries make the reaction stronger.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><select id="pressTargetClub" class="form-input" style="flex:1;min-width:210px"><option value="">Choose a club</option>'+clubs.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("")+'</select><button class="primary-btn" onclick="startPlayerRivalry()">Start rivalry</button></div></div>'+
+ '<div style="margin-top:18px"><div class="panel-title">Your press history</div>'+((c.pressHistory||[]).length?(c.pressHistory||[]).slice(-6).reverse().map(x=>'<div style="padding:10px 0;border-bottom:1px solid #303946"><b>'+escapeHTML(x.answer||"Statement")+'</b><div style="font-size:12px;color:#9ca5b1">'+escapeHTML(x.question||"")+'</div></div>').join(""):'<p style="color:#aab3bf">Your quotes and controversial moments will appear here.</p>')+'</div></div>'+
+ '<div class="panel" style="margin-top:16px"><div class="panel-title">Top 10 clubs that dislike you most</div><div class="panel-subtitle">Percentages combine real-world derby intensity, your results against them, public comments and transfer history. A move directly between major rivals can dramatically increase the old club’s hostility.</div>'+
+ (rivals.length?rivals.map((x,i)=>'<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #303946"><div style="color:#8dd5ff;font-weight:800;width:22px">'+(i+1)+'</div><div style="flex:1"><b>'+escapeHTML(x.club)+'</b><div style="height:6px;background:#29323e;border-radius:8px;margin-top:7px"><div style="height:100%;width:'+x.score+'%;background:'+(x.score>=80?'#ef6464':x.score>=50?'#e9a23b':'#60a5fa')+';border-radius:8px"></div></div></div><b style="min-width:44px;text-align:right">'+x.score+'%</b></div>').join(""):'<p style="color:#aab3bf">Your rivalries will appear here as you play matches and answer journalists.</p>')+'</div>';
+}
+function answerPressQuestion(style){
+ const c=getCurrentCareer();if(!c)return;const q=pcPressQuestion(c);
+ const text={respectful:"I respect them. The rivalry is part of football, but I keep it on the pitch.",confident:"We back ourselves against anyone. I look forward to proving it on the pitch.",controversial:"I don't rate them. They talk a lot, and I want to make sure they hear about it when we beat them."}[style];
+ const target=q.club||(document.getElementById("pressTargetClub")||{}).value||"";
+ if(target){if(!c.pressRivalries)c.pressRivalries={};const k=pcClubKey(target);c.pressRivalries[k]=(Number(c.pressRivalries[k])||0)+(style==="controversial"?18:style==="confident"?7:-3);}
+ if(!Array.isArray(c.pressHistory))c.pressHistory=[];c.pressHistory.push({question:q.question,answer:text,style,club:target,date:new Date().toISOString()});
+ c.currentPressQuestion=null;saveCareers();renderPlayerCareerPage("media");
+}
+function startPlayerRivalry(){
+ const c=getCurrentCareer(),el=document.getElementById("pressTargetClub"),club=el&&el.value;if(!c||!club){alert("Choose a club first.");return;}
+ if(!c.pressRivalries)c.pressRivalries={};const k=pcClubKey(club);c.pressRivalries[k]=(Number(c.pressRivalries[k])||0)+18;
+ c.currentPressQuestion={question:"You have publicly called out "+club+". What makes you so confident you can beat them?",topic:"rivalry",club};
+ if(!Array.isArray(c.pressHistory))c.pressHistory=[];c.pressHistory.push({question:"You have publicly called out "+club+".",answer:"I want that fixture. We have something to prove.",style:"rivalry",club,date:new Date().toISOString()});
+ saveCareers();renderPlayerCareerPage("media");
+}
+function generatePressQuestion(){const c=getCurrentCareer();if(!c)return;c.currentPressQuestion=null;pcPressQuestion(c);saveCareers();renderPlayerCareerPage("media");}
+
 function pcPrediction(c){const p=c.player||{},s=playerCareerStats(c,c.currentSeason),prev=pcPrev(c),age=pcAge(c),str=pcStrength(c),ov=Number(p.overall)||Number((c.seasonOverallRatings||{})[c.currentSeason])||65,pos=String(p.position||"").toUpperCase(),form=Number(s.average)||6.5,apps=Math.round(Math.max(12,Math.min(48,(age!==null&&age<21?25:age!==null&&age>32?24:34)*(ov/80)*(.65+form/14)))),gpa=prev&&prev.appearances?prev.goals/prev.appearances:(["ST","CF","LW","RW"].includes(pos)?.35:["CAM","CM","LM","RM"].includes(pos)?.12:.04),goals=Math.round(apps*gpa*(ov/75)),assists=Math.round(apps*(["LW","RW","CAM","LM","RM"].includes(pos)?.24:["ST","CF"].includes(pos)?.16:["CM"].includes(pos)?.17:.05));return '<div class="match-summary-grid">'+playerStatCard("Projected appearances",apps)+playerStatCard("Projected goals",goals)+playerStatCard("Projected assists",assists)+playerStatCard("Current overall",ov)+'</div><p style="color:#c5ced8;line-height:1.7;margin-top:14px">'+(str?'Your club is estimated at '+str.avg.toFixed(1)+' average overall and ranks '+str.rank+' of '+str.total+' squads found in '+escapeHTML(c.league||"its league")+'. League squad average: '+str.leagueAvg.toFixed(1)+'.':'Club strength could not be compared because the club/league was not matched in the FC27 database.')+'</p><p style="font-size:12px;color:#8995a4">Factors: '+escapeHTML((age===null?'age not set':'age '+age)+' · position '+(p.position||'not set')+' · last season '+(prev?prev.goals+' goals in '+prev.appearances+' appearances':'no previous-season record')+' · current average rating '+form.toFixed(2))+'. These are in-app data-based projections, not a live external AI model.</p>';}
 function pcProgress(c,o){const s=playerCareerStats(c,c.currentSeason),a=[["Appearances",s.appearances,o.apps],["Goals",s.goals,o.goals],["Assists",s.assists,o.assists],["Average rating",Number(s.average)||0,o.rating]].filter(x=>x[2]!==undefined&&x[2]!==null&&x[2]!=="");return (o.objective?'<p style="color:#c5ced8">Objective: <b>'+escapeHTML(o.objective)+'</b></p>':'')+(a.length?a.map(([n,v,t])=>{let pct=Number(t)>0?Math.min(100,Math.round(Number(v)/Number(t)*100)):0;return '<div style="padding:10px 0"><div style="display:flex;justify-content:space-between"><b>'+n+'</b><span>'+Number(v).toFixed(n==="Average rating"?2:0)+' / '+Number(t)+'</span></div><div style="height:7px;background:#29323e;border-radius:8px;margin-top:7px"><div style="height:100%;width:'+pct+'%;background:#34d399"></div></div></div>';}).join(""):'<p style="color:#aab3bf">Add targets to track progress here.</p>');}
 function pcNews(c){const p=c.player||{},s=playerCareerStats(c,c.currentSeason),m=(c.matches||[]).filter(x=>!x.international).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))),l=m[0],a=[];if(l)a.push(["MATCH REPORT",(p.name||"Your player")+" features in "+(c.clubName||"the club")+"'s latest result","Logged score "+(l.goalsFor??"—")+"–"+(l.goalsAgainst??"—")+" against "+(l.opponent||"opposition")+". Recorded contribution: "+(Number(l.goals)||0)+" goals, "+(Number(l.assists)||0)+" assists"+(l.rating?" and rating "+l.rating:"")+".",l.date]);if(s.appearances)a.push(["SEASON WATCH",(p.name||"Your player")+" has "+s.goals+" goals in "+s.appearances+" appearances","Saved season totals include "+s.assists+" assists and average rating "+(s.average||"not yet available")+".",c.currentSeason]);const t=c.contract||{};if(t.expiry)a.push(["CONTRACT WATCH","Contract timeline: "+t.expiry,"Your contract tracker lists this expiry. This is based on your entry, not actual negotiations.",c.currentSeason]);if(!a.length)a.push(["CAREER UPDATE",(p.name||"Your player")+" begins a new chapter at "+(c.clubName||"the club"),"Record matches and trophies to build your personal news feed.",c.currentSeason]);return a.map(x=>'<article style="padding:16px 0;border-bottom:1px solid #303946"><div style="font-size:11px;color:#8dd5ff;font-weight:800">'+x[0]+' · '+escapeHTML(x[3]||"Career")+'</div><h3 style="margin:7px 0">'+escapeHTML(x[1])+'</h3><p style="color:#bdc6d1;line-height:1.7">'+escapeHTML(x[2])+'</p></article>').join("");}
@@ -6376,7 +6467,7 @@ function savePCObjectives(e){e.preventDefault();const c=getCurrentCareer();if(!c
 function pcCareerPayload(c){
  const p=c.player||{},season=c.currentSeason,st=playerCareerStats(c,season),prev=pcPrev(c),strength=pcStrength(c);
  const matches=(c.matches||[]).filter(x=>!x.international).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12);
- return {player:{name:p.name||"",age:pcAge(c),position:p.position||"",overall:Number(p.overall)||Number((c.seasonOverallRatings||{})[season])||null,transferValue:p.transferValue??null},club:{name:c.clubName||"",league:c.league||"",season:season||"",strengthEstimate:strength},currentSeasonStats:st,previousSeasonStats:prev,contract:c.contract||{},seasonObjectives:(c.seasonObjectives||{})[season]||{},recentMatches:matches.map(m=>({date:m.date||null,opponent:m.opponent||null,competition:m.competition||null,score:m.goalsFor!=null?String(m.goalsFor)+"-"+String(m.goalsAgainst??"?"):null,goals:Number(m.goals)||0,assists:Number(m.assists)||0,rating:m.rating??null,minutes:m.minutes??null,manOfTheMatch:!!m.manOfTheMatch})),trophies:(c.trophies||[]).slice(-12).map(t=>({name:t.name||t.trophy||t.title||"",season:t.season||"",competition:t.competition||""}))};
+ return {player:{name:p.name||"",age:pcAge(c),position:p.position||"",overall:Number(p.overall)||Number((c.seasonOverallRatings||{})[season])||null,transferValue:p.transferValue??null},club:{name:c.clubName||"",league:c.league||"",season:season||"",strengthEstimate:strength},currentSeasonStats:st,previousSeasonStats:prev,contract:c.contract||{},seasonObjectives:(c.seasonObjectives||{})[season]||{},recentMatches:matches.map(m=>({date:m.date||null,opponent:m.opponent||null,competition:m.competition||null,score:m.goalsFor!=null?String(m.goalsFor)+"-"+String(m.goalsAgainst??"?"):null,goals:Number(m.goals)||0,assists:Number(m.assists)||0,rating:m.rating??null,minutes:m.minutes??null,manOfTheMatch:!!m.manOfTheMatch})),trophies:(c.trophies||[]).slice(-12).map(t=>({name:t.name||t.trophy||t.title||"",season:t.season||"",competition:t.competition||""})),clubRivalries:pcTopRivals(c),recentPressStatements:(c.pressHistory||[]).slice(-10)};
 }
 async function requestPlayerCareerAI(kind){
  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
@@ -6470,7 +6561,7 @@ function renderPlayerCareerPage(page){
     const allTrophies=c.trophies||[];
     const teamCount=allTrophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy").length;
     const individualCount=allTrophies.length-teamCount;
-    html+='<div class="topbar"><div><div class="panel-title">Trophy Cabinet</div><div class="panel-subtitle">Your recorded trophies and awards. Manage competitions and add awards in Awards & Competitions.</div></div><button class="secondary-btn" onclick="renderPlayerCareerPage(\'competitions\')">Awards & Competitions</button></div><div class="match-summary-grid">'+playerStatCard("Team Trophies",teamCount)+playerStatCard("Individual Awards",individualCount)+playerStatCard("Total Awards",allTrophies.length)+'</div><div class="panel" style="margin-top:18px"><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter type</label><select id="trophyCabinetFilter" class="form-input" onchange="filterPlayerTrophyCabinet()"><option value="all">All awards</option><option value="team">Team trophies</option><option value="individual">Individual awards</option></select></div><div class="setup-section"><label class="setup-label">Search</label><input id="trophyCabinetSearch" class="form-input" placeholder="Search trophy, team or season" oninput="filterPlayerTrophyCabinet()"></div></div><div id="playerTrophyCabinetList" style="margin-top:16px">'+playerTrophyTable(c)+'</div></div>';
+    html+='<div class="topbar"><div><div class="panel-title">Trophy Cabinet</div><div class="panel-subtitle">Your recorded trophies and awards. Manage competitions and add awards in Awards & Competitions.</div></div><button class="secondary-btn" onclick="renderPlayerCareerPage(\'competitions\')">Awards & Competitions</button></div><div class="match-summary-grid">'+playerStatCard("Team Trophies",teamCount)+playerStatCard("Individual Awards",individualCount)+playerStatCard("Total Awards",allTrophies.length)+'</div><div class="panel" style="margin-top:18px"><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter type</label><select id="trophyCabinetFilter" class="form-input" onchange="filterPlayerTrophyCabinet()"><option value="all">All awards</option><option value="team">Team trophies</option><option value="individual">Individual awards</option></select></div><div class="setup-section"><label class="setup-label">Search</label><input id="trophyCabinetSearch" class="form-input" placeholder="Search trophy, team or season" oninput="filterPlayerTrophyCabinet()"></div></div><div id="playerTrophyCabinetList" style="margin-top:16px">'+playerTrophyTable(c)+'</div></div>'+pcRecordTracker(c);
   }else if(page==="past"){
     html+='<div class="topbar"><div><div class="panel-title">Season History</div><div class="panel-subtitle">Finish a season to save a summary before moving to the next season.</div></div><button class="primary-btn" onclick="finishPlayerSeason()">Finish Season & Start Next</button></div><div class="panel">'+playerSeasonStatsTable(c)+'</div>';
   }else if(page==="national"){
@@ -6498,10 +6589,6 @@ function renderPlayerCareerPage(page){
     '<div class="setup-section"><label class="setup-label">Agent name</label><input class="form-input" name="agent" value="'+escapeHTML(ct.agent||"")+'"></div>'+
     '<div class="setup-section"><label class="setup-label">Career goal</label><input class="form-input" name="goal" value="'+escapeHTML(ct.goal||"")+'" placeholder="e.g. Become a crucial player"></div>'+
     '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Contract</button></div></form></div><div class="panel" style="margin-top:16px"><div class="panel-title">Agent Advice</div>'+pcAgentAdvice(c)+'<div style="margin-top:14px"><button class="primary-btn" data-kind="agent" onclick="requestPlayerCareerAI(this.dataset.kind)">Get AI Agent Advice</button>'+pcAIResults(c,"agent")+'</div></div>';
-  }else if(page==="journey"){
-    html+='<div class="panel"><div class="panel-title">Career Journey Map</div><div class="panel-subtitle">A timeline of your saved club history, trophies and standout performances.</div>'+pcJourney(c)+'</div>';
-  }else if(page==="records"){
-    html+='<div class="panel"><div class="panel-title">Records & Milestones</div><div class="panel-subtitle">Milestones update automatically from your recorded matches and trophies.</div>'+pcRecords(c)+'</div>';
   }else if(page==="objectives"){
     const o=(c.seasonObjectives||{})[c.currentSeason]||{};
     html+='<div class="panel"><div class="panel-title">Season Predictions & Objectives</div><div class="panel-subtitle">Personalised projections use age, position, overall, previous-season output, current form and estimated club strength within its league. These are estimates, not guaranteed outcomes.</div>'+pcPrediction(c)+
@@ -6512,7 +6599,7 @@ function renderPlayerCareerPage(page){
     '<div class="setup-section"><label class="setup-label">Target average rating</label><input class="form-input" name="rating" type="number" min="0" max="10" step="0.1" value="'+escapeHTML(String(o.rating??""))+'"></div>'+
     '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Objectives</button></div></form><div class="panel" style="margin-top:16px"><div class="panel-title">Progress</div>'+pcProgress(c,o)+'</div><div class="panel" style="margin-top:16px"><button class="primary-btn" data-kind="objectives" onclick="requestPlayerCareerAI(this.dataset.kind)">Generate AI Predictions & Objectives</button>'+pcAIResults(c,"objectives")+'</div></div>';
   }else if(page==="media"){
-    html+='<div class="panel"><div class="panel-title">Player Career News & Media Centre</div><div class="panel-subtitle">Career headlines are generated from your saved stats, not real external news reports.</div>'+pcNews(c)+'<div style="margin-top:14px"><button class="primary-btn" data-kind="news" onclick="requestPlayerCareerAI(this.dataset.kind)">Generate AI News & Press Conference</button>'+pcAIResults(c,"news")+'</div></div><div class="panel" style="margin-top:16px"><div class="panel-title">Press Conference Talking Points</div>'+pcPress(c)+'</div>';
+    html+=pcPress(c);
   }else if(page==="fullhistory"){
     const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
