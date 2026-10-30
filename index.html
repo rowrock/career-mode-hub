@@ -6244,7 +6244,9 @@ function createPlayerCareer(event){
 }
 
 function pcFansColor(v){v=Math.max(0,Math.min(100,Number(v)||0));return v<=10?"#dc2626":v<=25?"#f97316":v<=50?"#eab308":v<=75?"#a3a51c":"#14532d";}
-function pcFansRating(c){const s=playerCareerStats(c,c.currentSeason),p=c.player||{},age=pcAge(c),ovr=Number(p.overall||p.overallRating)||70,recent=(s.matches||[]).slice(-5).map(m=>Number(m.rating)).filter(Number.isFinite),avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:(Number(s.average)||6.5),expected=5.6+ovr*.012,form=(avg-expected)*13,ageBoost=age===null?0:age<=20?7:age<=23?4:age<=27?1:age<=30?-2:-4,total=s.wins+s.draws+s.losses,winRate=total?s.wins/total:0.5,winEffect=(winRate-.5)*24;return Math.round(Math.max(0,Math.min(100,52+form+ageBoost+winEffect)));}
+function pcCalculateFansRating(c){const s=playerCareerStats(c,c.currentSeason),p=c.player||{},age=pcAge(c),ovr=Number(p.overall||p.overallRating)||70,recent=(s.matches||[]).slice(-5).map(m=>Number(m.rating)).filter(Number.isFinite),avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:(Number(s.average)||6.5),expected=5.6+ovr*.012,form=(avg-expected)*13,ageBoost=age===null?0:age<=20?7:age<=23?4:age<=27?1:age<=30?-2:-4,total=s.wins+s.draws+s.losses,winRate=total?s.wins/total:0.5,winEffect=(winRate-.5)*24;return Math.round(Math.max(0,Math.min(100,52+form+ageBoost+winEffect)));}
+function pcFansRating(c){if(!c)return 50;if(!Number.isFinite(Number(c.teamFansRating))){c.teamFansRating=pcCalculateFansRating(c);saveCareers();}return Math.max(0,Math.min(100,Number(c.teamFansRating)));}
+function pcRefreshFansRating(c){if(!c)return;c.teamFansRating=pcCalculateFansRating(c);}
 
 function playerCareerStats(c, filter){
   const matches=(c.matches||[]).filter(m=>!m.international&&(!filter||m.season===filter));
@@ -6893,6 +6895,7 @@ function savePlayerMatch(event,international){
     if(!c.participatingCompetitions.includes(match.competition)){alert("Please add this competition in Awards & Competitions before recording the match.");return;}
   }
   c.matches.push(match);
+  pcRefreshFansRating(c);
   syncPlayerMotmAwards(c);
   if(international){
     if(!Array.isArray(c.internationalMatches))c.internationalMatches=[];
@@ -6920,6 +6923,7 @@ function savePlayerMatchEdit(event,id){
  const gf=num("goalsFor"),ga=num("goalsAgainst"),goals=num("goals"),ownGoals=num("ownGoals"),assists=num("assists"),minutes=num("minutes"),yellow=num("yellowCards"),red=num("redCards");
  if(!val("date")||!val("opponent").trim()||!val("competition").trim()||[gf,ga,goals,ownGoals,assists,minutes,yellow,red].some(n=>!Number.isFinite(n)||n<0)||(ratingText!==""&&(!Number.isFinite(Number(ratingText))||Number(ratingText)<0||Number(ratingText)>10))){alert("Please check the date and enter valid match statistics.");return;}
  Object.assign(m,{date:val("date"),opponent:val("opponent").trim(),competition:val("competition").trim(),homeAway:val("homeAway")||"Home",goalsFor:gf,goalsAgainst:ga,result:gf>ga?"W":gf<ga?"L":"D",rating:ratingText===""?null:Number(ratingText),minutes,goals,ownGoals,assists,yellowCards:yellow,redCards:red,position:val("position")||c.player?.position,cleanSheet:val("cleanSheet")==="true",manOfTheMatch:!!f.elements.namedItem("manOfTheMatch")?.checked});
+ pcRefreshFansRating(c);
  syncPlayerMotmAwards(c);
  saveCareers();renderPlayerCareerPage(m.international?"national":"matches");window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -6929,6 +6933,7 @@ function deletePlayerMatch(id){
   const m=c.matches.find(x=>String(x.id)===String(id));if(!m)return;
   if(!confirm("Delete the match against "+(m.opponent||"this opponent")+"?"))return;
   c.matches=c.matches.filter(x=>String(x.id)!==String(id));
+  pcRefreshFansRating(c);
   saveCareers();renderPlayerCareerPage(m.international?"national":"matches");
 }
 
