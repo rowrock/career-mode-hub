@@ -19,6 +19,7 @@ function instructions(task, clubName, careerData) {
     "Generate realistic expected appearances, goals, assists, target average rating, a recommended objective and clear reasoning. Projections are not guarantees.",
     "Give practical agent/contract advice based on age, squad role, expiry, wage if provided, playing time and performance trend. Never pretend a transfer offer exists.",
     "Create 3 to 5 plausible in-game career headlines with short article text and 3 press-conference questions with suggested answers. Use hypothetical framing for speculation.",
+    "Read careerData.clubRivalries and careerData.recentPressStatements. Ask relevant questions about the strongest rivalries, derby opponents, controversial statements, players/clubs the player has criticised, and any former club they left for a direct rival. A Figo-style move to a bitter rival should be treated as a major betrayal. Consider form and goals against a club. Never invent a rivalry or claim a real-world record not present in supplied data.",
     "Return exactly one JSON object, no Markdown, with this shape: " + JSON.stringify({prediction:{summary:"",expectedAppearances:0,expectedGoals:0,expectedAssists:0,targetAverageRating:0,recommendedObjective:"",reasoning:"",clubAssessment:"",playerAssessment:"",confidence:"low|medium|high"},agentAdvice:[""],news:[{category:"",headline:"",story:""}],pressConference:[{question:"",answer:""}]}),
     "Saved career data: " + JSON.stringify(careerData || {})
   ].join("\n");
