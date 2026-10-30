@@ -6514,6 +6514,7 @@ function pcAIResults(c,kind){
 }
 
 function renderPlayerCareerPage(page){
+  if(page==="league"){renderLeagueCentre();return;}
   const c=getCurrentCareer();
   if(!c||c.mode!=="player"){renderDashboard();return;}
   if(!Array.isArray(c.matches))c.matches=[];
