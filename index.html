@@ -6430,6 +6430,12 @@ function pcPressQuestion(c){
   const otherPlayer=allPlayers.length?allPlayers[Math.floor(Math.random()*allPlayers.length)]:null;
   const recentMatch=(c.matches||[]).filter(m=>m.season===c.currentSeason).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0]||(c.matches||[]).slice(-1)[0];
   const matchQuestions=[];
+  if(recentMatch&&String(c.lastPressMatchQuestionId||"")!==String(recentMatch.id||"")){
+   const team=recentMatch.clubName||c.clubName||"your team",opponent=recentMatch.opponent||"the opposition",score=Number(recentMatch.goalsFor??0)+"-"+Number(recentMatch.goalsAgainst??0),rating=recentMatch.rating===null||recentMatch.rating===undefined?"unrated":Number(recentMatch.rating).toFixed(1),goals=Number(recentMatch.goals)||0,assists=Number(recentMatch.assists)||0;
+   const details=goals||assists? " You recorded "+goals+" goal(s) and "+assists+" assist(s).":"";
+   c.currentPressQuestion={question:"Let's talk about your latest match for "+team+" against "+opponent+". The score was "+score+" and your match rating was "+rating+"."+details+" How do you think you performed, and was your rating fair?",topic:"recent_match",matchId:recentMatch.id,createdAt:new Date().toISOString()};
+   return c.currentPressQuestion;
+  }
   if(recentMatch){
    const team=recentMatch.clubName||c.clubName||"your team",opponent=recentMatch.opponent||"the opposition",score=Number(recentMatch.goalsFor??0)+"-"+Number(recentMatch.goalsAgainst??0),rating=recentMatch.rating===null||recentMatch.rating===undefined?"unrated":Number(recentMatch.rating).toFixed(1),overall=Number(p.overall||p.overallRating)||0,goals=Number(recentMatch.goals)||0,assists=Number(recentMatch.assists)||0;
    matchQuestions.push({question:"You have just played for "+team+" against "+opponent+" in a "+score+(recentMatch.homeAway?" ("+recentMatch.homeAway.toLowerCase()+")":"")+" match and received a "+rating+" rating. How do you think you performed?",topic:"recent_match",matchId:recentMatch.id});
@@ -6479,6 +6485,7 @@ async function submitPressAnswer(){
   const pi=d.playerImpacts.map(x=>({player:String(x.player||"").trim(),change:Math.max(-15,Math.min(15,Math.round(Number(x.change)||0))),reason:String(x.reason||"").slice(0,200)})).filter(x=>x.player&&x.change);
   ci.forEach(x=>{const k=pcClubKey(x.club),base=pcRivalryBase(c.clubName,x.club);c.pressRivalries[k]=Math.max(-base,Math.min(100-base,(Number(c.pressRivalries[k])||0)+x.change));});
   pi.forEach(x=>{const k=pcClubKey(x.player);c.pressPlayerRivalries[k]=Math.max(0,Math.min(100,(Number(c.pressPlayerRivalries[k])||0)+x.change));c.pressPlayerRivalryLabels[k]=x.player;});
+  if(q.matchId)c.lastPressMatchQuestionId=q.matchId;
   c.lastPressAnalysis={summary:String(d.summary||"Your answer has been analysed."),tone:String(d.tone||""),clubImpacts:ci,playerImpacts:pi};
   c.pressHistory=c.pressHistory||[];c.pressHistory.push({question:q.question,answer,style:"typed",tone:c.lastPressAnalysis.tone,clubImpacts:ci,playerImpacts:pi,date:new Date().toISOString()});c.currentPressQuestion=null;saveCareers();renderPlayerCareerPage("media");
  }catch(err){alert("Could not analyse your answer: "+(err.message||"Unknown error")+". Deploy the latest cloudflare-worker.js in Cloudflare.");if(btn){btn.disabled=false;btn.textContent="Submit answer & analyse reaction";}}
