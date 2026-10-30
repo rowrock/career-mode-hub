@@ -12,6 +12,18 @@ function reply(data, status = 200) {
   return new Response(JSON.stringify(data), { status: status, headers: CORS });
 }
 function instructions(task, clubName, careerData) {
+  if (task === "press_analysis") return [
+    "Analyse this typed answer at a fictional football career press conference. Read its tone, confidence, disrespect, humour and context. Identify clubs and players explicitly criticised, praised or challenged. Do not assume the selected target club was criticised unless the answer supports it.",
+    "Estimate personal rivalry changes. Usually -5 to +5; strong direct insults/challenges can be +/-10; maximum absolute change 15. Positive increases hostility; negative cools it. Return no impact if no rivalry changes. Only name targets identifiable in the answer or selected club; never invent names.",
+    "Return JSON only: " + JSON.stringify({tone:"hostile/confident/respectful/etc",summary:"Short explanation",clubImpacts:[{club:"Exact club name",change:3,reason:"Why"}],playerImpacts:[{player:"Exact player name",change:-2,reason:"Why"}]}),
+    "Current club: " + String(clubName || ""),
+    "Question: " + String(careerData && careerData.pressQuestion || ""),
+    "Typed answer: " + String(careerData && careerData.pressAnswer || ""),
+    "Selected target: " + String(careerData && careerData.targetClub || ""),
+    "Current club rivalries: " + JSON.stringify(careerData && careerData.clubRivalries || []),
+    "Current player rivalries: " + JSON.stringify(careerData && careerData.playerRivalries || []),
+    "Recent press history: " + JSON.stringify(careerData && careerData.recentPressStatements || [])
+  ].join("\n");
   if (task === "career_assist") return [
     "You are the career adviser, football journalist and season-planning assistant inside a personal EA SPORTS FC 27 Player Career tracker.",
     "Use only supplied saved career data. Do not claim access to live football news, real negotiations, hidden game data or actual game simulation. Distinguish estimates from recorded facts.",
@@ -97,9 +109,11 @@ function parseAnswer(answer) {
 }
 function validateData(task, data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("The AI response was not a JSON object.");
-  const keys = { calendar: "events", match: "players", league: "rows", transfer: "transfers", youth: "players", career_assist: null };
+  const keys = { calendar: "events", match: "players", league: "rows", transfer: "transfers", youth: "players", career_assist: null, press_analysis: null };
   if (!(task in keys) || (keys[task] && !Array.isArray(data[keys[task]]))) throw new Error("The AI returned incomplete " + task + " data.");
   if (task === "career_assist" && (!data.prediction || !Array.isArray(data.agentAdvice) || !Array.isArray(data.news) || !Array.isArray(data.pressConference))) throw new Error("The AI returned incomplete career advice. Please try again.");
+  if (task === "press_analysis" && (!Array.isArray(data.clubImpacts) || !Array.isArray(data.playerImpacts))) throw new Error("The AI returned incomplete press analysis. Please try again.");
+  if (task === "press_analysis") { data.clubImpacts = data.clubImpacts.slice(0, 8).map(x => ({ club: String(x.club || "").slice(0, 80), change: Math.max(-15, Math.min(15, Math.round(Number(x.change) || 0))), reason: String(x.reason || "").slice(0, 200) })); data.playerImpacts = data.playerImpacts.slice(0, 8).map(x => ({ player: String(x.player || "").slice(0, 80), change: Math.max(-15, Math.min(15, Math.round(Number(x.change) || 0))), reason: String(x.reason || "").slice(0, 200) })); data.tone = String(data.tone || "").slice(0, 80); data.summary = String(data.summary || "").slice(0, 500); }
   if (task === "calendar") {
     data.events = data.events.map(event => ({
       date: typeof event.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(event.date) ? event.date : null,
@@ -151,13 +165,13 @@ export default {
       body = JSON.parse(raw);
     } catch (_) { return reply({ ok: false, error: "Invalid request. Reload Career Mode Hub and try again." }, 400); }
     const task = body.task;
-    if (!["match", "calendar", "league", "transfer", "youth", "career_assist"].includes(task)) return reply({ ok: false, error: "Unknown analysis task." }, 400);
-    if (task !== "career_assist" && (!Array.isArray(body.images) || body.images.length < 1 || body.images.length > 4)) return reply({ ok: false, error: "Upload between one and four screenshots at a time." }, 400);
+    if (!["match", "calendar", "league", "transfer", "youth", "career_assist", "press_analysis"].includes(task)) return reply({ ok: false, error: "Unknown analysis task." }, 400);
+    if (task !== "career_assist" && task !== "press_analysis" && (!Array.isArray(body.images) || body.images.length < 1 || body.images.length > 4)) return reply({ ok: false, error: "Upload between one and four screenshots at a time." }, 400);
     let images;
-    try { images = task === "career_assist" ? [] : body.images.map(normalizeImage); }
+    try { images = task === "career_assist" || task === "press_analysis" ? [] : body.images.map(normalizeImage); }
     catch (error) { return reply({ ok: false, error: error.message }, 400); }
     try {
-      const result = await analyse(env.OPENROUTER_API_KEY, instructions(task, body.clubName, body.careerData), images, task);
+      const result = await analyse(env.OPENROUTER_API_KEY, instructions(task, body.clubName, task === "press_analysis" ? { ...(body.careerData || {}), pressQuestion: body.pressQuestion || "", pressAnswer: body.pressAnswer || "", targetClub: body.targetClub || "" } : body.careerData), images, task);
       return reply({ ok: true, data: result.data, model: result.model });
     } catch (error) { return reply({ ok: false, error: error.message || "AI analysis failed." }, 502); }
   }
