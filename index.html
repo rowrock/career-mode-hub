@@ -1350,7 +1350,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=["fullhistory","contract","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":"");
+      btn.style.display=page==="contract"?"none":(["fullhistory","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":""));
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
