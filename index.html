@@ -6244,7 +6244,20 @@ function createPlayerCareer(event){
 }
 
 function pcFansColor(v){v=Math.max(0,Math.min(100,Number(v)||0));return v<=10?"#dc2626":v<=25?"#f97316":v<=50?"#eab308":v<=75?"#a3a51c":"#14532d";}
-function pcCalculateFansRating(c){const s=playerCareerStats(c,c.currentSeason),p=c.player||{},age=pcAge(c),ovr=Number(p.overall||p.overallRating)||70,recent=(s.matches||[]).slice(-5).map(m=>Number(m.rating)).filter(Number.isFinite),avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:(Number(s.average)||6.5),expected=5.6+ovr*.012,form=(avg-expected)*13,ageBoost=age===null?0:age<=20?7:age<=23?4:age<=27?1:age<=30?-2:-4,total=s.wins+s.draws+s.losses,winRate=total?s.wins/total:0.5,winEffect=(winRate-.5)*24;return Math.round(Math.max(0,Math.min(100,52+form+ageBoost+winEffect)));}
+function pcCalculateFansRating(c){
+ const p=c.player||{},age=pcAge(c),ovr=Number(p.overall||p.overallRating)||70;
+ const allMatches=(c.matches||[]).filter(m=>!m.international&&(!c.currentSeason||m.season===c.currentSeason));
+ const hasClubTaggedMatches=allMatches.some(m=>m.clubName);
+ const clubMatches=hasClubTaggedMatches?allMatches.filter(m=>String(m.clubName||"").toLowerCase()===String(c.clubName||"").toLowerCase()):allMatches;
+ const recent=clubMatches.slice().sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))).slice(-5).map(m=>Number(m.rating)).filter(Number.isFinite);
+ const avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:6.5;
+ const expected=5.6+ovr*.012,form=(avg-expected)*13;
+ const ageBoost=age===null?0:age<=20?7:age<=23?4:age<=27?1:age<=30?-2:-4;
+ const total=clubMatches.filter(m=>["W","D","L"].includes(m.result)).length;
+ const wins=clubMatches.filter(m=>m.result==="W").length,draws=clubMatches.filter(m=>m.result==="D").length;
+ const winRate=total?(wins+draws*.5)/total:0.5,winEffect=(winRate-.5)*24;
+ return Math.round(Math.max(0,Math.min(100,52+form+ageBoost+winEffect)));
+}
 function pcFansRating(c){if(!c)return 50;if(!Number.isFinite(Number(c.teamFansRating))){c.teamFansRating=pcCalculateFansRating(c);saveCareers();}return Math.max(0,Math.min(100,Number(c.teamFansRating)));}
 function pcRefreshFansRating(c){if(!c)return;c.teamFansRating=pcCalculateFansRating(c);}
 
@@ -7086,6 +7099,7 @@ function addPlayerClubMove(){
   c.transfers.push({id:createId(),player:c.player.name,fromClub:oldClub,toClub:newClub.trim(),date:new Date().toISOString().slice(0,10),season:season,type:moveType.trim(),fee:fee.trim()});
   c.clubName=newClub.trim();c.league=league.trim();c.currentSeason=season;
   if(!c.seasons.some(x=>x.season===season))c.seasons.push({season:season,clubName:c.clubName,league:c.league,completed:false});
+  pcRefreshFansRating(c);
   saveCareers();updateNavigation();renderPlayerCareerPage("transfers");
 }
 
