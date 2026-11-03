@@ -7299,19 +7299,36 @@ function playerSeasonCountryKey(comp){
  if(/mls|us open cup|canadian championship/.test(s))return "north america";
  return "";
 }
+function playerSeasonLeagueMatchesCountry(league,country){
+ const s=String(league||"").toLowerCase();
+ const patterns={
+  england:/england|english|premier league|championship|league one|league two|national league|vanarama|fa wsl/,
+  france:/france|ligue|national|championnat/,
+  spain:/spain|la liga|segunda|primera federaci/,
+  germany:/germany|bundesliga|3\. liga|regionalliga/,
+  italy:/italy|serie [abc]|lega pro/,
+  netherlands:/netherlands|eredivisie|eerste divisie|keuken kampioen/,
+  scotland:/scotland|scottish|premiership|championship|league one|league two/,
+  portugal:/portugal|liga portugal|liga 2|liga 3/,
+  belgium:/belgium|belgian|jupiler|challenger pro/,
+  turkey:/turkey|turkish|süper lig|super lig|1\. lig/,
+  australia:/australia|a-league/,
+  "north america":/mls|usa|united states|canada|canadian|mexico|liga mx/
+ };
+ return !!(patterns[country]&&patterns[country].test(s));
+}
 function playerSeasonEuropeanLeague(league){
  const s=String(league||"").toLowerCase();
- return /premier league|championship|league one|league two|national league|ligue|france|la liga|segunda|bundesliga|2\. bundesliga|serie a|serie b|eredivisie|netherlands|scottish|liga portugal|portugal|belgian|jupiler|turkish|süper lig|super lig|austrian|swiss|super league|polish|ekstraklasa|danish|superliga|norwegian|eliteserien|swedish|allsvenskan|greek|super league|croatian|serbian|czech|premier league|ukrainian|romanian|bulgarian|irish|welsh|finnish|icelandic/.test(s);
+ return /premier league|championship|league one|league two|national league|ligue|france|la liga|segunda|primera federaci|bundesliga|3\. liga|serie [abc]|eredivisie|eerste divisie|scottish|liga portugal|liga 2|belgian|jupiler|turkish|süper lig|super lig|austrian|österreich|swiss|super league|polish|ekstraklasa|danish|superliga|norwegian|eliteserien|swedish|allsvenskan|greek|croatian|serbian|czech|ukrainian|romanian|bulgarian|irish|welsh|finnish|icelandic|cypriot|slovak|slovenian|hungarian|luxembourg|maltese|faroe|bosnian|albanian|montenegrin|armenian|georgian|azerbaijan|kazakh/.test(s);
 }
 function playerSeasonTeamOptions(comp,season){
  const country=playerSeasonCountryKey(comp);let options=[];
- if(country==="england")options=getEnglishClubs();
- else if(country==="france"||country==="spain"||country==="germany"||country==="italy"||country==="netherlands"||country==="scotland"||country==="portugal"||country==="belgium"||country==="turkey"){
-  const terms={france:/ligue|france|national/i,spain:/la liga|segunda|spain/i,germany:/bundesliga|germany/i,italy:/serie [ab]|italy/i,netherlands:/eredivisie|netherlands/i,scotland:/scottish|premiership|championship/i,portugal:/liga portugal|portugal/i,belgium:/belgian|jupiler|belgium/i,turkey:/süper lig|super lig|turkey/i};
-  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>terms[country].test(l));
+ if(country){
+  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>playerSeasonLeagueMatchesCountry(l,country));
   options=leagues.flatMap(l=>fc27ClubsByLeague[l]||[]);
- }else if(country==="australia"||country==="north america")options=getAllClubs();
- else if(/champions league|europa league|conference league|uefa super cup|european cup/.test(String(comp||"").toLowerCase())){
+  if(country==="north america"||country==="australia")options.push(...getAllClubs());
+  if(country==="england")options.push(...getEnglishClubs());
+ }else if(/champions league|europa league|conference league|uefa super cup|european cup|youth league/.test(String(comp||"").toLowerCase())){
   const leagues=Object.keys(fc27ClubsByLeague||{}).filter(playerSeasonEuropeanLeague);
   options=leagues.flatMap(l=>fc27ClubsByLeague[l]||[]);
  }else if(/world cup|european championship|nations league|international friendly|copa américa|africa cup|asian cup|gold cup|olympic/.test(String(comp||"").toLowerCase())){
@@ -7319,10 +7336,6 @@ function playerSeasonTeamOptions(comp,season){
  }else if(comp===season.league){
   options=[...(season.leagueTeams||[]),...(fc27ClubsByLeague[comp]||[])];
  }else options=typeof getCompetitionTeams==="function"?getCompetitionTeams(comp)||[]:[];
- if(comp===season.league&&country){
-  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>playerSeasonCountryKey(l)===country);
-  options.push(...leagues.flatMap(l=>fc27ClubsByLeague[l]||[]));
- }
  if(comp===season.league&&getCurrentCareer()?.clubName)options.push(getCurrentCareer().clubName);
  return [...new Set(options.map(x=>String(x||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
@@ -7332,12 +7345,12 @@ function openPlayerSeasonTeamPicker(seasonName,competition){
  const isDomesticCup=/fa cup|carabao|efl cup|league cup|coupe de france|copa del rey|dfb-pokal|coppa italia|knvb cup|scottish cup|taça de portugal|belgian cup|turkish cup/i.test(competition);
  const selected=new Set(Array.isArray(saved)&&saved.length?saved:(isDomesticCup?options:[]));
  window.__playerSeasonTeamPickerState={seasonName,competition,options,selected:[...selected],filtered:options};
- const html='<div class="modal-overlay" onclick="closeModalOutside(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div><div class="modal-title">Teams — '+escapeHTML(competition)+'</div><div class="panel-subtitle">'+escapeHTML(seasonName)+' · Search and add every participating team</div></div><button class="secondary-btn" onclick="closeModal()">✕</button></div><div class="setup-section"><label class="setup-label">Search teams</label><input id="playerSeasonTeamSearch" class="form-input" placeholder="Type a team name..." oninput="filterPlayerSeasonTeams(this.value)" autocomplete="off"><div id="playerSeasonTeamSearchResults" style="max-height:210px;overflow-y:auto;margin-top:6px;border:1px solid var(--border-color,#333);border-radius:8px"></div></div><div class="setup-section"><label class="setup-label">Selected teams (<span id="playerSeasonTeamCount">'+selected.size+'</span>)</label><div id="playerSeasonSelectedTeams" style="display:flex;gap:6px;flex-wrap:wrap;max-height:190px;overflow-y:auto">'+[...selected].sort().map(t=>'<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--border-color,#444);border-radius:16px">'+escapeHTML(t)+' <button type="button" onclick="removePlayerSeasonTeam(\''+escapeJS(t)+'\')" aria-label="Remove '+escapeHTML(t)+'">×</button></span>').join("")+'</div><div style="font-size:12px;color:#9ca3af;margin-top:6px">Domestic cups start with all teams from their country selected. You can remove teams or add others.</div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button class="secondary-btn" onclick="closeModal()">Cancel</button><button class="primary-btn" onclick="savePlayerSeasonTeamPicker(\''+escapeJS(seasonName)+'\',\''+escapeJS(competition)+'\')">Save Teams</button></div></div></div>';
+ const html='<div class="modal-overlay" onclick="closeModalOutside(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div><div class="modal-title">Teams — '+escapeHTML(competition)+'</div><div class="panel-subtitle">'+escapeHTML(seasonName)+' · Search and add every participating team</div></div><button class="secondary-btn" onclick="closeModal()">✕</button></div><div class="setup-section"><label class="setup-label">Search teams</label><input id="playerSeasonTeamSearch" class="form-input" placeholder="Type a team name..." oninput="filterPlayerSeasonTeams(this.value)" autocomplete="off"><div id="playerSeasonTeamSearchResults" style="max-height:360px;overflow-y:auto;margin-top:6px;border:1px solid var(--border-color,#333);border-radius:8px"></div></div><div class="setup-section"><label class="setup-label">Selected teams (<span id="playerSeasonTeamCount">'+selected.size+'</span>)</label><div id="playerSeasonSelectedTeams" style="display:flex;gap:6px;flex-wrap:wrap;max-height:190px;overflow-y:auto">'+[...selected].sort().map(t=>'<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--border-color,#444);border-radius:16px">'+escapeHTML(t)+' <button type="button" onclick="removePlayerSeasonTeam(\''+escapeJS(t)+'\')" aria-label="Remove '+escapeHTML(t)+'">×</button></span>').join("")+'</div><div style="font-size:12px;color:#9ca3af;margin-top:6px">Domestic cups start with all teams from their country selected. You can remove teams or add others.</div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button class="secondary-btn" onclick="closeModal()">Cancel</button><button class="primary-btn" onclick="savePlayerSeasonTeamPicker(\''+escapeJS(seasonName)+'\',\''+escapeJS(competition)+'\')">Save Teams</button></div></div></div>';
  document.getElementById("modalContainer").innerHTML=html;filterPlayerSeasonTeams("");
 }
 function filterPlayerSeasonTeams(query){
  const state=window.__playerSeasonTeamPickerState;if(!state)return;const q=String(query||"").trim().toLowerCase();
- const matches=state.options.filter(t=>t.toLowerCase().includes(q)&&!state.selected.includes(t)).slice(0,80);
+ const matches=state.options.filter(t=>t.toLowerCase().includes(q)&&!state.selected.includes(t)).slice(0,250);
  const box=document.getElementById("playerSeasonTeamSearchResults");if(box)box.innerHTML=matches.length?matches.map(t=>'<button type="button" class="search-option" style="display:block;width:100%;text-align:left" onclick="addPlayerSeasonTeam(\''+escapeJS(t)+'\')">'+escapeHTML(t)+' <span style="float:right">+ Add</span></button>').join(""):'<div class="search-option">No more teams found.</div>';
 }
 function addPlayerSeasonTeam(team){
