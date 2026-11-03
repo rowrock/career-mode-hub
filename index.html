@@ -7283,25 +7283,76 @@ function updatePlayerSeasonTeamButtons(){
  const c=getCurrentCareer(),name=String(f.elements.namedItem("seasonName").value),season=(c.seasons||[]).find(s=>String(s.season)===name)||{},league=String(f.elements.namedItem("league").value||""),extras=Array.from(f.querySelectorAll("[data-extra-competition]")).map(x=>String(x.value||"").trim()).filter(Boolean),comps=[...new Set([league,...extras].filter(Boolean))];
  box.innerHTML='<div class="setup-section"><label class="setup-label">Teams in each competition</label><div style="font-size:12px;color:#9ca3af;margin-bottom:8px">Choose the teams that take part in each competition. These lists are saved separately for every season and competition.</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+comps.map(comp=>{const count=(season.competitionTeams&&season.competitionTeams[comp]||[]).length;return '<button type="button" class="secondary-btn" onclick="openPlayerSeasonTeamPicker(\''+escapeJS(name)+'\',\''+escapeJS(comp)+'\')">'+escapeHTML(comp)+' · '+count+' teams</button>';}).join("")+'</div></div>';
 }
+function playerSeasonCountryKey(comp){
+ const s=String(comp||"").toLowerCase();
+ if(/premier league|fa cup|carabao|efl cup|league cup|community shield|efl trophy|fa trophy|fa vase|fa youth/.test(s))return "england";
+ if(/ligue 1|ligue 2|coupe de france|trophée des champions/.test(s))return "france";
+ if(/la liga|segunda|copa del rey|supercopa de españa/.test(s))return "spain";
+ if(/bundesliga|2\. bundesliga|dfb-pokal|dfl-supercup/.test(s))return "germany";
+ if(/serie a|serie b|coppa italia|supercoppa italiana/.test(s))return "italy";
+ if(/eredivisie|knvb cup|johan cruijff/.test(s))return "netherlands";
+ if(/scottish|sfa cup/.test(s))return "scotland";
+ if(/liga portugal|taça de portugal|taça da liga/.test(s))return "portugal";
+ if(/belgian|jupiler|croky cup/.test(s))return "belgium";
+ if(/turkish|süper lig|super lig|turkish cup/.test(s))return "turkey";
+ if(/a-league|australian|australia cup/.test(s))return "australia";
+ if(/mls|us open cup|canadian championship/.test(s))return "north america";
+ return "";
+}
+function playerSeasonEuropeanLeague(league){
+ const s=String(league||"").toLowerCase();
+ return /premier league|championship|league one|league two|national league|ligue|france|la liga|segunda|bundesliga|2\. bundesliga|serie a|serie b|eredivisie|netherlands|scottish|liga portugal|portugal|belgian|jupiler|turkish|süper lig|super lig|austrian|swiss|super league|polish|ekstraklasa|danish|superliga|norwegian|eliteserien|swedish|allsvenskan|greek|super league|croatian|serbian|czech|premier league|ukrainian|romanian|bulgarian|irish|welsh|finnish|icelandic/.test(s);
+}
 function playerSeasonTeamOptions(comp,season){
- const c=getCurrentCareer();let options=[];
- if(comp===season.league){
-  options=[...(season.leagueTeams||[]),...(typeof fc27ClubsByLeague!=="undefined"&&fc27ClubsByLeague[comp]||[])];
-  if(!options.length&&Array.isArray(allPlayers))options=allPlayers.filter(p=>String(p.league||"").toLowerCase()===String(comp).toLowerCase()).map(p=>p.club);
- }else if(typeof getCompetitionTeams==="function")options=getCompetitionTeams(comp)||[];
- if(c&&c.clubName&&comp===season.league)options.push(c.clubName);
+ const country=playerSeasonCountryKey(comp);let options=[];
+ if(country==="england")options=getEnglishClubs();
+ else if(country==="france"||country==="spain"||country==="germany"||country==="italy"||country==="netherlands"||country==="scotland"||country==="portugal"||country==="belgium"||country==="turkey"){
+  const terms={france:/ligue|france|national/i,spain:/la liga|segunda|spain/i,germany:/bundesliga|germany/i,italy:/serie [ab]|italy/i,netherlands:/eredivisie|netherlands/i,scotland:/scottish|premiership|championship/i,portugal:/liga portugal|portugal/i,belgium:/belgian|jupiler|belgium/i,turkey:/süper lig|super lig|turkey/i};
+  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>terms[country].test(l));
+  options=leagues.flatMap(l=>fc27ClubsByLeague[l]||[]);
+ }else if(country==="australia"||country==="north america")options=getAllClubs();
+ else if(/champions league|europa league|conference league|uefa super cup|european cup/.test(String(comp||"").toLowerCase())){
+  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(playerSeasonEuropeanLeague);
+  options=leagues.flatMap(l=>fc27ClubsByLeague[l]||[]);
+ }else if(/world cup|european championship|nations league|international friendly|copa américa|africa cup|asian cup|gold cup|olympic/.test(String(comp||"").toLowerCase())){
+  options=typeof countriesByContinent!=="undefined"?Object.values(countriesByContinent).flat():[];
+ }else if(comp===season.league){
+  options=[...(season.leagueTeams||[]),...(fc27ClubsByLeague[comp]||[])];
+ }else options=typeof getCompetitionTeams==="function"?getCompetitionTeams(comp)||[]:[];
+ if(comp===season.league&&country){
+  const leagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>playerSeasonCountryKey(l)===country);
+  options.push(...leagues.flatMap(l=>fc27ClubsByLeague[l]||[]));
+ }
+ if(comp===season.league&&getCurrentCareer()?.clubName)options.push(getCurrentCareer().clubName);
  return [...new Set(options.map(x=>String(x||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
 function openPlayerSeasonTeamPicker(seasonName,competition){
  const c=getCurrentCareer();if(!c)return;const season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName))||{season:seasonName};
- const options=playerSeasonTeamOptions(competition,season),selected=new Set((season.competitionTeams&&season.competitionTeams[competition])||[]);
- const optionHtml=options.map(team=>'<option value="'+escapeHTML(team)+'" '+(selected.has(team)?"selected":"")+'>'+escapeHTML(team)+'</option>').join("");
- document.getElementById("modalContainer").innerHTML='<div class="modal-overlay" onclick="closeModalOutside(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div><div class="modal-title">Teams — '+escapeHTML(competition)+'</div><div class="panel-subtitle">'+escapeHTML(seasonName)+' · Select all teams in this competition</div></div><button class="secondary-btn" onclick="closeModal()">✕</button></div><div class="setup-section"><label class="setup-label">Participating teams</label><select id="playerSeasonTeamsSelect" class="form-input" multiple size="16" style="min-height:280px">'+optionHtml+'</select><div style="font-size:12px;color:#9ca3af;margin-top:6px">Use Ctrl-click (Windows) or Command-click (Mac) to select multiple teams.</div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button class="secondary-btn" onclick="closeModal()">Cancel</button><button class="primary-btn" onclick="savePlayerSeasonTeamPicker(\''+escapeJS(seasonName)+'\',\''+escapeJS(competition)+'\')">Save Teams</button></div></div></div>';
+ const options=playerSeasonTeamOptions(competition,season),saved=season.competitionTeams&&season.competitionTeams[competition];
+ const isDomesticCup=/fa cup|carabao|efl cup|league cup|coupe de france|copa del rey|dfb-pokal|coppa italia|knvb cup|scottish cup|taça de portugal|belgian cup|turkish cup/i.test(competition);
+ const selected=new Set(Array.isArray(saved)?saved:(isDomesticCup?options:[]));
+ window.__playerSeasonTeamPickerState={seasonName,competition,options,selected:[...selected],filtered:options};
+ const html='<div class="modal-overlay" onclick="closeModalOutside(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div><div class="modal-title">Teams — '+escapeHTML(competition)+'</div><div class="panel-subtitle">'+escapeHTML(seasonName)+' · Search and add every participating team</div></div><button class="secondary-btn" onclick="closeModal()">✕</button></div><div class="setup-section"><label class="setup-label">Search teams</label><input id="playerSeasonTeamSearch" class="form-input" placeholder="Type a team name..." oninput="filterPlayerSeasonTeams(this.value)" autocomplete="off"><div id="playerSeasonTeamSearchResults" style="max-height:210px;overflow-y:auto;margin-top:6px;border:1px solid var(--border-color,#333);border-radius:8px"></div></div><div class="setup-section"><label class="setup-label">Selected teams (<span id="playerSeasonTeamCount">'+selected.size+'</span>)</label><div id="playerSeasonSelectedTeams" style="display:flex;gap:6px;flex-wrap:wrap;max-height:190px;overflow-y:auto">'+[...selected].sort().map(t=>'<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--border-color,#444);border-radius:16px">'+escapeHTML(t)+' <button type="button" onclick="removePlayerSeasonTeam(\''+escapeJS(t)+'\')" aria-label="Remove '+escapeHTML(t)+'">×</button></span>').join("")+'</div><div style="font-size:12px;color:#9ca3af;margin-top:6px">Domestic cups start with all teams from their country selected. You can remove teams or add others.</div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button class="secondary-btn" onclick="closeModal()">Cancel</button><button class="primary-btn" onclick="savePlayerSeasonTeamPicker(\''+escapeJS(seasonName)+'\',\''+escapeJS(competition)+'\')">Save Teams</button></div></div></div>';
+ document.getElementById("modalContainer").innerHTML=html;filterPlayerSeasonTeams("");
+}
+function filterPlayerSeasonTeams(query){
+ const state=window.__playerSeasonTeamPickerState;if(!state)return;const q=String(query||"").trim().toLowerCase();
+ const matches=state.options.filter(t=>t.toLowerCase().includes(q)&&!state.selected.includes(t)).slice(0,80);
+ const box=document.getElementById("playerSeasonTeamSearchResults");if(box)box.innerHTML=matches.length?matches.map(t=>'<button type="button" class="search-option" style="display:block;width:100%;text-align:left" onclick="addPlayerSeasonTeam(\''+escapeJS(t)+'\')">'+escapeHTML(t)+' <span style="float:right">+ Add</span></button>').join(""):'<div class="search-option">No more teams found.</div>';
+}
+function addPlayerSeasonTeam(team){
+ const s=window.__playerSeasonTeamPickerState;if(!s||s.selected.includes(team))return;s.selected.push(team);renderPlayerSeasonSelectedTeams();const q=document.getElementById("playerSeasonTeamSearch")?.value||"";filterPlayerSeasonTeams(q);
+}
+function removePlayerSeasonTeam(team){
+ const s=window.__playerSeasonTeamPickerState;if(!s)return;s.selected=s.selected.filter(x=>x!==team);renderPlayerSeasonSelectedTeams();filterPlayerSeasonTeams(document.getElementById("playerSeasonTeamSearch")?.value||"");
+}
+function renderPlayerSeasonSelectedTeams(){
+ const s=window.__playerSeasonTeamPickerState;if(!s)return;const box=document.getElementById("playerSeasonSelectedTeams"),count=document.getElementById("playerSeasonTeamCount");if(count)count.textContent=s.selected.length;if(box)box.innerHTML=s.selected.slice().sort((a,b)=>a.localeCompare(b)).map(t=>'<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--border-color,#444);border-radius:16px">'+escapeHTML(t)+' <button type="button" onclick="removePlayerSeasonTeam(\''+escapeJS(t)+'\')" aria-label="Remove '+escapeHTML(t)+'">×</button></span>').join("");
 }
 function savePlayerSeasonTeamPicker(seasonName,competition){
  const c=getCurrentCareer();if(!c)return;let season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName));
  if(!season){season={season:seasonName,league:c.league,leagueTeams:[],competitions:[]};c.seasons.push(season);}
- const select=document.getElementById("playerSeasonTeamsSelect");season.competitionTeams=season.competitionTeams||{};season.competitionTeams[competition]=Array.from(select.selectedOptions).map(o=>o.value);
+ const state=window.__playerSeasonTeamPickerState;season.competitionTeams=season.competitionTeams||{};season.competitionTeams[competition]=state?state.selected.slice():[];
  if(competition===season.league)season.leagueTeams=[...season.competitionTeams[competition]];
  saveCareers();closeModal();updatePlayerSeasonTeamButtons();
 }
