@@ -7251,8 +7251,9 @@ function playerSeasonStatsTable(c){
 }
 
 function playerSeasonCompetitionOptions(c,season,results){
- const cups=["FA Cup","Carabao Cup","EFL Cup","League Cup","Community Shield","EFL Trophy","Champions League","UEFA Champions League","Europa League","UEFA Europa League","UEFA Conference League","Conference League","Copa del Rey","Supercopa de España","Coppa Italia","Supercoppa Italiana","Coupe de France","Trophée des Champions","DFB-Pokal","DFL-Supercup","World Cup","European Championship","Euros","Copa America","AFC Asian Cup","Africa Cup of Nations"];
- return [...new Set([...playerCareerDatabaseValues("league"),...cups,...Object.keys(results||{}),...(c.participatingCompetitions||[]),...(season.competitions||[]),...(season.leagues||[])])].filter(Boolean).sort((a,b)=>a.localeCompare(b));
+ const catalogue=typeof trophyCatalogueNames==="function"?trophyCatalogueNames(c):[];
+ const cups=["FA Cup","Carabao Cup","EFL Cup","League Cup","Community Shield","EFL Trophy","Scottish Cup","Scottish League Cup","Copa del Rey","Supercopa de España","Coppa Italia","Supercoppa Italiana","Coupe de France","Trophée des Champions","DFB-Pokal","DFL-Supercup","KNVB Cup","Johan Cruyff Shield","Taça de Portugal","Taça da Liga","Belgian Cup","Turkish Cup","King's Cup","A-League Men Finals Series","MLS Cup","Canadian Championship","Copa Libertadores","Copa Sudamericana","Recopa Sudamericana","UEFA Super Cup","FIFA Club World Cup","Intercontinental Cup","UEFA Youth League","Premier League 2","FA Youth Cup","International Friendly","UEFA Nations League","World Cup","UEFA European Championship","European Championship","Copa América","AFC Asian Cup","Africa Cup of Nations","CONCACAF Gold Cup","CONCACAF Nations League","Olympic Football Gold Medal"];
+ return [...new Set([...playerCareerDatabaseValues("league"),...catalogue,...cups,...Object.keys(results||{}),...(c.participatingCompetitions||[]),...(season.competitions||[]),...(season.leagues||[])])].filter(Boolean).sort((a,b)=>a.localeCompare(b));
 }
 function editPlayerSeason(seasonName){
  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
@@ -7281,7 +7282,16 @@ function addPlayerSeasonExtraLeague(){
 }
 function seasonResultsForEdit(c,name){const season=(c.seasons||[]).find(s=>String(s.season)===name)||{};return season.competitionResults||((c.seasonCompetitionResults||{})[name])||{};}
 function playerSeasonDatabaseLeague(value){return playerCareerDatabaseValues("league").some(x=>String(x).toLowerCase()===String(value||"").toLowerCase());}
-function addPlayerSeasonExtraLeague(){const box=document.getElementById("editSeasonExtraLeagues");if(!box)return;const opts=[...new Set(playerCareerDatabaseValues("league"))].sort((a,b)=>a.localeCompare(b));const wrap=document.createElement("div");wrap.style.cssText="display:flex;gap:8px;margin:6px 0";const select=document.createElement("select");select.className="form-input";select.name="extraLeague";select.setAttribute("data-extra-league","");select.innerHTML='<option value="">Choose league</option>'+opts.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("");const remove=document.createElement("button");remove.type="button";remove.className="secondary-btn";remove.textContent="Remove";remove.onclick=()=>wrap.remove();wrap.append(select,remove);box.appendChild(wrap);}
+function addPlayerSeasonExtraLeague(){
+ const box=document.getElementById("editSeasonExtraLeagues");if(!box)return;
+ const f=document.getElementById("editPlayerSeasonForm"),c=getCurrentCareer(),seasonName=String(f.elements.namedItem("seasonName").value),season=(c.seasons||[]).find(s=>String(s.season)===seasonName)||{},results=seasonResultsForEdit(c,seasonName);
+ const mainLeague=String(f.elements.namedItem("league").value||"");
+ const opts=playerSeasonCompetitionOptions(c,season,results).filter(x=>x!==mainLeague);
+ const wrap=document.createElement("div");wrap.style.cssText="display:flex;gap:8px;margin:6px 0";
+ const select=document.createElement("select");select.className="form-input";select.name="extraCompetition";select.setAttribute("data-extra-competition","");select.innerHTML='<option value="">Choose competition</option>'+opts.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join("");select.onchange=updatePlayerSeasonExtraCompetitionFields;
+ const remove=document.createElement("button");remove.type="button";remove.className="secondary-btn";remove.textContent="Remove";remove.onclick=()=>{wrap.remove();updatePlayerSeasonExtraCompetitionFields();};
+ wrap.append(select,remove);box.appendChild(wrap);
+}
 function savePlayerSeasonEdit(event){
  event.preventDefault();const c=getCurrentCareer();if(!c||c.mode!=="player")return;
  const f=event.target,name=String(f.elements.namedItem("seasonName").value),club=String(f.elements.namedItem("club").value||"").trim(),league=String(f.elements.namedItem("league").value||"").trim(),extraComps=[...new Set(Array.from(f.querySelectorAll("[data-extra-competition]")).map(x=>String(x.value||"").trim()).filter(x=>x&&x!==league))],allCompetitions=[...new Set([league,...extraComps])],allLeagues=[...new Set([league,...extraComps.filter(x=>playerSeasonDatabaseLeague(x))])],overall=Number(f.elements.namedItem("overall").value),value=cleanTransferValue(f.elements.namedItem("value").value||""),currency=String(f.elements.namedItem("currency").value||"EUR");
