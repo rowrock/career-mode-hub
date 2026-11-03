@@ -7286,7 +7286,7 @@ function updatePlayerSeasonTeamButtons(){
 function playerSeasonTeamOptions(comp,season){
  const c=getCurrentCareer();let options=[];
  if(comp===season.league){
-  options=[...(season.leagueTeams||[]),...(fc27ClubsByLeague&&fc27ClubsByLeague[comp]||[])];
+  options=[...(season.leagueTeams||[]),...(typeof fc27ClubsByLeague!=="undefined"&&fc27ClubsByLeague[comp]||[])];
   if(!options.length&&Array.isArray(allPlayers))options=allPlayers.filter(p=>String(p.league||"").toLowerCase()===String(comp).toLowerCase()).map(p=>p.club);
  }else if(typeof getCompetitionTeams==="function")options=getCompetitionTeams(comp)||[];
  if(c&&c.clubName&&comp===season.league)options.push(c.clubName);
@@ -7309,7 +7309,7 @@ function updatePlayerSeasonExtraCompetitionFields(){
  const f=document.getElementById("editPlayerSeasonForm");if(!f)return;
  const box=document.getElementById("seasonExtraCompetitionFields"),seasonName=String(f.elements.namedItem("seasonName").value),season=(getCurrentCareer().seasons||[]).find(s=>String(s.season)===seasonName)||{},stages=["Winner","Runner-up","Final","Semi-final","Quarter-final","Round of 16","Round of 32","Round of 64","League phase","Group stage","Play-off round","Did not qualify"];
  if(!box)return;
- if(!season.completed){box.innerHTML="";return;}
+ if(!season.completed){box.innerHTML="";updatePlayerSeasonTeamButtons();return;}
  const selected=[String(f.elements.namedItem("league").value||""),...Array.from(f.querySelectorAll("[data-extra-competition]")).map(x=>x.value)].filter(Boolean),saved=seasonResultsForEdit(getCurrentCareer(),seasonName);
  box.innerHTML=selected.map((comp,i)=>{const type=playerSeasonCompetitionType(comp,getCurrentCareer()),item=saved[comp]||{};return '<div class="setup-section" style="border-top:1px solid var(--border-color,#333);padding-top:10px;margin-top:10px"><strong>'+escapeHTML(comp)+'</strong>'+((type==="league"||type==="hybrid")?'<label class="setup-label">Final league position</label><input class="form-input" type="number" min="1" name="extra_position_'+i+'" value="'+escapeHTML(String(item.leaguePosition||""))+'" placeholder="e.g. 4" required>':"")+((type==="knockout"||type==="hybrid")?'<label class="setup-label">Furthest stage reached</label><select class="form-input" name="extra_stage_'+i+'" required><option value="">Choose stage</option>'+stages.map(s=>'<option '+(s===item.stage?"selected":"")+'>'+s+'</option>').join("")+'</select>':"")+'</div>';}).join("");
  updatePlayerSeasonTeamButtons();
