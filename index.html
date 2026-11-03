@@ -7244,21 +7244,45 @@ function playerSeasonStatsTable(c){
   return html+'</tbody></table></div>';
 }
 
-function finishPlayerSeason(){
-  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
-  const old=c.currentSeason||"2026/27";
-  const st=playerCareerStats(c,old);
-  const found=c.seasons.find(s=>s.season===old);
-  if(found){found.completed=true;found.clubName=c.clubName;found.league=c.league;found.summary={appearances:st.appearances,goals:st.goals,assists:st.assists,averageRating:st.average};}
-  else c.seasons.push({season:old,clubName:c.clubName,league:c.league,completed:true,summary:{appearances:st.appearances,goals:st.goals,assists:st.assists,averageRating:st.average}});
-  const match=String(old).match(/^(\d{4})\s*\/\s*(\d{2}|\d{4})$/);
-  if(!match){const next=prompt("Current season saved. Enter the next season label:",old);if(next===null)return;c.currentSeason=next.trim()||old;}
-  else{const start=Number(match[1])+1;c.currentSeason=String(start)+"/"+String(start+1).slice(-2);}
-  c.seasonNumber=(Number(c.seasonNumber)||1)+1;
-  if(!c.seasons.some(s=>s.season===c.currentSeason))c.seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league,completed:false});
-  saveCareers();renderPlayerCareerPage("past");
+function playerSeasonCompetitionType(comp,c){
+ const key=String(comp||"").toLowerCase();
+ const hybrid=["champions league","uefa champions league","europa league","uefa europa league","conference league","uefa conference league","continental cup","world cup","euros","european championship","copa america","afc asian cup"].some(x=>key.includes(x));
+ if(hybrid)return "hybrid";
+ if(key===String(c.league||"").toLowerCase()||playerCareerDatabaseValues("league").some(x=>String(x).toLowerCase()===key))return "league";
+ return "knockout";
 }
-
+function playerSeasonFinishForm(){
+ const c=getCurrentCareer(),old=c.currentSeason||"2026/27",m=String(old).match(/^(\d{4})\s*\/\s*(\d{2}|\d{4})$/),next=m?String(Number(m[1])+1)+"/"+String(Number(m[1])+2).slice(-2):"";
+ const comps=[...new Set([...(c.participatingCompetitions||[]),...(c.league?[c.league]:[])])],stages=["Winner","Runner-up","Final","Semi-final","Quarter-final","Round of 16","Round of 32","Round of 64","League phase","Group stage","Play-off round","Did not qualify"];
+ let html='<div class="panel" style="margin-top:16px"><div class="panel-title">Finish '+escapeHTML(old)+'</div><div class="panel-subtitle">Enter your final position in every competition, then set your starting rating and transfer value for next season.</div><form id="finishPlayerSeasonForm" class="form-grid" style="margin-top:16px">';
+ comps.forEach((comp,i)=>{const type=playerSeasonCompetitionType(comp,c);html+='<div class="setup-section" style="grid-column:1/-1;border-top:1px solid var(--border-color,#333);padding-top:12px"><label class="setup-label">'+escapeHTML(comp)+'</label><input type="hidden" name="comp_'+i+'" value="'+escapeHTML(comp)+'">';
+ if(type==="league"||type==="hybrid")html+='<label class="setup-label">League position</label><input class="form-input" type="number" name="position_'+i+'" min="1" max="100" placeholder="e.g. 4" required>';
+ if(type==="knockout"||type==="hybrid")html+='<label class="setup-label" style="margin-top:8px">Furthest stage reached</label><select class="form-input" name="stage_'+i+'" required><option value="">Choose stage</option>'+stages.map(s=>'<option>'+s+'</option>').join("")+'</select>';
+ html+='</div>';});
+ html+='<div class="setup-section" style="grid-column:1/-1"><label class="setup-label">Starting Overall Rating for '+escapeHTML(next||"next season")+'</label><input class="form-input" type="number" name="nextOverall" min="1" max="99" required value="'+escapeHTML(String(c.player?.overall||""))+'"></div><div class="setup-section"><label class="setup-label">Starting Transfer Value</label><input class="form-input" name="nextValue" required placeholder="e.g. 45m or 45000000" value="'+escapeHTML(String(c.player?.transferValue||""))+'"></div><div class="setup-section"><label class="setup-label">Currency</label><select class="form-input" name="nextCurrency">'+["EUR","GBP","USD","AUD"].map(x=>'<option value="'+x+'" '+((c.player?.transferCurrency||"EUR")===x?"selected":"")+'>'+x+'</option>').join("")+'</select></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="primary-btn" type="submit">Save Season & Start Next</button><button class="secondary-btn" type="button" onclick="renderPlayerCareerPage(\'past\')">Cancel</button></div></form></div>';
+ const content=document.getElementById("pageContent");content.insertAdjacentHTML("beforeend",html);document.getElementById("finishPlayerSeasonForm").onsubmit=completePlayerSeason;
+}
+function finishPlayerSeason(){
+ const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ if((c.seasons||[]).some(s=>s.season===c.currentSeason&&s.completed)){alert("This season has already been finished.");return;}
+ playerSeasonFinishForm();
+}
+function completePlayerSeason(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const f=event.target,old=c.currentSeason||"2026/27",m=String(old).match(/^(\d{4})\s*\/\s*(\d{2}|\d{4})$/),next=m?String(Number(m[1])+1)+"/"+String(Number(m[1])+2).slice(-2):"";
+ if(!next){alert("The season label could not be advanced automatically. Please use a season in YYYY/YY format.");return;}
+ const comps=[...new Set([...(c.participatingCompetitions||[]),...(c.league?[c.league]:[])])],results={};
+ comps.forEach((comp,i)=>{const type=playerSeasonCompetitionType(comp,c),item={type};if(type==="league"||type==="hybrid")item.leaguePosition=Number(f.elements.namedItem("position_"+i)?.value);if(type==="knockout"||type==="hybrid")item.stage=String(f.elements.namedItem("stage_"+i)?.value||"");results[comp]=item;});
+ const overall=Number(f.elements.namedItem("nextOverall")?.value),value=cleanTransferValue(f.elements.namedItem("nextValue")?.value||""),currency=String(f.elements.namedItem("nextCurrency")?.value||"EUR");
+ if(!Number.isInteger(overall)||overall<1||overall>99||!value){alert("Enter a valid overall rating (1–99) and transfer value.");return;}
+ const st=playerCareerStats(c,old);let found=(c.seasons||[]).find(s=>s.season===old);if(!found){found={season:old};c.seasons.push(found);}
+ Object.assign(found,{completed:true,clubName:c.clubName,league:c.league,summary:{appearances:st.appearances,goals:st.goals,assists:st.assists,averageRating:st.average},competitionResults:results});
+ c.seasonCompetitionResults=c.seasonCompetitionResults||{};c.seasonCompetitionResults[old]=results;c.currentSeason=next;c.seasonNumber=(Number(c.seasonNumber)||1)+1;
+ if(!c.seasons.some(s=>s.season===next))c.seasons.push({season:next,clubName:c.clubName,league:c.league,completed:false});
+ c.seasonOverallRatings=c.seasonOverallRatings||{};c.seasonTransferValues=c.seasonTransferValues||{};c.seasonTransferCurrencies=c.seasonTransferCurrencies||{};
+ c.seasonOverallRatings[next]=overall;c.seasonTransferValues[next]=value;c.seasonTransferCurrencies[next]=currency;c.player.overall=overall;c.player.transferValue=value;c.player.transferCurrency=currency;
+ saveCareers();renderPlayerCareerPage("past");
+}
 
 
 /* PLAYER CAREER SCREENSHOT AI — reuses the existing secure Worker and OpenRouter connection */
