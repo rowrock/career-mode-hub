@@ -1350,7 +1350,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=page==="contract"?"none":(["fullhistory","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":""));
+      btn.style.display=page==="contract"?"none":(playerMode&&page==="league"?"none":(["fullhistory","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":"")));
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
@@ -7191,8 +7191,9 @@ function playerTrophyTable(c){
  if(!seasons.length)seasons.push(String(c.currentSeason||"Current Season"));
  seasons.sort((a,b)=>{if(a==="Unassigned")return 1;if(b==="Unassigned")return -1;return Number(b.slice(0,4))-Number(a.slice(0,4));});
  const entry=t=>{
-  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",date=t.date||"Date not recorded",icon=isTeam?trophyImageMarkup(competition):playerAwardIcon(title);
-  return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #2a323d">'+icon+'<div style="flex:1;min-width:0"><div style="font-weight:750">'+escapeHTML(title)+'</div><div style="font-size:13px;color:#aab3bf;margin-top:5px">Competition: '+escapeHTML(competition)+' · Date: '+escapeHTML(date)+' · Team: '+escapeHTML(team)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></div>';
+  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=isTeam?trophyImageMarkup(competition):playerAwardIcon(title);
+  const when=isTeam?"Season: "+season:(date?"Date: "+date:(t.season?"Season: "+season:"Date not recorded"));
+  return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #2a323d">'+icon+'<div style="flex:1;min-width:0"><div style="font-weight:750">'+escapeHTML(title)+'</div><div style="font-size:13px;color:#aab3bf;margin-top:5px">Competition: '+escapeHTML(competition)+' · '+escapeHTML(when)+' · Team: '+escapeHTML(team)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></div>';
  };
  return '<div class="season-trophy-groups">'+seasons.map((season,idx)=>{
   const list=trophies.filter(t=>String(t.season||"Unassigned")===season),team=list.filter(t=>String(t.type||"").toLowerCase()==="team trophy"),individual=list.filter(t=>String(t.type||"").toLowerCase()!=="team trophy"),groups=new Map();
@@ -7208,7 +7209,7 @@ function playerCareerAwardTally(c){
 function playerCareerTeamTrophiesWon(c){
  const won=(c.trophies||[]).filter(t=>String(t.type||"").toLowerCase()==="team trophy");
  if(!won.length)return '<p style="color:#8d97a3">No team trophies won yet.</p>';
- return '<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Trophy</th><th>Team</th><th>Season</th><th>Date</th></tr></thead><tbody>'+won.slice().reverse().map(t=>'<tr><td>'+escapeHTML(t.competition||t.award||"Team Trophy")+'</td><td>'+escapeHTML(t.team||c.clubName||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td><td>'+escapeHTML(t.date||"—")+'</td></tr>').join("")+'</tbody></table></div>';
+ return '<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Trophy</th><th>Team</th><th>Season</th></tr></thead><tbody>'+won.slice().reverse().map(t=>'<tr><td>'+escapeHTML(t.competition||t.award||"Team Trophy")+'</td><td>'+escapeHTML(t.team||c.clubName||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td></tr>').join("")+'</tbody></table></div>';
 }
 
 function filterPlayerTrophyCabinet(){
