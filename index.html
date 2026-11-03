@@ -7319,7 +7319,7 @@ function playerSeasonLeagueMatchesCountry(league,country){
 }
 function playerSeasonEuropeanLeague(league){
  const s=String(league||"").toLowerCase();
- return /premier league|championship|league one|league two|national league|ligue|france|la liga|segunda|primera federaci|bundesliga|3\. liga|serie [abc]|eredivisie|eerste divisie|scottish|liga portugal|liga 2|belgian|jupiler|turkish|süper lig|super lig|austrian|österreich|swiss|super league|polish|ekstraklasa|danish|superliga|norwegian|eliteserien|swedish|allsvenskan|greek|croatian|serbian|czech|ukrainian|romanian|bulgarian|irish|welsh|finnish|icelandic|cypriot|slovak|slovenian|hungarian|luxembourg|maltese|faroe|bosnian|albanian|montenegrin|armenian|georgian|azerbaijan|kazakh/.test(s);
+ return /premier league|championship|league one|league two|national league|ligue|france|la liga|segunda|primera federaci|bundesliga|3\. liga|serie [abc]|eredivisie|eerste divisie|scottish|liga portugal|liga 2|belgian|jupiler|turkish|süper lig|super lig|austrian|österreich|swiss|super league|polish|ekstraklasa|danish|superliga|norwegian|eliteserien|swedish|allsvenskan|greek|greece|hellas|super league|croatian|serbian|czech|ukrainian|romanian|bulgarian|irish|welsh|finnish|icelandic|cypriot|slovak|slovenian|hungarian|luxembourg|maltese|faroe|bosnian|albanian|montenegrin|armenian|georgian|azerbaijan|kazakh/.test(s);
 }
 function playerSeasonTeamOptions(comp,season){
  const country=playerSeasonCountryKey(comp);let options=[];
@@ -7331,6 +7331,10 @@ function playerSeasonTeamOptions(comp,season){
  }else if(/champions league|europa league|conference league|uefa super cup|european cup|youth league/.test(String(comp||"").toLowerCase())){
   const leagues=Object.keys(fc27ClubsByLeague||{}).filter(playerSeasonEuropeanLeague);
   options=leagues.flatMap(l=>fc27ClubsByLeague[l]||[]);
+  // Some FC databases label Greece simply as "Super League" without the country name.
+  const greekLeagues=Object.keys(fc27ClubsByLeague||{}).filter(l=>/greece|greek|hellas|super league/i.test(l));
+  options.push(...greekLeagues.flatMap(l=>fc27ClubsByLeague[l]||[]));
+  allPlayers.filter(p=>/olympiacos|olympiakos/i.test(String(p.club||""))).forEach(p=>options.push(p.club));
  }else if(/world cup|european championship|nations league|international friendly|copa américa|africa cup|asian cup|gold cup|olympic/.test(String(comp||"").toLowerCase())){
   options=typeof countriesByContinent!=="undefined"?Object.values(countriesByContinent).flat():[];
  }else if(comp===season.league){
