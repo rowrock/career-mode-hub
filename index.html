@@ -7233,41 +7233,42 @@ function deletePlayerTrophy(id){
 }
 
 function playerSeasonStatsTable(c){
-  const seasons=(c.seasons||[]).slice();
-  if(!seasons.some(s=>s.season===c.currentSeason))seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league,current:true});
-  if(!seasons.length)return '<p style="color:#8d97a3">Season summaries will appear here.</p>';
-  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season</th><th>Club</th><th>League</th><th>Apps</th><th>Goals</th><th>Assists</th><th>Avg Rating</th><th>Status</th><th>Edit</th></tr></thead><tbody>';
-  seasons.slice().sort((a,b)=>String(b.season).localeCompare(String(a.season))).forEach(function(season){
-    const st=playerCareerStats(c,season.season);
-    html+='<tr><td>'+escapeHTML(season.season||"—")+'</td><td>'+escapeHTML(season.clubName||c.clubName||"—")+'</td><td>'+escapeHTML(season.league||c.league||"—")+'</td><td>'+st.appearances+'</td><td>'+st.goals+'</td><td>'+st.assists+'</td><td>'+st.average+'</td><td>'+(season.completed?"Completed":"In progress")+'</td><td><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(season.season||'')+'\')">Edit</button></td></tr>';
-  });
-  return html+'</tbody></table></div>';
+ const seasons=(c.seasons||[]).slice();
+ if(!seasons.some(s=>s.season===c.currentSeason))seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league,current:true});
+ if(!seasons.length)return '<p style="color:#8d97a3">Season summaries will appear here.</p>';
+ const statsFor=matches=>{
+  const rated=matches.filter(m=>m.rating!==null&&m.rating!==undefined&&m.rating!==""&&Number.isFinite(Number(m.rating)));
+  return {apps:matches.length,goals:matches.reduce((n,m)=>n+(Number(m.goals)||0),0),ownGoals:matches.reduce((n,m)=>n+(Number(m.ownGoals)||0),0),assists:matches.reduce((n,m)=>n+(Number(m.assists)||0),0),minutes:matches.reduce((n,m)=>n+(Number(m.minutes)||0),0),average:rated.length?(rated.reduce((n,m)=>n+Number(m.rating),0)/rated.length).toFixed(2):"—",wins:matches.filter(m=>m.result==="W").length,draws:matches.filter(m=>m.result==="D").length,losses:matches.filter(m=>m.result==="L").length,yellow:matches.reduce((n,m)=>n+(Number(m.yellowCards)||0),0),red:matches.reduce((n,m)=>n+(Number(m.redCards)||0),0)};
+ };
+ let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season / Team</th><th>Apps</th><th>Goals</th><th>Own Goals</th><th>Assists</th><th>Minutes</th><th>Avg Rating</th><th>W</th><th>D</th><th>L</th><th>Yellow</th><th>Red</th><th>Status</th><th>Edit</th></tr></thead><tbody>';
+ seasons.sort((a,b)=>String(b.season).localeCompare(String(a.season))).forEach(season=>{
+  const all=(c.matches||[]).filter(m=>!season.season||m.season===season.season),club=statsFor(all.filter(m=>!m.international)),country=statsFor(all.filter(m=>m.international)),total=statsFor(all);
+  const row=(label,s)=>'<tr><td>'+label+'</td><td>'+s.apps+'</td><td>'+s.goals+'</td><td>'+s.ownGoals+'</td><td>'+s.assists+'</td><td>'+s.minutes+'</td><td>'+s.average+'</td><td>'+s.wins+'</td><td>'+s.draws+'</td><td>'+s.losses+'</td><td>'+s.yellow+'</td><td>'+s.red+'</td><td>'+(season.completed?"Completed":"In progress")+'</td><td></td></tr>';
+  html+='<tr><td colspan="14" style="font-weight:700;background:var(--panel-bg,rgba(128,128,128,.12))">'+escapeHTML(season.season||"Season")+' — '+escapeHTML(season.clubName||c.clubName||"Club")+' / '+escapeHTML(season.league||c.league||"League")+'</td><td><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(season.season||'')+'\')">Edit</button></td></tr>';
+  html+=row('Club',club)+row('Country',country)+row('Total',total);
+ });
+ return html+'</tbody></table></div>';
 }
 
 function editPlayerSeason(seasonName){
  const c=getCurrentCareer();if(!c||c.mode!=="player")return;
  const season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName))||{season:seasonName};
- const club=prompt("Club for "+seasonName+":",season.clubName||c.clubName||"");if(club===null)return;
- const league=prompt("Main league for "+seasonName+":",season.league||c.league||"");if(league===null)return;
- const ratingMap=c.seasonOverallRatings||{},valueMap=c.seasonTransferValues||{},currencyMap=c.seasonTransferCurrencies||{};
- const ratingRaw=prompt("Starting overall rating for "+seasonName+" (1–99):",String(ratingMap[seasonName]??(seasonName===c.currentSeason?c.player?.overall:"")??""));if(ratingRaw===null)return;
- const rating=Number(ratingRaw);if(!Number.isInteger(rating)||rating<1||rating>99){alert("Enter a valid overall rating from 1 to 99.");return;}
- const valueRaw=prompt("Starting transfer value for "+seasonName+":",String(valueMap[seasonName]??(seasonName===c.currentSeason?c.player?.transferValue:"")??""));if(valueRaw===null)return;
- const value=cleanTransferValue(valueRaw);if(!value){alert("Enter a valid transfer value.");return;}
- const currency=prompt("Currency (EUR, GBP, USD or AUD):",currencyMap[seasonName]||c.player?.transferCurrency||"EUR");if(currency===null)return;
- const results=Object.assign({},season.competitionResults||((c.seasonCompetitionResults||{})[seasonName])||{});
- for(const comp of Object.keys(results)){
-  const item=results[comp]||{},type=item.type||playerSeasonCompetitionType(comp,c);
-  if(type==="league"||type==="hybrid"){const raw=prompt(comp+" — final league position:",String(item.leaguePosition||""));if(raw===null)return;const pos=Number(raw);if(!Number.isInteger(pos)||pos<1||pos>100){alert("Enter a valid league position for "+comp+".");return;}item.leaguePosition=pos;}
-  if(type==="knockout"||type==="hybrid"){const stage=prompt(comp+" — furthest stage reached:",item.stage||"");if(stage===null)return;item.stage=stage.trim();}
-  results[comp]=item;
- }
- let target=(c.seasons||[]).find(s=>String(s.season)===String(seasonName));if(!target){target={season:seasonName};c.seasons.push(target);}
- Object.assign(target,{clubName:club.trim()||season.clubName,league:league.trim()||season.league,competitionResults:results});
- c.seasonCompetitionResults=c.seasonCompetitionResults||{};c.seasonCompetitionResults[seasonName]=results;
- c.seasonOverallRatings=c.seasonOverallRatings||{};c.seasonTransferValues=c.seasonTransferValues||{};c.seasonTransferCurrencies=c.seasonTransferCurrencies||{};
- c.seasonOverallRatings[seasonName]=rating;c.seasonTransferValues[seasonName]=value;c.seasonTransferCurrencies[seasonName]=currency.trim().toUpperCase();
- if(seasonName===c.currentSeason){c.clubName=target.clubName;c.league=target.league;c.player.overall=rating;c.player.transferValue=value;c.player.transferCurrency=currency.trim().toUpperCase();}
+ const results=season.competitionResults||((c.seasonCompetitionResults||{})[seasonName])||{};
+ const stages=["Winner","Runner-up","Final","Semi-final","Quarter-final","Round of 16","Round of 32","Round of 64","League phase","Group stage","Play-off round","Did not qualify"];
+ const rating=(c.seasonOverallRatings||{})[seasonName]??"",value=(c.seasonTransferValues||{})[seasonName]??"",currency=(c.seasonTransferCurrencies||{})[seasonName]||c.player?.transferCurrency||"EUR";
+ let html='<div class="panel" style="margin-top:16px"><div class="panel-title">Edit '+escapeHTML(seasonName)+'</div><div class="panel-subtitle">Update this season using the same form layout as Finish Season.</div><form id="editPlayerSeasonForm" class="form-grid" style="margin-top:16px"><input type="hidden" name="seasonName" value="'+escapeHTML(seasonName)+'"><div class="setup-section"><label class="setup-label">Club</label><input class="form-input" name="club" required value="'+escapeHTML(season.clubName||c.clubName||"")+'"></div><div class="setup-section"><label class="setup-label">Main league</label><input class="form-input" name="league" required value="'+escapeHTML(season.league||c.league||"")+'"></div>';
+ Object.keys(results).forEach((comp,i)=>{const item=results[comp]||{},type=item.type||playerSeasonCompetitionType(comp,c);html+='<div class="setup-section" style="grid-column:1/-1;border-top:1px solid var(--border-color,#333);padding-top:12px"><label class="setup-label">'+escapeHTML(comp)+'</label><input type="hidden" name="comp_'+i+'" value="'+escapeHTML(comp)+'">';if(type==="league"||type==="hybrid")html+='<label class="setup-label">Final league position</label><input class="form-input" type="number" name="position_'+i+'" min="1" max="100" value="'+escapeHTML(String(item.leaguePosition||""))+'" required>';if(type==="knockout"||type==="hybrid")html+='<label class="setup-label" style="margin-top:8px">Furthest stage reached</label><select class="form-input" name="stage_'+i+'" required><option value="">Choose stage</option>'+stages.map(s=>'<option '+(s===item.stage?"selected":"")+'>'+s+'</option>').join("")+'</select>';html+='</div>';});
+ html+='<div class="setup-section"><label class="setup-label">Starting Overall Rating</label><input class="form-input" type="number" name="overall" min="1" max="99" required value="'+escapeHTML(String(rating))+'"></div><div class="setup-section"><label class="setup-label">Starting Transfer Value</label><input class="form-input" name="value" required value="'+escapeHTML(String(value))+'"></div><div class="setup-section"><label class="setup-label">Currency</label><select class="form-input" name="currency">'+["EUR","GBP","USD","AUD"].map(x=>'<option '+(x===currency?"selected":"")+'>'+x+'</option>').join("")+'</select></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="primary-btn" type="submit">Save Changes</button><button class="secondary-btn" type="button" onclick="renderPlayerCareerPage(\'past\')">Cancel</button></div></form></div>';
+ const content=document.getElementById("pageContent");content.insertAdjacentHTML("beforeend",html);document.getElementById("editPlayerSeasonForm").onsubmit=savePlayerSeasonEdit;
+}
+function savePlayerSeasonEdit(event){
+ event.preventDefault();const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const f=event.target,name=String(f.elements.namedItem("seasonName").value),club=String(f.elements.namedItem("club").value||"").trim(),league=String(f.elements.namedItem("league").value||"").trim(),overall=Number(f.elements.namedItem("overall").value),value=cleanTransferValue(f.elements.namedItem("value").value||""),currency=String(f.elements.namedItem("currency").value||"EUR");
+ if(!club||!league||!Number.isInteger(overall)||overall<1||overall>99||!value){alert("Please enter a club, league, valid overall rating and transfer value.");return;}
+ const results={};Object.keys(c.seasonCompetitionResults?.[name]||{}).forEach((comp,i)=>{const old=(c.seasonCompetitionResults[name]||{})[comp]||{},type=old.type||playerSeasonCompetitionType(comp,c),item={type};if(type==="league"||type==="hybrid"){const pos=Number(f.elements.namedItem("position_"+i)?.value);if(!Number.isInteger(pos)||pos<1){alert("Enter a valid final league position for "+comp+".");return;}item.leaguePosition=pos;}if(type==="knockout"||type==="hybrid")item.stage=String(f.elements.namedItem("stage_"+i)?.value||"");results[comp]=item;});
+ const season=(c.seasons||[]).find(s=>String(s.season)===name);if(season)Object.assign(season,{clubName:club,league:league,competitionResults:results});
+ c.seasonCompetitionResults=c.seasonCompetitionResults||{};c.seasonCompetitionResults[name]=results;c.seasonOverallRatings=c.seasonOverallRatings||{};c.seasonTransferValues=c.seasonTransferValues||{};c.seasonTransferCurrencies=c.seasonTransferCurrencies||{};c.seasonOverallRatings[name]=overall;c.seasonTransferValues[name]=value;c.seasonTransferCurrencies[name]=currency;
+ if(name===c.currentSeason){c.clubName=club;c.league=league;c.player.overall=overall;c.player.transferValue=value;c.player.transferCurrency=currency;}
  saveCareers();renderPlayerCareerPage("past");
 }
 
