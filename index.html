@@ -6392,26 +6392,55 @@ function pcJourney(c){const a=[];(c.clubHistory||[]).forEach(x=>a.push({date:x.d
 function pcRecords(c){const s=playerCareerStats(c,null),m=c.matches||[],g=m.reduce((a,x)=>a+(Number(x.goals)||0),0),as=m.reduce((a,x)=>a+(Number(x.assists)||0),0),r=m.map(x=>Number(x.rating)).filter(x=>x>0),motm=m.filter(x=>x.manOfTheMatch).length,ms=[["First appearance",s.appearances>=1],["10 appearances",s.appearances>=10],["50 appearances",s.appearances>=50],["100 appearances",s.appearances>=100],["First goal",g>=1],["10 goals",g>=10],["25 goals",g>=25],["50 goals",g>=50],["First assist",as>=1],["First Man of the Match",motm>=1],["First trophy",(c.trophies||[]).length>=1]];return '<div class="match-summary-grid">'+playerStatCard("Appearances",s.appearances)+playerStatCard("Goals",g)+playerStatCard("Assists",as)+playerStatCard("Best rating",r.length?Math.max(...r).toFixed(1):"—")+playerStatCard("Man of the Match",motm)+playerStatCard("Trophies",(c.trophies||[]).length)+'</div><h3 style="margin-top:22px">Milestones</h3><div class="form-grid">'+ms.map(([n,ok])=>'<div style="padding:12px;border:1px solid '+(ok?'#28654f':'#303946')+';border-radius:10px"><b style="color:'+(ok?'#6ee7b7':'#aab3bf')+'">'+(ok?'✓ ':'○ ')+n+'</b><div style="font-size:12px;color:#8d97a3;margin-top:5px">'+(ok?'Unlocked':'Not reached')+'</div></div>').join("")+'</div>';}
 
 function pcRecordTracker(c){
- const matches=(c.matches||[]).filter(m=>!m.international),p=c.player||{};
- const comp=(m)=>String(m.competition||"").toLowerCase();
- const pl=matches.filter(m=>/premier league|english premier league|\bepl\b/.test(comp(m)));
- const ucl=matches.filter(m=>/champions league|uefa champions league|\bucl\b/.test(comp(m)));
+ const matches=(c.matches||[]).filter(m=>m&&String(m.competition||"").trim());
+ const key=v=>String(v||"").toLowerCase().replace(/\buefa\b/g,"").replace(/[^a-z0-9]/g,"");
  const sum=(a,k)=>a.reduce((n,m)=>n+(Number(m[k])||0),0);
- const catalog=[
-  {name:"Premier League all-time goals",holder:"Alan Shearer",record:260,value:sum(pl,"goals"),unit:"goals",scope:"Premier League"},
-  {name:"Premier League all-time assists",holder:"Ryan Giggs",record:162,value:sum(pl,"assists"),unit:"assists",scope:"Premier League"},
-  {name:"Premier League appearances",holder:"James Milner",record:653,value:pl.length,unit:"appearances",scope:"Premier League"},
-  {name:"Champions League all-time goals",holder:"Cristiano Ronaldo",record:140,value:sum(ucl,"goals"),unit:"goals",scope:"UEFA Champions League"},
-  {name:"Champions League all-time assists",holder:"Cristiano Ronaldo",record:42,value:sum(ucl,"assists"),unit:"assists",scope:"UEFA Champions League"}
- ];
- const held=catalog.filter(x=>x.value>=x.record);
- const closest=catalog.filter(x=>x.value<x.record).map(x=>({...x,pct:Math.min(100,x.value/x.record*100),remaining:x.record-x.value})).sort((a,b)=>b.pct-a.pct).slice(0,5);
- const metric=(x)=>x.value.toLocaleString()+" / "+x.record.toLocaleString()+" "+x.unit;
- return '<div class="panel" style="margin-top:18px"><div class="panel-title">Records you hold</div><div class="panel-subtitle">Official competition records are checked against the matches you have logged. Only recorded competition stats count.</div>'+
- (held.length?held.map(x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">Record holder: '+escapeHTML(x.holder)+' · '+metric(x)+'</div></div>').join(""):'<p style="color:#aab3bf">You do not currently hold any of the tracked all-time records. Keep logging your matches to track your progress.</p>')+
- '</div><div class="panel" style="margin-top:16px"><div class="panel-title">The 5 records you are closest to</div><div class="panel-subtitle">Ranked by your progress towards the all-time benchmark, using your recorded Premier League and Champions League matches.</div>'+
- (closest.length?closest.map((x,i)=>'<div style="padding:13px 0;border-bottom:1px solid #303946"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+(i+1)+'. '+escapeHTML(x.name)+'</b><b style="color:#8dd5ff">'+x.pct.toFixed(1)+'%</b></div><div style="height:7px;background:#29323e;border-radius:8px;margin:9px 0"><div style="height:100%;width:'+x.pct+'%;background:#60a5fa;border-radius:8px"></div></div><div style="font-size:12px;color:#aab3bf">'+metric(x)+' · '+x.remaining.toLocaleString()+' to go · Record holder: '+escapeHTML(x.holder)+'</div></div>').join(""):'<p style="color:#aab3bf">No tracked competitions found yet. Add match competition names such as Premier League or UEFA Champions League.</p>')+
- '<p style="font-size:11px;color:#8290a0;margin-top:12px">These are benchmark comparisons, not a claim that your save contains every historical match. Missing or unlogged matches will affect the totals.</p></div>';
+ const known={
+  "premierleague":{goals:[260,"Alan Shearer"],assists:[162,"Ryan Giggs"],appearances:[658,"James Milner"]},
+  "laliga":{goals:[474,"Lionel Messi"],assists:[192,"Lionel Messi"],appearances:[622,"Andoni Zubizarreta / Joaquín"]},
+  "bundesliga":{goals:[365,"Gerd Müller"],assists:[178,"Thomas Müller"],appearances:[602,"Charly Körbel"]},
+  "seriea":{goals:[274,"Silvio Piola"],assists:[158,"Francesco Totti"],appearances:[647,"Paolo Maldini"]},
+  "ligue1":{goals:[299,"Delio Onnis"],assists:[115,"Dimitri Payet"],appearances:[618,"Mickaël Landreau"]},
+  "championsleague":{goals:[140,"Cristiano Ronaldo"],assists:[41,"Ryan Giggs"],appearances:[183,"Cristiano Ronaldo"]},
+  "mls":{goals:[171,"Chris Wondolowski"],assists:[136,"Landon Donovan"],appearances:[498,"Kyle Beckerman"]},
+  "facup":{goals:[40,"Ian Rush"]},
+  "copadelrey":{goals:[56,"Lionel Messi"],assists:[33,"Lionel Messi"]},
+  "worldcup":{goals:[22,"Kylian Mbappé"],assists:[10,"Pelé / Lionel Messi"],appearances:[26,"Lionel Messi"]},
+  "eurochampionship":{goals:[14,"Cristiano Ronaldo"],assists:[8,"Karel Poborský / Cristiano Ronaldo"],appearances:[30,"Cristiano Ronaldo"]},
+  "copaamerica":{goals:[17,"Norberto Méndez / Zizinho"],assists:[18,"Lionel Messi"],appearances:[39,"Lionel Messi"]}
+ };
+ const groups=new Map();
+ matches.forEach(m=>{
+  const raw=String(m.competition||"").trim();
+  let k=key(raw);
+  if(k==="epl"||k==="englishpremierleague")k="premierleague";
+  if(k==="ucl"||k==="uefachampionsleague")k="championsleague";
+  if(k==="uefaeuropaleague")k="europaleague";
+  if(k==="uefaeuropaconferenceleague"||k==="conferenceleague")k="conferenceleague";
+  if(!k)return;
+  if(!groups.has(k))groups.set(k,{name:k==="championsleague"?"UEFA Champions League":k==="premierleague"?"Premier League":raw,matches:[]});
+  groups.get(k).matches.push(m);
+ });
+ const catalog=[];
+ groups.forEach((g,k)=>{
+  const ref=known[k]||{};
+  [["goals","goals"],["assists","assists"],["appearances","appearances"]].forEach(([field,label])=>{
+   const value=field==="appearances"?g.matches.length:sum(g.matches,field);
+   const data=ref[field];
+   const record=data?data[0]:(field==="goals"?100:field==="assists"?50:100);
+   const holder=data?data[1]:"FC career target";
+   catalog.push({name:g.name+" "+label+" record",competition:g.name,unit:label,value,record,holder,official:!!data,pct:Math.min(100,value/record*100),remaining:Math.max(0,record-value)});
+  });
+ });
+ const held=catalog.filter(x=>x.value>=x.record).sort((a,b)=>a.competition.localeCompare(b.competition)||a.name.localeCompare(b.name));
+ const closest=catalog.filter(x=>x.value<x.record).sort((a,b)=>b.pct-a.pct||a.competition.localeCompare(b.competition)).slice(0,5);
+ const metric=x=>x.value.toLocaleString()+" / "+x.record.toLocaleString()+" "+x.unit;
+ const recordCard=x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">'+(x.official?'All-time benchmark: ':'Career target: ')+escapeHTML(x.holder)+' · '+metric(x)+'</div></div>';
+ return '<div class="panel" style="margin-top:18px"><div class="panel-title">Records you hold</div><div class="panel-subtitle">Every competition in your logged matches is tracked for goals, assists and appearances, including domestic leagues, European competitions and cups.</div>'+
+ (held.length?held.map(recordCard).join(""):'<p style="color:#aab3bf">You do not currently hold any of the tracked records. Keep logging your matches to track your progress.</p>')+
+ '</div><div class="panel" style="margin-top:16px"><div class="panel-title">The 5 records you are closest to</div><div class="panel-subtitle">Your five highest completion percentages across every competition and all three record types.</div>'+
+ (closest.length?closest.map((x,i)=>'<div style="padding:13px 0;border-bottom:1px solid #303946"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+(i+1)+'. '+escapeHTML(x.name)+'</b><b style="color:#8dd5ff">'+x.pct.toFixed(1)+'%</b></div><div style="height:7px;background:#29323e;border-radius:8px;margin:9px 0"><div style="height:100%;width:'+x.pct+'%;background:#60a5fa;border-radius:8px"></div></div><div style="font-size:12px;color:#aab3bf">'+metric(x)+' · '+x.remaining.toLocaleString()+' to go · '+(x.official?'All-time leader: ':'Target: ')+escapeHTML(x.holder)+'</div></div>').join(""):'<p style="color:#aab3bf">Log matches with a competition selected to start tracking records.</p>')+
+ '<p style="font-size:11px;color:#8290a0;margin-top:12px">Where an all-time competition record is available in the tracker, it is shown with its holder. For competitions without a verified benchmark, the app uses a clearly labelled FC career target instead of inventing an official record. Only your logged matches count.</p></div>';
 }
 const PC_RIVALRIES=[
  ["Brighton & Hove Albion","Crystal Palace",92],["Barcelona","Real Madrid",98],["Atlético Madrid","Real Madrid",88],["Sevilla","Real Betis",94],["Arsenal","Tottenham Hotspur",95],["Manchester United","Manchester City",94],["Liverpool","Everton",90],["Chelsea","Tottenham Hotspur",80],["Newcastle United","Sunderland",96],["Celtic","Rangers",99],["Inter","AC Milan",96],["Roma","Lazio",97],["Juventus","Inter",86],["Borussia Dortmund","Bayern Munich",82],["Schalke 04","Borussia Dortmund",95],["PSG","Marseille",91],["Ajax","Feyenoord",94],["Benfica","Sporting CP",91],["Porto","Benfica",91],["Galatasaray","Fenerbahçe",99],["Fenerbahçe","Beşiktaş",88],["Boca Juniors","River Plate",99],["Flamengo","Fluminense",92],["Club América","Chivas",96],["LA Galaxy","Los Angeles FC",90],["Portsmouth","Southampton",96],["Aston Villa","Birmingham City",95],["Nottingham Forest","Derby County",92],["Manchester United","Liverpool",84],["Real Madrid","Barcelona",98]
