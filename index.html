@@ -7236,12 +7236,39 @@ function playerSeasonStatsTable(c){
   const seasons=(c.seasons||[]).slice();
   if(!seasons.some(s=>s.season===c.currentSeason))seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league,current:true});
   if(!seasons.length)return '<p style="color:#8d97a3">Season summaries will appear here.</p>';
-  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season</th><th>Club</th><th>League</th><th>Apps</th><th>Goals</th><th>Assists</th><th>Avg Rating</th><th>Status</th></tr></thead><tbody>';
+  let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season</th><th>Club</th><th>League</th><th>Apps</th><th>Goals</th><th>Assists</th><th>Avg Rating</th><th>Status</th><th>Edit</th></tr></thead><tbody>';
   seasons.slice().sort((a,b)=>String(b.season).localeCompare(String(a.season))).forEach(function(season){
     const st=playerCareerStats(c,season.season);
-    html+='<tr><td>'+escapeHTML(season.season||"—")+'</td><td>'+escapeHTML(season.clubName||c.clubName||"—")+'</td><td>'+escapeHTML(season.league||c.league||"—")+'</td><td>'+st.appearances+'</td><td>'+st.goals+'</td><td>'+st.assists+'</td><td>'+st.average+'</td><td>'+(season.completed?"Completed":"In progress")+'</td></tr>';
+    html+='<tr><td>'+escapeHTML(season.season||"—")+'</td><td>'+escapeHTML(season.clubName||c.clubName||"—")+'</td><td>'+escapeHTML(season.league||c.league||"—")+'</td><td>'+st.appearances+'</td><td>'+st.goals+'</td><td>'+st.assists+'</td><td>'+st.average+'</td><td>'+(season.completed?"Completed":"In progress")+'</td><td><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(season.season||'')+'\')">Edit</button></td></tr>';
   });
   return html+'</tbody></table></div>';
+}
+
+function editPlayerSeason(seasonName){
+ const c=getCurrentCareer();if(!c||c.mode!=="player")return;
+ const season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName))||{season:seasonName};
+ const club=prompt("Club for "+seasonName+":",season.clubName||c.clubName||"");if(club===null)return;
+ const league=prompt("Main league for "+seasonName+":",season.league||c.league||"");if(league===null)return;
+ const ratingMap=c.seasonOverallRatings||{},valueMap=c.seasonTransferValues||{},currencyMap=c.seasonTransferCurrencies||{};
+ const ratingRaw=prompt("Starting overall rating for "+seasonName+" (1–99):",String(ratingMap[seasonName]??(seasonName===c.currentSeason?c.player?.overall:"")??""));if(ratingRaw===null)return;
+ const rating=Number(ratingRaw);if(!Number.isInteger(rating)||rating<1||rating>99){alert("Enter a valid overall rating from 1 to 99.");return;}
+ const valueRaw=prompt("Starting transfer value for "+seasonName+":",String(valueMap[seasonName]??(seasonName===c.currentSeason?c.player?.transferValue:"")??""));if(valueRaw===null)return;
+ const value=cleanTransferValue(valueRaw);if(!value){alert("Enter a valid transfer value.");return;}
+ const currency=prompt("Currency (EUR, GBP, USD or AUD):",currencyMap[seasonName]||c.player?.transferCurrency||"EUR");if(currency===null)return;
+ const results=Object.assign({},season.competitionResults||((c.seasonCompetitionResults||{})[seasonName])||{});
+ for(const comp of Object.keys(results)){
+  const item=results[comp]||{},type=item.type||playerSeasonCompetitionType(comp,c);
+  if(type==="league"||type==="hybrid"){const raw=prompt(comp+" — final league position:",String(item.leaguePosition||""));if(raw===null)return;const pos=Number(raw);if(!Number.isInteger(pos)||pos<1||pos>100){alert("Enter a valid league position for "+comp+".");return;}item.leaguePosition=pos;}
+  if(type==="knockout"||type==="hybrid"){const stage=prompt(comp+" — furthest stage reached:",item.stage||"");if(stage===null)return;item.stage=stage.trim();}
+  results[comp]=item;
+ }
+ let target=(c.seasons||[]).find(s=>String(s.season)===String(seasonName));if(!target){target={season:seasonName};c.seasons.push(target);}
+ Object.assign(target,{clubName:club.trim()||season.clubName,league:league.trim()||season.league,competitionResults:results});
+ c.seasonCompetitionResults=c.seasonCompetitionResults||{};c.seasonCompetitionResults[seasonName]=results;
+ c.seasonOverallRatings=c.seasonOverallRatings||{};c.seasonTransferValues=c.seasonTransferValues||{};c.seasonTransferCurrencies=c.seasonTransferCurrencies||{};
+ c.seasonOverallRatings[seasonName]=rating;c.seasonTransferValues[seasonName]=value;c.seasonTransferCurrencies[seasonName]=currency.trim().toUpperCase();
+ if(seasonName===c.currentSeason){c.clubName=target.clubName;c.league=target.league;c.player.overall=rating;c.player.transferValue=value;c.player.transferCurrency=currency.trim().toUpperCase();}
+ saveCareers();renderPlayerCareerPage("past");
 }
 
 function playerSeasonCompetitionType(comp,c){
