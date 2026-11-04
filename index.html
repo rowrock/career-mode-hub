@@ -7309,20 +7309,22 @@ async function pcFindManifestClubCrest(name){
  try{
   if(!pcClubLogoManifestPromise)pcClubLogoManifestPromise=fetch("https://raw.githubusercontent.com/frertommy/team-logos/main/manifest.json").then(r=>{if(!r.ok)throw new Error("Logo manifest unavailable");return r.json();});
   const manifest=await pcClubLogoManifestPromise,teams=Array.isArray(manifest.teams)?manifest.teams:[];
-  const key=pcClubNameKey(name);
-  const match=teams.find(t=>pcClubNameKey(t.team)===key||pcClubNameKey(t.matched_as)===key);
+  const key=pcClubNameKey(name),searchKey=pcClubNameKey(pcClubSearchName(name));
+  const candidates=[key,searchKey,key.replace(/^losc/,""),searchKey.replace(/^losc/,""),key.replace(/^lille/,""),searchKey.replace(/^lille/,"")].filter(Boolean);
+  const match=teams.find(t=>[t.team,t.matched_as].some(v=>candidates.includes(pcClubNameKey(v))));
   if(!match||!Array.isArray(match.files))return "";
-  const path=match.files.find(p=>p.endsWith("_big_circle.png"))||match.files.find(p=>p.endsWith("_big_square.png"));
+  // Use the square master inside our circular frame; the circle variant has extra inset padding.
+  const path=match.files.find(p=>p.endsWith("_big_square.png"))||match.files.find(p=>p.endsWith("_big_circle.png"));
   return path?"https://frertommy.github.io/team-logos/"+path.split("/").map(encodeURIComponent).join("/"):"";
  }catch(e){pcClubLogoManifestPromise=null;return "";}
 }
 async function pcFetchOfficialClubCrest(name){
  const key=pcClubNameKey(pcClubSearchName(name));
- // First use the curated transparent crest pack for the major FC leagues, then fall back to live team search for other clubs.
- const manifestCrest=await pcFindManifestClubCrest(name);if(manifestCrest)return manifestCrest;
- // Use a verified direct image for Brighton instead of the unreliable search API.
+ // Brighton's direct crest is fuller than the inset catalogue variant.
  const verifiedCrests={brightonhovealbion:"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png"};
  if(verifiedCrests[key])return verifiedCrests[key];
+ // Use curated transparent square crests for other major-league clubs, then live search as fallback.
+ const manifestCrest=await pcFindManifestClubCrest(name);if(manifestCrest)return manifestCrest;
  const cacheKey="pcOfficialClubCrest:v4:"+key;
  try{const cached=localStorage.getItem(cacheKey);if(cached)return cached==="none"?"":cached;}catch(e){}
  try{
