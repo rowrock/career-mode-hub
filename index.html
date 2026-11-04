@@ -1073,6 +1073,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
 
+.pc-display-club-badge{position:relative;overflow:hidden}.pc-display-club-badge .pc-official-club-crest{width:100%;height:100%;object-fit:contain;padding:3px;background:transparent}.pc-display-club-badge .pc-club-initials{display:flex;align-items:center;justify-content:center;width:100%;height:100%}.pc-display-club-badge .pc-official-club-crest:not([hidden]){display:block}
 /* Two permanent cabinets: team trophies and grouped individual awards */
 .pc-individual-cabinet{padding-bottom:16px}
 .pc-individual-award-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start}
@@ -6831,6 +6832,7 @@ function renderPlayerCareerPage(page){
     html+='<div class="panel"><div class="panel-title">Player Career</div><p>Choose a section from the sidebar.</p></div>';
   }
   content.innerHTML=html;
+  if(page==="trophies")loadPlayerCabinetClubCrests();
   if(page==="competitions")renderPlayerTrophyCatalogue();
   document.querySelectorAll("#careerNavigation .nav-btn").forEach(function(btn){btn.classList.toggle("active",btn.dataset.page===page);});
   if(page==="fullhistory"){try{filterPlayerFullHistory();}catch(err){console.error("Full Career statistics failed:",err);const box=document.getElementById("fullHistoryStats");if(box)box.innerHTML='<p style="color:#fca5a5">Full Career statistics could not load. Please refresh and try again.</p>';}}
@@ -7273,7 +7275,7 @@ function playerTrophyTable(c){
  const initials=name=>String(name||"").trim().split(/\\s+/).filter(Boolean).slice(0,3).map(x=>x[0]).join("").toUpperCase()||"FC";
  const teamCard=t=>{
   const title=t.competition||t.award||"Team Trophy",club=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded";
-  return '<article class="pc-display-card"><div class="pc-display-trophy">'+trophyImageMarkup(title)+'</div><div class="pc-display-club-badge" title="'+escapeHTML(club)+'">'+escapeHTML(initials(club))+'</div><div class="pc-display-name">'+escapeHTML(title)+'</div><div class="pc-display-meta">'+escapeHTML(club)+'<br>'+escapeHTML(season)+'</div><button class="delete-btn player-award-delete pc-display-remove" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></article>';
+  return '<article class="pc-display-card"><div class="pc-display-trophy">'+trophyImageMarkup(title)+'</div><div class="pc-display-club-badge" title="'+escapeHTML(club)+'" data-club-name="'+escapeHTML(club)+'"><span class="pc-club-initials">'+escapeHTML(initials(club))+'</span><img class="pc-official-club-crest" alt="'+escapeHTML(club)+' crest" loading="lazy" hidden></div><div class="pc-display-name">'+escapeHTML(title)+'</div><div class="pc-display-meta">'+escapeHTML(club)+'<br>'+escapeHTML(season)+'</div><button class="delete-btn player-award-delete pc-display-remove" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></article>';
  };
  const groups=new Map();
  individual.forEach(t=>{const name=t.award||t.competition||"Individual Award";if(!groups.has(name))groups.set(name,[]);groups.get(name).push(t);});
@@ -7294,6 +7296,39 @@ function playerCareerTeamTrophiesWon(c){
  return '<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Trophy</th><th>Team</th><th>Season</th></tr></thead><tbody>'+won.slice().reverse().map(t=>'<tr><td>'+escapeHTML(t.competition||t.award||"Team Trophy")+'</td><td>'+escapeHTML(t.team||c.clubName||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td></tr>').join("")+'</tbody></table></div>';
 }
 
+function pcClubNameKey(name){return String(name||"").toLowerCase().replace(/\b(fc|afc|cf|cfc|sc|ac|club|football|futbol|de|the)\b/g,"").replace(/[^a-z0-9]/g,"");}
+function pcClubSearchName(name){
+ const n=String(name||"").trim(),k=pcClubNameKey(n);
+ const aliases={"mancity":"Manchester City","manutd":"Manchester United","spurs":"Tottenham Hotspur","tottenham":"Tottenham Hotspur","brighton":"Brighton and Hove Albion","wolves":"Wolverhampton Wanderers","forest":"Nottingham Forest","nottmforest":"Nottingham Forest","westham":"West Ham United","newcastle":"Newcastle United","psg":"Paris Saint-Germain","inter":"Inter Milan","acmilan":"AC Milan","atletico":"Atletico Madrid","athleticbilbao":"Athletic Club"};
+ return aliases[k]||n;
+}
+async function pcFetchOfficialClubCrest(name){
+ const cacheKey="pcOfficialClubCrest:"+pcClubNameKey(name);
+ try{const cached=localStorage.getItem(cacheKey);if(cached)return cached==="none"?"":cached;}catch(e){}
+ try{
+  const response=await fetch("https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t="+encodeURIComponent(pcClubSearchName(name)));
+  if(!response.ok)throw new Error("Crest lookup failed");
+  const data=await response.json(),teams=Array.isArray(data.teams)?data.teams:[];
+  const key=pcClubNameKey(pcClubSearchName(name));
+  const match=teams.find(t=>pcClubNameKey(t.strTeam)===key);
+  const url=match&&match.strBadge?String(match.strBadge):"";
+  try{localStorage.setItem(cacheKey,url||"none");}catch(e){}
+  return url;
+ }catch(e){return "";}
+}
+async function loadPlayerCabinetClubCrests(){
+ const nodes=Array.from(document.querySelectorAll("#playerTrophyCabinetList .pc-display-club-badge[data-club-name]"));
+ const names=[...new Set(nodes.map(n=>n.dataset.clubName).filter(Boolean))];
+ for(const name of names){
+  const url=await pcFetchOfficialClubCrest(name);
+  if(url)document.querySelectorAll("#playerTrophyCabinetList .pc-display-club-badge[data-club-name]").forEach(box=>{
+   if(pcClubNameKey(box.dataset.clubName)!==pcClubNameKey(name))return;
+   const img=box.querySelector(".pc-official-club-crest"),initials=box.querySelector(".pc-club-initials");
+   if(!img)return;img.src=url;img.onload=()=>{img.hidden=false;if(initials)initials.hidden=true;};img.onerror=()=>{img.hidden=true;};
+  });
+  await new Promise(resolve=>setTimeout(resolve,1250));
+ }
+}
 function filterPlayerTrophyCabinet(){
  const c=getCurrentCareer();if(!c)return;
  const mode=document.getElementById("trophyCabinetFilter")?.value||"all";
@@ -7304,7 +7339,7 @@ function filterPlayerTrophyCabinet(){
   return [t.award,t.competition,t.team,t.season,t.date].some(v=>String(v||"").toLowerCase().includes(q));
  });
  const box=document.getElementById("playerTrophyCabinetList");if(!box)return;
- box.innerHTML=playerTrophyTable({...c,trophies:selected});
+ box.innerHTML=playerTrophyTable({...c,trophies:selected});loadPlayerCabinetClubCrests();
 }
 
 function deletePlayerTrophy(id){
