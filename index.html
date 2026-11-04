@@ -1207,6 +1207,7 @@ Past Seasons
 </button>
 
 <button class="nav-btn disabled" data-page="shirtHistory" onclick="showPage('shirtHistory')">Shirt History</button>
+<button class="nav-btn disabled" data-page="shirtSwap" onclick="showPage('shirtSwap')">Shirt Swap</button>
 
 <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
 Trophy Cabinet
@@ -6849,6 +6850,8 @@ function renderPlayerCareerPage(page){
     html+=pcPress(c);
   }else if(page==="shirtHistory"){
     html+=renderPlayerShirtHistoryPage(c);
+  }else if(page==="shirtSwap"){
+    html+=renderPlayerShirtSwapPage(c);
   }else if(page==="fullhistory"){
     const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
@@ -7496,6 +7499,48 @@ function deletePlayerShirt(seasonName,type){
  const c=getCurrentCareer();if(!c||!c.shirtHistory?.[seasonName])return;
  if(!confirm("Remove this "+type.toLowerCase()+" shirt from "+seasonName+"?"))return;
  c.shirtHistory[seasonName]=c.shirtHistory[seasonName].filter(x=>x.type!==type);saveCareers();renderPlayerCareerPage("shirtHistory");
+}
+
+function renderPlayerShirtSwapPage(c){
+ if(!Array.isArray(c.shirtSwaps))c.shirtSwaps=[];
+ const seasons=playerCareerSeasonList(c);if(c.currentSeason&&!seasons.includes(String(c.currentSeason)))seasons.push(String(c.currentSeason));
+ let html='<div class="panel"><div class="panel-title">Shirt Swap</div><div class="panel-subtitle">Keep a collection of shirts you have swapped with other players. Add each shirt using a photo, the player and club details, and the season the swap happened.</div><div style="margin-top:14px"><button class="primary-btn" type="button" onclick="editPlayerShirtSwap()">+ Add Shirt Swap</button></div></div>';
+ if(!c.shirtSwaps.length)return html+'<div class="panel"><p style="color:#9ca5b1">No shirt swaps recorded yet. Add your first swapped shirt above.</p></div>';
+ const grouped={};c.shirtSwaps.forEach((x,i)=>{const s=String(x.season||"Unassigned");(grouped[s]||(grouped[s]=[])).push({...x,_index:i});});
+ Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(season=>{
+  html+='<section class="panel pc-shirt-season"><div class="topbar"><div><div class="panel-title">'+escapeHTML(season)+'</div><div class="panel-subtitle">'+grouped[season].length+' shirt swap'+(grouped[season].length===1?'':'s')+'</div></div><button class="secondary-btn" type="button" onclick="editPlayerShirtSwap(null,\''+escapeJS(season)+'\')">+ Add to season</button></div><div class="pc-shirt-grid">';
+  grouped[season].forEach(shirt=>{
+   html+='<article class="pc-shirt-card"><div class="pc-shirt-type">Shirt Swap</div>';
+   if(shirt.imageUrl)html+='<div class="pc-shirt-image-wrap"><img class="pc-shirt-image" src="'+escapeHTML(shirt.imageUrl)+'" alt="Swapped shirt from '+escapeHTML(shirt.name||"player")+'" loading="lazy"></div>';
+   else html+='<div class="pc-shirt-empty"><div class="pc-shirt-empty-icon">👕</div><div>No shirt photo added</div></div>';
+   html+='<div class="pc-shirt-personalisation"><div class="pc-shirt-player-name">'+escapeHTML(shirt.name||"Unknown player")+'</div><div class="pc-shirt-player-number">'+escapeHTML(String(shirt.number||"—"))+'</div><div class="pc-shirt-meta">'+escapeHTML(shirt.team||"Club not set")+' · '+escapeHTML(shirt.sleeve||"Short sleeve")+'</div></div><div class="pc-shirt-actions"><button class="secondary-btn" type="button" onclick="editPlayerShirtSwap('+shirt._index+')">Edit</button><button class="secondary-btn" type="button" onclick="deletePlayerShirtSwap('+shirt._index+')">Remove</button></div></article>';
+  });html+='</div></section>';
+ });return html;
+}
+function editPlayerShirtSwap(index,seasonPreset){
+ const c=getCurrentCareer();if(!c)return;if(!Array.isArray(c.shirtSwaps))c.shirtSwaps=[];
+ const existing=Number.isInteger(index)?(c.shirtSwaps[index]||{}):{},seasons=playerCareerSeasonList(c);
+ if(c.currentSeason&&!seasons.includes(String(c.currentSeason)))seasons.push(String(c.currentSeason));
+ const chosenSeason=existing.season||seasonPreset||c.currentSeason||seasons[0]||"2026/27";
+ const panel=document.getElementById("pageContent"),old=document.getElementById("pcShirtSwapEditor");if(old)old.remove();
+ const editor=document.createElement("div");editor.id="pcShirtSwapEditor";editor.className="panel";
+ editor.innerHTML='<div class="panel-title">'+(Number.isInteger(index)?'Edit':'Add')+' Shirt Swap</div><div class="panel-subtitle">Upload a photo of the shirt you received and enter the player it was swapped with. Choose the season when the swap happened.</div><form id="pcShirtSwapForm" class="form-grid" style="margin-top:14px"><div class="setup-section"><label class="setup-label">Season</label><select class="form-input" name="season" required>'+seasons.map(s=>'<option value="'+escapeHTML(s)+'" '+(String(s)===String(chosenSeason)?'selected':'')+'>'+escapeHTML(s)+'</option>').join("")+'</select></div><div class="setup-section"><label class="setup-label">Player name</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||"")+'" placeholder="Player you swapped with"></div><div class="setup-section"><label class="setup-label">Player club</label><input class="form-input" name="team" required value="'+escapeHTML(existing.team||"")+'" placeholder="e.g. Arsenal"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" value="'+escapeHTML(String(existing.number||""))+'" placeholder="Optional"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div><div class="setup-section" style="grid-column:1/-1"><label class="setup-label">Upload shirt photo</label><input class="form-input" name="kitPhoto" type="file" accept="image/*"><small style="color:#9ca5b1">Choose a JPG, PNG or WebP image. The app resizes it to reduce save space.</small><input type="hidden" name="imageUrl" value="'+escapeHTML(existing.imageUrl||"")+'"><div id="pcShirtSwapPreview" style="margin-top:12px;min-height:120px;display:flex;align-items:center;justify-content:center;background:rgba(128,128,128,.06);border-radius:10px;padding:10px">'+(existing.imageUrl?'<img src="'+escapeHTML(existing.imageUrl)+'" alt="Selected shirt preview" style="max-width:100%;max-height:220px;object-fit:contain">':'<span style="color:#9ca5b1">No shirt photo selected yet</span>')+'</div></div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Shirt Swap</button> <button class="secondary-btn" type="button" onclick="document.getElementById(\'pcShirtSwapEditor\')?.remove()">Cancel</button></div></form>';
+ panel.appendChild(editor);editor.scrollIntoView({behavior:"smooth",block:"center"});
+ const form=editor.querySelector("#pcShirtSwapForm"),fileInput=form.elements.namedItem("kitPhoto"),imageField=form.elements.namedItem("imageUrl"),preview=editor.querySelector("#pcShirtSwapPreview");
+ fileInput.addEventListener("change",function(){
+  const file=this.files&&this.files[0];if(!file)return;if(!file.type.startsWith("image/")){alert("Please choose an image file.");this.value="";return;}if(file.size>12*1024*1024){alert("Please choose an image smaller than 12 MB.");this.value="";return;}
+  const reader=new FileReader();reader.onload=function(){const img=new Image();img.onload=function(){const scale=Math.min(1,1000/img.width,1200/img.height),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);imageField.value=canvas.toDataURL("image/webp",0.82);preview.innerHTML='<img src="'+imageField.value+'" alt="Selected shirt preview" style="max-width:100%;max-height:220px;object-fit:contain">';};img.onerror=function(){alert("That image could not be opened. Please try another photo.");};img.src=reader.result;};reader.onerror=function(){alert("The image could not be read. Please try again.");};reader.readAsDataURL(file);
+ });form.addEventListener("submit",function(event){savePlayerShirtSwap(event,index);});
+}
+function savePlayerShirtSwap(event,index){
+ event.preventDefault();const c=getCurrentCareer(),form=event.target;if(!c)return;if(!Array.isArray(c.shirtSwaps))c.shirtSwaps=[];
+ const numberRaw=form.elements.namedItem("number").value.trim(),data={season:form.elements.namedItem("season").value,name:form.elements.namedItem("name").value.trim(),team:form.elements.namedItem("team").value.trim(),number:numberRaw?Number(numberRaw):"",sleeve:form.elements.namedItem("sleeve").value,imageUrl:form.elements.namedItem("imageUrl").value};
+ if(!data.season||!data.name||!data.team||(numberRaw&&(!Number.isInteger(data.number)||data.number<1||data.number>99))){alert("Please enter the season, player's name and club. Shirt number must be between 1 and 99 if supplied.");return;}if(!data.imageUrl){alert("Please upload a photo of the swapped shirt before saving.");return;}
+ if(Number.isInteger(index)&&c.shirtSwaps[index])c.shirtSwaps[index]=data;else c.shirtSwaps.push(data);
+ try{saveCareers();renderPlayerCareerPage("shirtSwap");}catch(err){alert("The shirt swap could not be saved. Try a smaller image.");console.error(err);}
+}
+function deletePlayerShirtSwap(index){
+ const c=getCurrentCareer();if(!c||!c.shirtSwaps?.[index])return;if(!confirm("Remove this shirt swap?"))return;c.shirtSwaps.splice(index,1);saveCareers();renderPlayerCareerPage("shirtSwap");
 }
 
 function playerSeasonCompetitionOptions(c,season,results){
