@@ -2456,26 +2456,26 @@ function trophyCatalogueNames(c){
 }
 function trophyImageFor(name){
  var n=String(name||"").toLowerCase();
- if(/conference league|europa conference/i.test(n))return "./assets/conference-league-trophy.webp";
  var files=[
-  [/premier league|english premier league/,"Premier_League_Trophy_at_Manchester's_National_Football_Museum_(Ank_Kumar)_02.jpg"],
-  [/la liga|laliga|spanish primera/,"La_Liga_trophy.jpg"],
-  [/bundesliga|meisterschale/,"Meisterschale.jpg"],
-  [/serie a|seriea/,"Coppa_Campioni_d’Italia.jpg"],
-  [/ligue 1|ligue1/,"Ligue_1_Trophy_2024.jpg"],
-  [/fa cup|english fa cup/,"The_FA_Cup_Trophy.jpg"],
-  [/copa del rey/,"Copa_del_Rey_trophy.jpg"],
-  [/dfb.?pok(al|a)l|german cup/,"DFB-Pokal_trophy.jpg"],
-  [/coppa italia|italian cup/,"The_Coppa_Italia_trophy.jpg"],
-  [/coupe de france|french cup/,"Coupe_de_France_trophy.jpg"],
-  [/champions league|uefa champions/,"Champions_League_Trophy_(52736201132).jpg"],
-  [/europa conference|conference league/,"UEFA_Europa_Conference_League_Trophy.jpg"],
-  [/europa league|uefa cup/,"UEFA_Cup_trophy.jpg"],
-  [/ballon d.?or|ballon dor/,"Ballon_d'Or_trophy.jpg"],
-  [/world cup|fifa world cup/,"FIFA_World_Cup_Trophy.jpg"]
+  [/premier league|english premier league/,"premier-league.webp"],
+  [/la liga|laliga|spanish primera/,"la-liga.webp"],
+  [/bundesliga|meisterschale/,"bundesliga.webp"],
+  [/serie a|seriea/,"serie-a.webp"],
+  [/ligue 1|ligue1/,"ligue-1.webp"],
+  [/fa cup|english fa cup/,"fa-cup.webp"],
+  [/copa del rey/,"copa-del-rey.webp"],
+  [/dfb.?pok(al|a)l|german cup/,"dfb-pokal.webp"],
+  [/coppa italia|italian cup/,"coppa-italia.webp"],
+  [/coupe de france|french cup/,"coupe-de-france.webp"],
+  [/carabao|caraboa|efl cup|english league cup|league cup/,"caraboa-cup.webp"],
+  [/champions league|uefa champions/,"champions-league.webp"],
+  [/europa conference|conference league/,"conference-league-trophy.webp"],
+  [/europa league|uefa cup/,"europa-league.webp"],
+  [/ballon d.?or|ballon dor/,"ballon-dor.webp"],
+  [/world cup|fifa world cup/,"world-cup.webp"]
  ];
  var match=files.find(function(x){return x[0].test(n);});
- return match?"https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(match[1]):"";
+ return match?"./assets/"+match[1]:"";
 }
 function trophyImageMarkup(name){
  var src=trophyImageFor(name),isConference=/conference league|europa conference/i.test(String(name||""));
@@ -7218,7 +7218,7 @@ function playerTrophyTable(c){
  if(!seasons.length)seasons.push(String(c.currentSeason||"Current Season"));
  seasons.sort((a,b)=>{if(a==="Unassigned")return 1;if(b==="Unassigned")return -1;return Number(b.slice(0,4))-Number(a.slice(0,4));});
  const entry=t=>{
-  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=isTeam?trophyImageMarkup(competition):playerAwardIcon(title);
+  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=(isTeam||/ballon d.?or|ballon dor/i.test(title))?trophyImageMarkup(isTeam?competition:title):playerAwardIcon(title);
   const when=isTeam?"Season: "+season:(date?"Date: "+date:(t.season?"Season: "+season:"Date not recorded"));
   return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #2a323d">'+icon+'<div style="flex:1;min-width:0"><div style="font-weight:750">'+escapeHTML(title)+'</div><div style="font-size:13px;color:#aab3bf;margin-top:5px">Competition: '+escapeHTML(competition)+' · '+escapeHTML(when)+' · Team: '+escapeHTML(team)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></div>';
  };
