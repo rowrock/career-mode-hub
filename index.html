@@ -6406,92 +6406,63 @@ function pcRecords(c){const s=playerCareerStats(c,null),m=c.matches||[],g=m.redu
 
 function pcRecordTracker(c){
  const matches=(c.matches||[]).filter(m=>m&&String(m.competition||"").trim());
- const key=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\buefa\b/g,"").replace(/[^a-z0-9]/g,"");
+ const key=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\buefa\\b/g,"").replace(/[^a-z0-9]/g,"");
  const sum=(a,k)=>a.reduce((n,m)=>n+(Number(m[k])||0),0);
  const known={
-  premierleague:{goals:[260,"Alan Shearer"],assists:[162,"Ryan Giggs"],appearances:[658,"James Milner"]},
-  laliga:{goals:[474,"Lionel Messi"],assists:[192,"Lionel Messi"],appearances:[622,"Andoni Zubizarreta / Joaquín"]},
-  bundesliga:{goals:[365,"Gerd Müller"],assists:[178,"Thomas Müller (assist data since 1992/93)"],appearances:[602,"Charly Körbel"]},
-  seriea:{goals:[274,"Silvio Piola"],appearances:[657,"Gianluigi Buffon"]},
-  ligue1:{goals:[299,"Delio Onnis"],appearances:[618,"Mickaël Landreau"]},
-  championsleague:{goals:[141,"Cristiano Ronaldo"],assists:[42,"Cristiano Ronaldo"],appearances:[187,"Cristiano Ronaldo"]},
-  mls:{goals:[171,"Chris Wondolowski"],assists:[136,"Landon Donovan"]},
-  facup:{goals:[49,"Harry Cursham"]},
-  copadelrey:{goals:[56,"Lionel Messi"]},
-  worldcup:{goals:[16,"Miroslav Klose"],assists:[8,"Pelé / Diego Maradona / Lionel Messi"],appearances:[26,"Lionel Messi"]},
-  eurochampionship:{goals:[14,"Cristiano Ronaldo"],assists:[8,"Cristiano Ronaldo"],appearances:[30,"Cristiano Ronaldo"]},
-  copaamerica:{goals:[17,"Norberto Méndez / Zizinho"],assists:[18,"Lionel Messi"],appearances:[39,"Lionel Messi"]}
+  premierleague:{goals:[260,"Alan Shearer"],assists:[162,"Ryan Giggs"]},
+  laliga:{goals:[474,"Lionel Messi"],assists:[192,"Lionel Messi"]},
+  bundesliga:{goals:[365,"Gerd Müller"],assists:[178,"Thomas Müller (official assist data since 1992/93)"]},
+  seriea:{goals:[274,"Silvio Piola"],assists:[162,"Francesco Totti"]},
+  ligue1:{goals:[299,"Delio Onnis"],assists:[106,"Dimitri Payet (21st-century data only)"]},
+  facup:{goals:[49,"Harry Cursham"]},eflcup:{goals:[49,"Ian Rush"]},
+  copadelrey:{goals:[81,"Telmo Zarra"]},dfbpokal:{goals:[78,"Gerd Müller"]},
+  coppaitalia:{goals:[56,"Alessandro Altobelli"]},
+  championsleague:{goals:[141,"Cristiano Ronaldo"],assists:[42,"Cristiano Ronaldo"]},
+  europaleague:{goals:[40,"Henrik Larsson"],assists:[24,"Pavel Dočkal / Dries Mertens"]},
+  conferenceleague:{goals:[13,"Cyriel Dessers / Mikael Ishak"]}
  };
  const seasonBenchmarks={
   premierleague:{goals:[36,"Erling Haaland (2022/23)"],assists:[21,"Bruno Fernandes (2025/26)"]},
-  championsleague:{goals:[17,"Cristiano Ronaldo (2013/14)"],assists:[9,"James Milner (2017/18)"]},
-  laliga:{goals:[50,"Lionel Messi (2011/12)"],assists:[21,"Míchel (1987/88), Xavi (2008/09), Lionel Messi (2019/20)"]},
+  laliga:{goals:[50,"Lionel Messi (2011/12)"],assists:[21,"Lionel Messi (2019/20)"]},
   bundesliga:{goals:[41,"Robert Lewandowski (2020/21)"],assists:[21,"Thomas Müller (2019/20)"]},
-  seriea:{goals:[36,"Gonzalo Higuaín (2015/16) / Ciro Immobile (2019/20)"]},
-  ligue1:{goals:[38,"Zlatan Ibrahimović (2015/16)"],assists:[18,"Ángel Di María (2015/16)"]}
+  seriea:{goals:[36,"Gonzalo Higuaín (2015/16) / Ciro Immobile (2019/20)"],assists:[18,"Federico Dimarco (2025/26)"]},
+  ligue1:{goals:[38,"Zlatan Ibrahimović (2015/16)"],assists:[18,"Ángel Di María (2015/16)"]},
+  facup:{goals:[19,"W. 'Doc' Dowden (1929/30)"]},
+  coppaitalia:{goals:[13,"Gianluca Vialli (1988/89)"]},
+  championsleague:{goals:[17,"Cristiano Ronaldo (2013/14)"],assists:[9,"James Milner (2017/18)"]},
+  europaleague:{goals:[17,"Radamel Falcao (2010/11)"]},
+  conferenceleague:{goals:[11,"Ayoub El Kaabi (2023/24)"]}
  };
+ const aliases={
+  epl:"premierleague",englishpremierleague:"premierleague",
+  ucl:"championsleague",uefachampionsleague:"championsleague",
+  uel:"europaleague",uefaeuropaleague:"europaleague",
+  uecl:"conferenceleague",uefaeuropaconferenceleague:"conferenceleague",conferenceleague:"conferenceleague",
+  englishfacup:"facup",thefacup:"facup",emiratesfacup:"facup",
+  carabaocup:"eflcup",englishfootballleaguecup:"eflcup",
+  spanishcopa:"copadelrey",copadelrey:"copadelrey",
+  germancup:"dfbpokal",dfbpokal:"dfbpokal",
+  italiancup:"coppaitalia",coppaitalia:"coppaitalia",
+  frenchcup:"coupedefrance",coupedefrance:"coupedefrance"
+ };
+ const names={premierleague:"Premier League",laliga:"La Liga",bundesliga:"Bundesliga",seriea:"Serie A",ligue1:"Ligue 1",facup:"FA Cup",eflcup:"EFL Cup",copadelrey:"Copa del Rey",dfbpokal:"DFB-Pokal",coppaitalia:"Coppa Italia",coupedefrance:"Coupe de France",championsleague:"UEFA Champions League",europaleague:"UEFA Europa League",conferenceleague:"UEFA Conference League"};
  const groups=new Map();
- matches.forEach(m=>{
-  const raw=String(m.competition||"").trim();let k=key(raw);
-  if(k==="epl"||k==="englishpremierleague")k="premierleague";
-  if(k==="ucl"||k==="uefachampionsleague")k="championsleague";
-  if(k==="uefaeuropaleague")k="europaleague";
-  if(k==="uefaeuropaconferenceleague"||k==="conferenceleague")k="conferenceleague";
-  if(k.startsWith("ligue1"))k="ligue1";
-  if(k==="englishfacup"||k==="thefacup")k="facup";
-  if(!k)return;
-  if(!groups.has(k))groups.set(k,{name:k==="championsleague"?"UEFA Champions League":k==="premierleague"?"Premier League":k==="ligue1"?"Ligue 1":raw,matches:[]});
-  groups.get(k).matches.push(m);
- });
+ matches.forEach(m=>{let k=key(m.competition);if(aliases[k])k=aliases[k];if(k.startsWith("ligue1"))k="ligue1";if(!groups.has(k))groups.set(k,{name:names[k]||String(m.competition).trim(),matches:[]});groups.get(k).matches.push(m);});
  const catalog=[];
- groups.forEach((g,k)=>{
-  const ref=known[k]||{};
-  [["goals","goals"],["assists","assists"],["appearances","appearances"]].forEach(([field,label])=>{
-   const data=ref[field];if(!data)return;
-   const value=field==="appearances"?g.matches.length:sum(g.matches,field);
-   const record=data[0],holder=data[1];
-   catalog.push({name:g.name+" "+label+" record",competition:g.name,unit:label,value,record,holder,pct:Math.min(100,value/record*100),remaining:Math.max(0,record-value)});
-  });
- });
- const held=catalog.filter(x=>x.value>=x.record).sort((a,b)=>a.competition.localeCompare(b.competition)||a.name.localeCompare(b.name));
- const closest=catalog.filter(x=>x.value<x.record).sort((a,b)=>b.pct-a.pct||a.competition.localeCompare(b.competition)).slice(0,5);
- const seasonGroups=new Map();
- groups.forEach((g,k)=>{
-  const bySeason=new Map();
-  g.matches.forEach(m=>{
-   const season=String(m.season||m.seasonName||"Unknown season");
-   if(!bySeason.has(season))bySeason.set(season,{goals:0,assists:0});
-   const row=bySeason.get(season);row.goals+=Number(m.goals)||0;row.assists+=Number(m.assists)||0;
-  });
-  seasonGroups.set(k,{name:g.name,bySeason});
- });
+ groups.forEach((g,k)=>{const ref=known[k]||{};["goals","assists"].forEach(field=>{const d=ref[field];if(!d)return;const value=sum(g.matches,field),record=d[0];catalog.push({name:g.name+" all-time "+field+" record",competition:g.name,unit:field,value,record,holder:d[1],pct:Math.min(100,value/record*100),remaining:Math.max(0,record-value)});});});
+ const held=catalog.filter(x=>x.value>=x.record).sort((a,b)=>a.competition.localeCompare(b.competition)),closest=catalog.filter(x=>x.value<x.record).sort((a,b)=>b.pct-a.pct).slice(0,5);
  const seasonCatalog=[];
- seasonGroups.forEach((g,k)=>{
-  const best={goals:{value:0,season:""},assists:{value:0,season:""}};
-  g.bySeason.forEach((v,s)=>["goals","assists"].forEach(field=>{if(v[field]>best[field].value)best[field]={value:v[field],season:s};}));
-  const ref=seasonBenchmarks[k]||{};
-  ["goals","assists"].forEach(field=>{
-   const data=ref[field];if(!data)return;
-   const record=data[0],holder=data[1];
-   seasonCatalog.push({name:g.name+" most "+field+" in a season",competition:g.name,unit:field,value:best[field].value,season:best[field].season,record,holder,pct:Math.min(100,best[field].value/record*100),remaining:Math.max(0,record-best[field].value)});
-  });
+ groups.forEach((g,k)=>{const bySeason=new Map();g.matches.forEach(m=>{const s=String(m.season||m.seasonName||"Unknown season");if(!bySeason.has(s))bySeason.set(s,{goals:0,assists:0});const x=bySeason.get(s);x.goals+=Number(m.goals)||0;x.assists+=Number(m.assists)||0;});
+  const best={goals:{value:0,season:""},assists:{value:0,season:""}};bySeason.forEach((v,s)=>["goals","assists"].forEach(f=>{if(v[f]>best[f].value)best[f]={value:v[f],season:s};}));
+  const ref=seasonBenchmarks[k]||{};["goals","assists"].forEach(f=>{const d=ref[f];if(!d)return;seasonCatalog.push({name:g.name+" single-season "+f+" record",competition:g.name,unit:f,value:best[f].value,season:best[f].season,record:d[0],holder:d[1],pct:Math.min(100,best[f].value/d[0]*100),remaining:Math.max(0,d[0]-best[f].value)});});
  });
- const seasonHeld=seasonCatalog.filter(x=>x.value>=x.record).sort((a,b)=>a.competition.localeCompare(b.competition)||a.name.localeCompare(b.name));
- const seasonClosest=seasonCatalog.filter(x=>x.value<x.record).sort((a,b)=>b.pct-a.pct||a.competition.localeCompare(b.competition)).slice(0,5);
+ const seasonHeld=seasonCatalog.filter(x=>x.value>=x.record).sort((a,b)=>a.competition.localeCompare(b.competition)),seasonClosest=seasonCatalog.filter(x=>x.value<x.record).sort((a,b)=>b.pct-a.pct).slice(0,5);
  const metric=x=>x.value.toLocaleString()+" / "+x.record.toLocaleString()+" "+x.unit;
- const recordCard=x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">All-time leader: '+escapeHTML(x.holder)+' · '+metric(x)+'</div></div>';
+ const recordCard=x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">World record: '+escapeHTML(x.holder)+' · '+metric(x)+'</div></div>';
  const seasonCard=x=>'<div style="padding:12px 0;border-bottom:1px solid #303946"><b style="color:#6ee7b7">★ '+escapeHTML(x.name)+'</b><div style="color:#aab3bf;font-size:13px">'+x.value+' '+x.unit+' · Your best: '+escapeHTML(x.season||"No season data")+' · World record: '+escapeHTML(x.holder)+' ('+x.record+')</div></div>';
- const progressCard=(x,i,season)=>'<div style="padding:13px 0;border-bottom:1px solid #303946"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+(i+1)+'. '+escapeHTML(x.name)+'</b><b style="color:#8dd5ff">'+x.pct.toFixed(1)+'%</b></div><div style="height:7px;background:#29323e;border-radius:8px;margin:9px 0"><div style="height:100%;width:'+x.pct+'%;background:#60a5fa;border-radius:8px"></div></div><div style="font-size:12px;color:#aab3bf">'+(season?x.value+' / '+x.record+' '+x.unit+' · Best season: '+escapeHTML(x.season||"No season data"):metric(x)+' · '+x.remaining.toLocaleString()+' to go')+' · World record: '+escapeHTML(x.holder)+'</div></div>';
- return '<div class="panel" style="margin-top:18px"><div class="panel-title">Records you hold</div><div class="panel-subtitle">Your logged goals, assists and appearances compared with verified real-world competition records. Competitions without a reliable benchmark are not included.</div>'+
- (held.length?held.map(recordCard).join(""):'<p style="color:#aab3bf">You do not currently hold any of the verified records tracked here.</p>')+
- '</div><div class="panel" style="margin-top:16px"><div class="panel-title">The 5 records you are closest to</div><div class="panel-subtitle">Your five highest completion percentages across verified all-time records only.</div>'+
- (closest.length?closest.map((x,i)=>progressCard(x,i,false)).join(""):'<p style="color:#aab3bf">No verified record benchmarks are available for the competitions in your match log yet.</p>')+
- '<p style="font-size:11px;color:#8290a0;margin-top:12px">Only sourced historical records are shown. No estimated or FC career targets are used.</p></div>'+
- '<div class="panel" style="margin-top:16px"><div class="panel-title">Single-season records you hold</div><div class="panel-subtitle">Your highest goals and assists totals in one season, compared with verified real-world single-season records.</div>'+
- (seasonHeld.length?seasonHeld.map(seasonCard).join(""):'<p style="color:#aab3bf">You do not currently hold any of the verified single-season records tracked here.</p>')+
- '</div><div class="panel" style="margin-top:16px"><div class="panel-title">5 closest single-season records</div><div class="panel-subtitle">Your five closest season goal and assist records, ranked by percentage complete.</div>'+
- (seasonClosest.length?seasonClosest.map((x,i)=>progressCard(x,i,true)).join(""):'<p style="color:#aab3bf">No verified single-season benchmarks are available for the competitions in your match log yet.</p>')+
- '<p style="font-size:11px;color:#8290a0;margin-top:12px">Season totals are calculated from your logged matches grouped by competition and season. Only competitions with verified benchmarks are included.</p></div>';
+ const progressCard=(x,i,s)=>'<div style="padding:13px 0;border-bottom:1px solid #303946"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+(i+1)+'. '+escapeHTML(x.name)+'</b><b style="color:#8dd5ff">'+x.pct.toFixed(1)+'%</b></div><div style="height:7px;background:#29323e;border-radius:8px;margin:9px 0"><div style="height:100%;width:'+x.pct+'%;background:#60a5fa;border-radius:8px"></div></div><div style="font-size:12px;color:#aab3bf">'+(s?x.value+' / '+x.record+' '+x.unit+' · Best season: '+escapeHTML(x.season||"No season data"):metric(x)+' · '+x.remaining.toLocaleString()+' to go')+' · World record: '+escapeHTML(x.holder)+'</div></div>';
+ const note='<p style="font-size:11px;color:#8290a0;margin-top:12px">Coverage: the five major leagues, their main domestic cups, and the Champions League, Europa League and Conference League. Only competitions with logged matches appear. Domestic-cup assist benchmarks and unverified season records are intentionally omitted rather than invented. Ligue 1 career assists cover the official 21st-century data set; Bundesliga career assists are tracked from 1992/93.</p>';
+ return '<div class="panel" style="margin-top:18px"><div class="panel-title">All-time goals & assists records</div><div class="panel-subtitle">Your logged career totals compared with real-world competition records.</div>'+(held.length?held.map(recordCard).join(""):'<p style="color:#aab3bf">You do not currently hold any verified records tracked here.</p>')+'</div><div class="panel" style="margin-top:16px"><div class="panel-title">5 closest all-time records</div><div class="panel-subtitle">Your five highest completion percentages across verified records.</div>'+(closest.length?closest.map((x,i)=>progressCard(x,i,false)).join(""):'<p style="color:#aab3bf">No verified benchmarks are available for competitions in your match log yet.</p>')+'</div><div class="panel" style="margin-top:16px"><div class="panel-title">Single-season goals & assists records you hold</div><div class="panel-subtitle">Your best goals and assists totals in one season, compared with real-world records.</div>'+(seasonHeld.length?seasonHeld.map(seasonCard).join(""):'<p style="color:#aab3bf">You do not currently hold any verified single-season records tracked here.</p>')+'</div><div class="panel" style="margin-top:16px"><div class="panel-title">5 closest single-season records</div><div class="panel-subtitle">Your five closest season goal and assist records, ranked by percentage complete.</div>'+(seasonClosest.length?seasonClosest.map((x,i)=>progressCard(x,i,true)).join(""):'<p style="color:#aab3bf">No verified single-season benchmarks are available for competitions in your match log yet.</p>')+note+'</div>';
 }
 const PC_RIVALRIES=[
  ["Brighton & Hove Albion","Crystal Palace",92],["Barcelona","Real Madrid",98],["Atlético Madrid","Real Madrid",88],["Sevilla","Real Betis",94],["Arsenal","Tottenham Hotspur",95],["Manchester United","Manchester City",94],["Liverpool","Everton",90],["Chelsea","Tottenham Hotspur",80],["Newcastle United","Sunderland",96],["Celtic","Rangers",99],["Inter","AC Milan",96],["Roma","Lazio",97],["Juventus","Inter",86],["Borussia Dortmund","Bayern Munich",82],["Schalke 04","Borussia Dortmund",95],["PSG","Marseille",91],["Ajax","Feyenoord",94],["Benfica","Sporting CP",91],["Porto","Benfica",91],["Galatasaray","Fenerbahçe",99],["Fenerbahçe","Beşiktaş",88],["Boca Juniors","River Plate",99],["Flamengo","Fluminense",92],["Club América","Chivas",96],["LA Galaxy","Los Angeles FC",90],["Portsmouth","Southampton",96],["Aston Villa","Birmingham City",95],["Nottingham Forest","Derby County",92],["Manchester United","Liverpool",84],["Real Madrid","Barcelona",98]
