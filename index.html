@@ -7276,7 +7276,7 @@ function playerTrophyTable(c){
  const teamCard=t=>{
   const title=t.competition||t.award||"Team Trophy",club=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded";
   const crestKey=pcClubNameKey(pcClubSearchName(club));
-  const directCrest=crestKey==="brightonhovealbion"?"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png":"";
+  const directCrest=crestKey==="brightonhovealbion"?"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png":(crestKey==="losclille"||crestKey==="lille")?"https://raw.githubusercontent.com/frertommy/team-logos/main/MSI2026/Ligue%201/Lille/lille_big_square.png":"";
   return '<article class="pc-display-card"><div class="pc-display-trophy">'+trophyImageMarkup(title)+'</div><div class="pc-display-club-badge" title="'+escapeHTML(club)+'" data-club-name="'+escapeHTML(club)+'"><span class="pc-club-initials"'+(directCrest?' hidden':'')+'">'+escapeHTML(initials(club))+'</span><img class="pc-official-club-crest" alt="'+escapeHTML(club)+' crest" '+(directCrest?'src="'+directCrest+'" onload="this.hidden=false" onerror="this.hidden=true;this.previousElementSibling.hidden=false"':'loading="lazy" hidden')+'></div><div class="pc-display-name">'+escapeHTML(title)+'</div><div class="pc-display-meta">'+escapeHTML(club)+'<br>'+escapeHTML(season)+'</div><button class="delete-btn player-award-delete pc-display-remove" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></article>';
  };
  const groups=new Map();
@@ -7321,7 +7321,7 @@ async function pcFindManifestClubCrest(name){
 async function pcFetchOfficialClubCrest(name){
  const key=pcClubNameKey(pcClubSearchName(name));
  // Brighton's direct crest is fuller than the inset catalogue variant.
- const verifiedCrests={brightonhovealbion:"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png",losclille:"https://frertommy.github.io/team-logos/MSI2026/Ligue%201/Lille/lille_big_square.png",lille:"https://frertommy.github.io/team-logos/MSI2026/Ligue%201/Lille/lille_big_square.png"};
+ const verifiedCrests={brightonhovealbion:"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png",losclille:"https://raw.githubusercontent.com/frertommy/team-logos/main/MSI2026/Ligue%201/Lille/lille_big_square.png",lille:"https://raw.githubusercontent.com/frertommy/team-logos/main/MSI2026/Ligue%201/Lille/lille_big_square.png"};
  if(verifiedCrests[key])return verifiedCrests[key];
  // Use curated transparent square crests for other major-league clubs, then live search as fallback.
  const manifestCrest=await pcFindManifestClubCrest(name);if(manifestCrest)return manifestCrest;
