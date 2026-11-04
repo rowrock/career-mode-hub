@@ -7434,24 +7434,44 @@ function editPlayerShirt(seasonName,type){
  const c=getCurrentCareer();if(!c)return;
  if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
  const existing=(c.shirtHistory[seasonName]||[]).find(x=>x.type===type)||{},season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName)),team=existing.team||season?.clubName||c.clubName||"";
- const search=playerShirtSearchUrl(team,seasonName,type);
- const panel=document.getElementById("pageContent");
- const old=document.getElementById("pcShirtEditor");if(old)old.remove();
+ const panel=document.getElementById("pageContent"),old=document.getElementById("pcShirtEditor");if(old)old.remove();
  const editor=document.createElement("div");editor.id="pcShirtEditor";editor.className="panel";
- editor.innerHTML='<div class="panel-title">'+(existing.type?'Edit ':'Add ')+type+' Kit · '+escapeHTML(seasonName)+'</div><div class="panel-subtitle">Use a photo of the actual shirt worn by '+escapeHTML(team)+' in '+escapeHTML(seasonName)+'. Search for the exact season and kit type, then copy the image address.</div><p style="margin:10px 0"><a class="secondary-btn" href="'+escapeHTML(search)+'" target="_blank" rel="noopener">Find actual '+type.toLowerCase()+' kit photo ↗</a></p><form id="pcShirtForm" class="form-grid"><div class="setup-section"><label class="setup-label">Team / Club</label><input class="form-input" name="team" required value="'+escapeHTML(team)+'"></div><div class="setup-section"><label class="setup-label">Name on shirt</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||c.player?.name||"")+'"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" required value="'+escapeHTML(String(existing.number||c.player?.shirtNumber||""))+'"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div><div class="setup-section" style="grid-column:1/-1"><label class="setup-label">Actual kit image URL</label><input class="form-input" name="imageUrl" type="url" value="'+escapeHTML(existing.imageUrl||"")+'" placeholder="Paste a direct image link ending in .jpg, .png or .webp"><small style="color:#9ca5b1">Use a direct image address, not the webpage address. The photo will show on your shirt history page.</small></div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Kit</button> <button class="secondary-btn" type="button" onclick="document.getElementById(\'pcShirtEditor\')?.remove()">Cancel</button></div></form>';
+ editor.innerHTML='<div class="panel-title">'+(existing.type?'Edit ':'Add ')+type+' Kit · '+escapeHTML(seasonName)+'</div><div class="panel-subtitle">Upload a photo of the exact real-world '+escapeHTML(team)+' '+escapeHTML(type.toLowerCase())+' shirt for '+escapeHTML(seasonName)+'. You can choose any kit photo saved on your device.</div><form id="pcShirtForm" class="form-grid" style="margin-top:14px"><div class="setup-section"><label class="setup-label">Team / Club</label><input class="form-input" name="team" required value="'+escapeHTML(team)+'"></div><div class="setup-section"><label class="setup-label">Name on shirt</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||c.player?.name||"")+'"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" required value="'+escapeHTML(String(existing.number||c.player?.shirtNumber||""))+'"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div><div class="setup-section" style="grid-column:1/-1"><label class="setup-label">Upload kit photo</label><input class="form-input" name="kitPhoto" type="file" accept="image/*"><small style="color:#9ca5b1">Choose a JPG, PNG or WebP image. The app will resize it so it takes up less save space.</small><input type="hidden" name="imageUrl" value="'+escapeHTML(existing.imageUrl||"")+'"><div id="pcShirtUploadPreview" style="margin-top:12px;min-height:120px;display:flex;align-items:center;justify-content:center;background:rgba(128,128,128,.06);border-radius:10px;padding:10px">'+(existing.imageUrl?'<img src="'+escapeHTML(existing.imageUrl)+'" alt="Selected kit preview" style="max-width:100%;max-height:220px;object-fit:contain">':'<span style="color:#9ca5b1">No kit photo selected yet</span>')+'</div></div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Kit</button> <button class="secondary-btn" type="button" onclick="document.getElementById(\'pcShirtEditor\')?.remove()">Cancel</button></div></form>';
  panel.appendChild(editor);editor.scrollIntoView({behavior:"smooth",block:"center"});
- editor.querySelector("#pcShirtForm").addEventListener("submit",function(event){savePlayerShirt(event,seasonName,type);});
+ const form=editor.querySelector("#pcShirtForm"),fileInput=form.elements.namedItem("kitPhoto"),imageField=form.elements.namedItem("imageUrl"),preview=editor.querySelector("#pcShirtUploadPreview");
+ fileInput.addEventListener("change",function(){
+  const file=this.files&&this.files[0];if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Please choose an image file.");this.value="";return;}
+  if(file.size>12*1024*1024){alert("Please choose an image smaller than 12 MB.");this.value="";return;}
+  const reader=new FileReader();
+  reader.onload=function(){
+   const img=new Image();
+   img.onload=function(){
+    const maxW=1000,maxH=1200,scale=Math.min(1,maxW/img.width,maxH/img.height),canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+    const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    imageField.value=canvas.toDataURL("image/webp",0.82);
+    preview.innerHTML='<img src="'+imageField.value+'" alt="Selected kit preview" style="max-width:100%;max-height:220px;object-fit:contain">';
+   };
+   img.onerror=function(){alert("That image could not be opened. Please try another photo.");};
+   img.src=reader.result;
+  };
+  reader.onerror=function(){alert("The image could not be read. Please try again.");};
+  reader.readAsDataURL(file);
+ });
+ form.addEventListener("submit",function(event){savePlayerShirt(event,seasonName,type);});
 }
 function savePlayerShirt(event,seasonName,type){
  event.preventDefault();const c=getCurrentCareer(),form=event.target;if(!c)return;
  if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
  if(!Array.isArray(c.shirtHistory[seasonName]))c.shirtHistory[seasonName]=[];
- const data={type,team:form.elements.namedItem("team").value.trim(),name:form.elements.namedItem("name").value.trim(),number:Number(form.elements.namedItem("number").value),sleeve:form.elements.namedItem("sleeve").value,imageUrl:form.elements.namedItem("imageUrl").value.trim()};
+ const data={type,team:form.elements.namedItem("team").value.trim(),name:form.elements.namedItem("name").value.trim(),number:Number(form.elements.namedItem("number").value),sleeve:form.elements.namedItem("sleeve").value,imageUrl:form.elements.namedItem("imageUrl").value};
  if(!data.team||!data.name||!Number.isInteger(data.number)||data.number<1||data.number>99){alert("Please enter a team, shirt name and a number from 1 to 99.");return;}
- if(data.imageUrl&&!/^https?:\/\//i.test(data.imageUrl)){alert("Please enter a valid image URL.");return;}
+ if(!data.imageUrl){alert("Please upload a photo of the kit before saving.");return;}
  const list=c.shirtHistory[seasonName],idx=list.findIndex(x=>x.type===type);if(idx>=0)list[idx]=data;else list.push(data);
- saveCareers();renderPlayerCareerPage("shirtHistory");
+ try{saveCareers();renderPlayerCareerPage("shirtHistory");}catch(err){alert("The kit photo could not be saved. Try a smaller image.");console.error(err);}
 }
+
 function deletePlayerShirt(seasonName,type){
  const c=getCurrentCareer();if(!c||!c.shirtHistory?.[seasonName])return;
  if(!confirm("Remove this "+type.toLowerCase()+" shirt from "+seasonName+"?"))return;
