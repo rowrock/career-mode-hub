@@ -7321,7 +7321,7 @@ async function pcFindManifestClubCrest(name){
 async function pcFetchOfficialClubCrest(name){
  const key=pcClubNameKey(pcClubSearchName(name));
  // Brighton's direct crest is fuller than the inset catalogue variant.
- const verifiedCrests={brightonhovealbion:"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png"};
+ const verifiedCrests={brightonhovealbion:"https://www.footylogos.com/dls/logo/rgba-v1/brighton-and-hove-albion.png",losclille:"https://frertommy.github.io/team-logos/MSI2026/Ligue%201/Lille/lille_big_square.png",lille:"https://frertommy.github.io/team-logos/MSI2026/Ligue%201/Lille/lille_big_square.png"};
  if(verifiedCrests[key])return verifiedCrests[key];
  // Use curated transparent square crests for other major-league clubs, then live search as fallback.
  const manifestCrest=await pcFindManifestClubCrest(name);if(manifestCrest)return manifestCrest;
