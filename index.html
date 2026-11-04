@@ -1070,6 +1070,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .pc-cabinet-shelves [style*="border-top:1px solid #2a323d"]{border-top:1px solid #9b795655!important;background:linear-gradient(90deg,#ffffff08,transparent);padding:14px 10px!important;border-radius:6px}
 .pc-cabinet-shelves .season-trophy-groups>details.panel>div{color:#f7ead7}.pc-cabinet-shelves .season-trophy-groups>details.panel details[style*="border:1px solid"]{background:#20170f;border-color:#876443!important}
 .pc-records-page{margin-top:18px}.pc-records-page .panel{margin-top:14px}
+
+/* Real trophy photographs in the Player Career cabinet and competition catalogue */
+.pc-cabinet-shelves .trophy-photo-frame{width:92px;height:112px;flex:0 0 92px;display:flex;align-items:center;justify-content:center;padding:5px;background:linear-gradient(145deg,#f5e6c8,#9e7445 45%,#ead3a9);border:2px solid #d1ae79;border-radius:7px;box-shadow:0 3px 9px #0009;overflow:hidden}
+.pc-cabinet-shelves .trophy-photo{display:block;width:100%;height:100%;object-fit:contain;background:#21170f;border-radius:3px}
+.pc-cabinet-shelves .trophy-photo-fallback{display:none;color:#ead3a9;text-align:center;font-size:10px;line-height:1.3}
+.pc-cabinet-shelves .trophy-photo-frame.image-missing{background:#2b2118;border:1px dashed #9b7956}.pc-cabinet-shelves .trophy-photo-frame.image-missing .trophy-photo-fallback{display:block}
+.pc-cabinet-shelves [style*="border-top:1px solid #2a323d"]{align-items:center!important;min-height:132px}
+.trophy-catalogue-card .trophy-photo-frame{height:132px;width:100%;display:flex;align-items:center;justify-content:center;padding:8px;background:#17120e;border:1px solid #80613f;border-radius:8px;overflow:hidden}
+.trophy-catalogue-card .trophy-photo{width:100%;height:100%;object-fit:contain}.trophy-catalogue-card .trophy-photo-fallback{display:none}.trophy-catalogue-card .image-missing .trophy-photo-fallback{display:block;color:#aab3bf;font-size:11px}
 </style>
 </head>
 
@@ -2442,19 +2451,29 @@ function trophyCatalogueNames(c){
 }
 function trophyImageFor(name){
  var n=String(name||"").toLowerCase();
- if(n.includes("champions league")&&!n.includes("women"))return "https://www.pngkey.com/png/detail/311-3116758_trophy-clipart-uefa-champions-league-champions-league-cup.png";
- if(n==="world cup"||n.includes("fifa world cup"))return "https://www.realclipart.com/png/small/135-1350876_trophy-gallery-world-cup-trophy-silhouette.png";
- if(n.includes("european championship")||n==="euros"||n==="uefa euro")return "https://commons.wikimedia.org/wiki/Special:FilePath/Coupe_Henri_Delaunay_2017.jpg";
- if(n==="premier league")return "https://commons.wikimedia.org/wiki/Special:FilePath/Premier_league_trophy_icon.png";
- if(n==="laliga"||n==="la liga")return "https://commons.wikimedia.org/wiki/Special:FilePath/LaLiga.png";
- if(n==="serie a")return "https://commons.wikimedia.org/wiki/Special:FilePath/Coppa_Campioni_d%27Italia_%28Serie_A%29.png";
- if(n==="bundesliga")return "https://commons.wikimedia.org/wiki/Special:FilePath/Meisterschale-10.svg";
- if(n==="ligue 1")return "https://commons.wikimedia.org/wiki/Special:FilePath/Ligue_1_Trophy_2024.png";
- return "";
+ var files=[
+  [/premier league|english premier league/,"Premier_League_Trophy_at_Manchester's_National_Football_Museum_(Ank_Kumar)_02.jpg"],
+  [/la liga|laliga|spanish primera/,"La_Liga_trophy.jpg"],
+  [/bundesliga|meisterschale/,"Meisterschale.jpg"],
+  [/serie a|seriea/,"Coppa_Campioni_d’Italia.jpg"],
+  [/ligue 1|ligue1/,"Ligue_1_Trophy_2024.jpg"],
+  [/fa cup|english fa cup/,"The_FA_Cup_Trophy.jpg"],
+  [/copa del rey/,"Copa_del_Rey_trophy.jpg"],
+  [/dfb.?pok(al|a)l|german cup/,"DFB-Pokal_trophy.jpg"],
+  [/coppa italia|italian cup/,"The_Coppa_Italia_trophy.jpg"],
+  [/coupe de france|french cup/,"Coupe_de_France_trophy.jpg"],
+  [/champions league|uefa champions/,"Champions_League_Trophy_(52736201132).jpg"],
+  [/europa conference|conference league/,"UEFA_Europa_Conference_League_Trophy.jpg"],
+  [/europa league|uefa cup/,"UEFA_Cup_trophy.jpg"],
+  [/ballon d.?or|ballon dor/,"Ballon_d'Or_trophy.jpg"],
+  [/world cup|fifa world cup/,"FIFA_World_Cup_Trophy.jpg"]
+ ];
+ var match=files.find(function(x){return x[0].test(n);});
+ return match?"https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(match[1]):"";
 }
 function trophyImageMarkup(name){
  var src=trophyImageFor(name);
- return src?'<img class="trophy-art" src="'+src+'" alt="'+escapeHTML(name)+' trophy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="trophy-art-fallback" style="display:none">🏆</div>':'<div class="trophy-art-fallback">🏆</div>';
+ return src?'<div class="trophy-photo-frame"><img class="trophy-art trophy-photo" loading="lazy" src="'+src+'" alt="'+escapeHTML(name)+' trophy photograph" onerror="this.parentElement.classList.add(&quot;image-missing&quot;)"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>':'<div class="trophy-photo-frame image-missing"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>';
 }
 function renderCompetitionsHub(){
  var c=getCurrentCareer();if(!c){renderDashboard();return;}
