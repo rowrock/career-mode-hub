@@ -1082,11 +1082,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 /* Remove the pink display backdrop from the real Conference League trophy photograph.
    The silver trophy is close to neutral grey; the pink backdrop is keyed out by its red/green difference. */
 .conference-cutout{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;overflow:visible!important}
-.conference-cutout-image{background:transparent!important;filter:url(#conferencePinkKey);object-fit:contain!important}
+.conference-cutout-image{background:transparent!important;filter:none!important;object-fit:contain!important}
 </style>
 </head>
 
-<body><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><filter id="conferencePinkKey" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -3 3 0 0 1"/></filter></svg>
+<body>
 
 
 <aside class="sidebar">
@@ -2456,6 +2456,7 @@ function trophyCatalogueNames(c){
 }
 function trophyImageFor(name){
  var n=String(name||"").toLowerCase();
+ if(/conference league|europa conference/i.test(n))return "./assets/conference-league-trophy.webp";
  var files=[
   [/premier league|english premier league/,"Premier_League_Trophy_at_Manchester's_National_Football_Museum_(Ank_Kumar)_02.jpg"],
   [/la liga|laliga|spanish primera/,"La_Liga_trophy.jpg"],
