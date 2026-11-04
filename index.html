@@ -2472,6 +2472,7 @@ function trophyImageFor(name){
   [/europa conference|conference league/,"conference-league-trophy.webp"],
   [/europa league|uefa cup/,"europa-league.webp"],
   [/ballon d.?or|ballon dor/,"ballon-dor.webp"],
+  [/golden boot/,"golden-boot.webp"],
   [/world cup|fifa world cup/,"world-cup.webp"]
  ];
  var match=files.find(function(x){return x[0].test(n);});
@@ -7218,7 +7219,7 @@ function playerTrophyTable(c){
  if(!seasons.length)seasons.push(String(c.currentSeason||"Current Season"));
  seasons.sort((a,b)=>{if(a==="Unassigned")return 1;if(b==="Unassigned")return -1;return Number(b.slice(0,4))-Number(a.slice(0,4));});
  const entry=t=>{
-  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=(isTeam||/ballon d.?or|ballon dor/i.test(title))?trophyImageMarkup(isTeam?competition:title):playerAwardIcon(title);
+  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=(isTeam||/ballon d.?or|ballon dor|golden boot/i.test(title))?trophyImageMarkup(isTeam?competition:title):playerAwardIcon(title);
   const when=isTeam?"Season: "+season:(date?"Date: "+date:(t.season?"Season: "+season:"Date not recorded"));
   return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #2a323d">'+icon+'<div style="flex:1;min-width:0"><div style="font-weight:750">'+escapeHTML(title)+'</div><div style="font-size:13px;color:#aab3bf;margin-top:5px">Competition: '+escapeHTML(competition)+' · '+escapeHTML(when)+' · Team: '+escapeHTML(team)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></div>';
  };
