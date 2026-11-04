@@ -1071,6 +1071,40 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .pc-cabinet-shelves .season-trophy-groups>details.panel>div{color:#f7ead7}.pc-cabinet-shelves .season-trophy-groups>details.panel details[style*="border:1px solid"]{background:#20170f;border-color:#876443!important}
 .pc-records-page{margin-top:18px}.pc-records-page .panel{margin-top:14px}
 
+
+/* Trophy Cabinet — display-case layout matching the user's wooden reference cabinet */
+.pc-trophy-room{padding:18px 18px 30px!important;border:12px solid #b88a55!important;border-image:linear-gradient(90deg,#e0bb83,#875b32 18%,#d4aa70 50%,#754a27 82%,#e2bd86) 1!important;border-radius:0!important;background:linear-gradient(90deg,#3b2517,#69452b 5%,#382316 9%,#4a2e1c 50%,#382316 91%,#69452b 95%,#3b2517)!important;box-shadow:inset 0 0 0 4px #3b2416,inset 0 0 55px #100904,0 16px 38px #0008!important;overflow:visible!important}
+.pc-cabinet-heading{background:linear-gradient(180deg,#29180f,#432817);margin:-6px -6px 16px;padding:12px!important;border:1px solid #9a7047;color:#f4d5a0!important}
+.pc-cabinet-heading>span{display:none}
+.pc-cabinet-controls{background:#21150e!important;border-color:#a47b50!important;margin-bottom:20px}
+.pc-cabinet-display{display:flex;flex-direction:column;gap:25px}
+.pc-cabinet-shelf-section{background:linear-gradient(180deg,#382315 0%,#51331e 70%,#2a1a10 100%);border:2px solid #8c623b;box-shadow:inset 0 0 35px #120a05;border-radius:2px;padding:12px 12px 0;position:relative}
+.pc-shelf-season{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 8px 12px;color:#f4d4a0;text-shadow:0 2px 3px #000;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.pc-shelf-season small{font-size:11px;color:#d2b18a;letter-spacing:.2px;text-transform:none;font-weight:500}
+.pc-display-shelf{position:relative;padding:5px 6px 0;min-height:185px}
+.pc-display-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:12px 16px;align-items:end;justify-items:center}
+.pc-display-card{width:100%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;position:relative;padding:4px 5px 8px;color:#f7e9d4}
+.pc-display-trophy{width:100%;height:142px;display:flex;align-items:flex-end;justify-content:center;position:relative}
+.pc-display-trophy .trophy-photo-frame{width:100%!important;height:138px!important;flex:1 1 auto!important;display:flex;align-items:flex-end;justify-content:center;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;overflow:visible!important}
+.pc-display-trophy .trophy-photo{width:100%!important;height:138px!important;object-fit:contain!important;background:transparent!important;border-radius:0!important;filter:drop-shadow(0 5px 4px #0009)}
+.pc-display-trophy .trophy-photo-fallback{color:#e6c99f}
+.pc-display-club-badge{width:43px;height:43px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:-1px auto 6px;background:radial-gradient(circle at 35% 25%,#fff,#d7d7d7 38%,#777 100%);border:2px solid #e8d5a9;color:#18202b;font-weight:900;font-size:11px;box-shadow:0 2px 5px #000b}
+.pc-display-award-mark{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;margin:4px auto 8px;background:linear-gradient(145deg,#f6df9c,#a87532);border:1px solid #f4d9a0;color:#4a2a0d;font-size:19px}
+.pc-display-name{font-size:12px;font-weight:800;line-height:1.25;max-width:145px;color:#fff0d7;text-shadow:0 1px 3px #000}
+.pc-display-meta{font-size:10px;line-height:1.4;color:#d6bb98;margin-top:4px;overflow-wrap:anywhere}
+.pc-display-remove{font-size:10px!important;padding:3px 7px!important;margin-top:6px!important;opacity:.8}
+.pc-shelf-plank{height:17px;margin:10px -14px 0;background:linear-gradient(180deg,#e0bd88 0%,#b18450 22%,#714523 65%,#3b2111 100%);border-top:2px solid #f0d4a5;box-shadow:0 7px 10px #100904,0 10px 0 #241409}
+.pc-shelf-empty{grid-column:1/-1;align-self:center;padding:38px 10px;color:#c8a982;font-size:13px;text-align:center}
+.pc-individual-display{padding:16px 4px 14px}
+.pc-individual-display h4{margin:0 0 10px;color:#f0cd96;text-transform:uppercase;letter-spacing:1px;font-size:11px}
+.pc-individual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}
+.pc-individual-grid .pc-display-card{background:#24170f99;border:1px solid #805a36;border-radius:4px;padding:8px}
+.pc-individual-grid .pc-display-trophy{height:92px}
+.pc-individual-grid .pc-display-trophy .trophy-photo-frame,.pc-individual-grid .pc-display-trophy .trophy-photo{height:88px!important}
+.pc-display-award-icon{height:80px;width:100%;display:grid;place-items:center}
+.pc-display-award-icon .player-award-art{transform:scale(.85)}
+@media(max-width:650px){.pc-trophy-room{padding:10px!important;border-width:7px!important}.pc-display-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pc-display-trophy{height:112px}.pc-display-trophy .trophy-photo-frame,.pc-display-trophy .trophy-photo{height:108px!important}.pc-shelf-season{align-items:flex-start;flex-direction:column}}
+
 /* Real trophy photographs in the Player Career cabinet and competition catalogue */
 .pc-cabinet-shelves .trophy-photo-frame{width:92px;height:112px;flex:0 0 92px;display:flex;align-items:center;justify-content:center;padding:5px;background:linear-gradient(145deg,#f5e6c8,#9e7445 45%,#ead3a9);border:2px solid #d1ae79;border-radius:7px;box-shadow:0 3px 9px #0009;overflow:hidden}
 .pc-cabinet-shelves .trophy-photo{display:block;width:100%;height:100%;object-fit:contain;background:#21170f;border-radius:3px}
@@ -7218,18 +7252,19 @@ function playerTrophyTable(c){
  trophies.forEach(t=>{const z=String(t.season||"Unassigned");if(!seasons.includes(z))seasons.push(z);});
  if(!seasons.length)seasons.push(String(c.currentSeason||"Current Season"));
  seasons.sort((a,b)=>{if(a==="Unassigned")return 1;if(b==="Unassigned")return -1;return Number(b.slice(0,4))-Number(a.slice(0,4));});
- const entry=t=>{
-  const isTeam=String(t.type||"").toLowerCase()==="team trophy",title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"",icon=(isTeam||/ballon d.?or|ballon dor|golden boot/i.test(title))?trophyImageMarkup(isTeam?competition:title):playerAwardIcon(title);
+ const initials=name=>String(name||"").trim().split(/\\s+/).filter(Boolean).slice(0,3).map(x=>x[0]).join("").toUpperCase()||"FC";
+ const entry=(t,isTeam)=>{
+  const title=t.award||t.competition||"Award",competition=t.competition||"Not specified",team=t.team||c.clubName||"Team not recorded",season=t.season||"Season not recorded",date=t.date||"";
+  const image=(isTeam||/ballon d.?or|ballon dor|golden boot/i.test(title))?trophyImageMarkup(isTeam?competition:title):'<div class="pc-display-award-icon">'+playerAwardIcon(title)+'</div>';
   const when=isTeam?"Season: "+season:(date?"Date: "+date:(t.season?"Season: "+season:"Date not recorded"));
-  return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #2a323d">'+icon+'<div style="flex:1;min-width:0"><div style="font-weight:750">'+escapeHTML(title)+'</div><div style="font-size:13px;color:#aab3bf;margin-top:5px">Competition: '+escapeHTML(competition)+' · '+escapeHTML(when)+' · Team: '+escapeHTML(team)+'</div></div><button class="delete-btn player-award-delete" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></div>';
+  return '<article class="pc-display-card"><div class="pc-display-trophy">'+image+'</div>'+(isTeam?'<div class="pc-display-club-badge" title="'+escapeHTML(team)+'">'+escapeHTML(initials(team))+'</div>':'<div class="pc-display-award-mark">★</div>')+'<div class="pc-display-name">'+escapeHTML(title)+'</div><div class="pc-display-meta">'+escapeHTML(team)+'<br>'+escapeHTML(when)+'</div><button class="delete-btn player-award-delete pc-display-remove" onclick="deletePlayerTrophy(\''+escapeJS(String(t.id))+'\')">Remove</button></article>';
  };
- return '<div class="season-trophy-groups">'+seasons.map((season,idx)=>{
+ return '<div class="pc-cabinet-display">'+seasons.map((season,idx)=>{
   const list=trophies.filter(t=>String(t.season||"Unassigned")===season),team=list.filter(t=>String(t.type||"").toLowerCase()==="team trophy"),individual=list.filter(t=>String(t.type||"").toLowerCase()!=="team trophy"),groups=new Map();
   individual.forEach(t=>{const name=t.award||t.competition||"Individual Award";if(!groups.has(name))groups.set(name,[]);groups.get(name).push(t);});
-  return '<details class="panel" style="margin-top:14px;padding:16px" '+(idx===0?'open':'')+'><summary style="cursor:pointer;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><span>'+escapeHTML(season)+'</span><span style="font-size:13px;font-weight:500;color:#9ca5b1">'+team.length+' team trophies · '+individual.length+' individual awards</span></summary><div style="margin-top:16px"><h4 style="margin:8px 0 10px">Team Trophies ('+team.length+')</h4><div>'+ (team.length?team.map(entry).join(""):'<p style="color:#8d97a3">No team trophies recorded for this season.</p>')+'</div><h4 style="margin:20px 0 10px">Individual Awards ('+individual.length+')</h4>'+(groups.size?[...groups.entries()].map(([name,arr])=>'<details style="border:1px solid #2a323d;border-radius:10px;padding:12px;margin:10px 0"><summary style="cursor:pointer;font-weight:750;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;justify-content:center">'+playerAwardIcon(name)+'</span><span>'+escapeHTML(name)+'</span><span style="color:#9ca5b1;font-weight:500">×'+arr.length+'</span></summary><div style="margin-top:8px">'+arr.map(entry).join("")+'</div></details>').join(""):'<p style="color:#8d97a3">No individual awards recorded for this season.</p>')+'</div></details>';
+  return '<section class="pc-cabinet-shelf-section"><div class="pc-shelf-season"><span>'+escapeHTML(season)+'</span><small>'+team.length+' trophies · '+individual.length+' awards</small></div><div class="pc-display-shelf"><div class="pc-display-grid">'+(team.length?team.map(t=>entry(t,true)).join(""):'<div class="pc-shelf-empty">No team trophies recorded for this season</div>')+'</div><div class="pc-shelf-plank"></div></div>'+(individual.length?'<div class="pc-individual-display"><h4>Individual honours</h4><div class="pc-individual-grid">'+individual.map(t=>entry(t,false)).join("")+'</div></div>':'')+'</section>';
  }).join("")+'</div>';
 }
-
 function playerCareerAwardTally(c){
  const awards=[["Man of the Match",/man of the match|motm|player of the match/i],["Player of the Month",/player of the month/i],["Player of the Season",/player of the season|season player/i],["Playmaker of the Season",/playmaker of the season/i],["Ballon d’Or",/ballon d.?or/i],["Golden Boot",/golden boot/i],["Golden Glove",/golden glove/i],["Team of the Week",/team of the week|totw/i],["Team of the Season",/team of the season|tots/i],["Team of the Year",/team of the year|toty/i],["Player of the Tournament",/player of the tournament/i]];
  return awards.map(([name,re])=>'<div class="award-count-row"><span class="award-count-name">'+escapeHTML(name)+'</span><span class="award-count-value">'+(c.trophies||[]).filter(t=>String(t.type||"").toLowerCase()!=="team trophy"&&re.test(String(t.award||""))).length+'</span></div>').join("");
