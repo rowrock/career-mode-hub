@@ -7303,16 +7303,22 @@ function pcClubSearchName(name){
  return aliases[k]||n;
 }
 async function pcFetchOfficialClubCrest(name){
- const cacheKey="pcOfficialClubCrest:v2:"+pcClubNameKey(name);
- try{const cached=localStorage.getItem(cacheKey);if(cached)return cached==="none"?"":cached;}catch(e){}
+ const key=pcClubNameKey(pcClubSearchName(name));
+ const cacheKey="pcOfficialClubCrest:v3:"+key;
+ try{const cached=localStorage.getItem(cacheKey);if(cached)return cached;}catch(e){}
  try{
-  const response=await fetch("https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t="+encodeURIComponent(pcClubSearchName(name)));
+  // Brighton has a stable TheSportsDB team ID; use the direct record lookup
+  // rather than relying on the free text-search endpoint's name matching.
+  const knownTeamIds={brightonhovealbion:"133619"};
+  const endpoint=knownTeamIds[key]
+   ?"https://www.thesportsdb.com/api/v1/json/123/lookupteam.php?id="+knownTeamIds[key]
+   :"https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t="+encodeURIComponent(pcClubSearchName(name));
+  const response=await fetch(endpoint);
   if(!response.ok)throw new Error("Crest lookup failed");
   const data=await response.json(),teams=Array.isArray(data.teams)?data.teams:[];
-  const key=pcClubNameKey(pcClubSearchName(name));
-  const match=teams.find(t=>pcClubNameKey(t.strTeam)===key);
-  const url=match&&match.strBadge?String(match.strBadge):"";
-  try{localStorage.setItem(cacheKey,url||"none");}catch(e){}
+  const match=knownTeamIds[key]?teams[0]:teams.find(t=>pcClubNameKey(t.strTeam)===key);
+  const url=match&&match.strBadge?String(match.strBadge).replace(/^http:\/\//i,"https://"):"";
+  if(url)try{localStorage.setItem(cacheKey,url);}catch(e){}
   return url;
  }catch(e){return "";}
 }
