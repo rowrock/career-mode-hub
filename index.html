@@ -1079,10 +1079,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .pc-cabinet-shelves [style*="border-top:1px solid #2a323d"]{align-items:center!important;min-height:132px}
 .trophy-catalogue-card .trophy-photo-frame{height:132px;width:100%;display:flex;align-items:center;justify-content:center;padding:8px;background:#17120e;border:1px solid #80613f;border-radius:8px;overflow:hidden}
 .trophy-catalogue-card .trophy-photo{width:100%;height:100%;object-fit:contain}.trophy-catalogue-card .trophy-photo-fallback{display:none}.trophy-catalogue-card .image-missing .trophy-photo-fallback{display:block;color:#aab3bf;font-size:11px}
+/* Remove the pink display backdrop from the real Conference League trophy photograph.
+   The silver trophy is close to neutral grey; the pink backdrop is keyed out by its red/green difference. */
+.conference-cutout{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;overflow:visible!important}
+.conference-cutout-image{background:transparent!important;filter:url(#conferencePinkKey);object-fit:contain!important}
 </style>
 </head>
 
-<body>
+<body><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><filter id="conferencePinkKey" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -3 3 0 0 1"/></filter></svg>
+
 
 <aside class="sidebar">
 
@@ -2472,8 +2477,10 @@ function trophyImageFor(name){
  return match?"https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(match[1]):"";
 }
 function trophyImageMarkup(name){
- var src=trophyImageFor(name);
- return src?'<div class="trophy-photo-frame"><img class="trophy-art trophy-photo" loading="lazy" src="'+src+'" alt="'+escapeHTML(name)+' trophy photograph" onerror="this.parentElement.classList.add(&quot;image-missing&quot;)"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>':'<div class="trophy-photo-frame image-missing"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>';
+ var src=trophyImageFor(name),isConference=/conference league|europa conference/i.test(String(name||""));
+ var frameClass='trophy-photo-frame'+(isConference?' conference-cutout':'');
+ var imageClass='trophy-art trophy-photo'+(isConference?' conference-cutout-image':'');
+ return src?'<div class="'+frameClass+'"><img class="'+imageClass+'" loading="lazy" src="'+src+'" alt="'+escapeHTML(name)+' trophy photograph with background removed" onerror="this.parentElement.classList.add(&quot;image-missing&quot;)"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>':'<div class="'+frameClass+' image-missing"><span class="trophy-photo-fallback">Trophy photo unavailable</span></div>';
 }
 function renderCompetitionsHub(){
  var c=getCurrentCareer();if(!c){renderDashboard();return;}
