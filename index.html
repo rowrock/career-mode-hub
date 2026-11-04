@@ -7296,14 +7296,14 @@ function playerCareerTeamTrophiesWon(c){
  return '<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Trophy</th><th>Team</th><th>Season</th></tr></thead><tbody>'+won.slice().reverse().map(t=>'<tr><td>'+escapeHTML(t.competition||t.award||"Team Trophy")+'</td><td>'+escapeHTML(t.team||c.clubName||"—")+'</td><td>'+escapeHTML(t.season||"—")+'</td></tr>').join("")+'</tbody></table></div>';
 }
 
-function pcClubNameKey(name){return String(name||"").toLowerCase().replace(/\b(fc|afc|cf|cfc|sc|ac|club|football|futbol|de|the)\b/g,"").replace(/[^a-z0-9]/g,"");}
+function pcClubNameKey(name){return String(name||"").toLowerCase().replace(/\b(fc|afc|cf|cfc|sc|ac|club|football|futbol|de|the|and)\b/g,"").replace(/[^a-z0-9]/g,"");}
 function pcClubSearchName(name){
  const n=String(name||"").trim(),k=pcClubNameKey(n);
  const aliases={"mancity":"Manchester City","manutd":"Manchester United","spurs":"Tottenham Hotspur","tottenham":"Tottenham Hotspur","brighton":"Brighton and Hove Albion","wolves":"Wolverhampton Wanderers","forest":"Nottingham Forest","nottmforest":"Nottingham Forest","westham":"West Ham United","newcastle":"Newcastle United","psg":"Paris Saint-Germain","inter":"Inter Milan","acmilan":"AC Milan","atletico":"Atletico Madrid","athleticbilbao":"Athletic Club"};
  return aliases[k]||n;
 }
 async function pcFetchOfficialClubCrest(name){
- const cacheKey="pcOfficialClubCrest:"+pcClubNameKey(name);
+ const cacheKey="pcOfficialClubCrest:v2:"+pcClubNameKey(name);
  try{const cached=localStorage.getItem(cacheKey);if(cached)return cached==="none"?"":cached;}catch(e){}
  try{
   const response=await fetch("https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t="+encodeURIComponent(pcClubSearchName(name)));
