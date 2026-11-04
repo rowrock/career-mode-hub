@@ -7382,14 +7382,58 @@ function playerSeasonStatsTable(c){
   const rated=matches.filter(m=>m.rating!==null&&m.rating!==undefined&&m.rating!==""&&Number.isFinite(Number(m.rating)));
   return {apps:matches.length,goals:matches.reduce((n,m)=>n+(Number(m.goals)||0),0),ownGoals:matches.reduce((n,m)=>n+(Number(m.ownGoals)||0),0),assists:matches.reduce((n,m)=>n+(Number(m.assists)||0),0),minutes:matches.reduce((n,m)=>n+(Number(m.minutes)||0),0),average:rated.length?(rated.reduce((n,m)=>n+Number(m.rating),0)/rated.length).toFixed(2):"—",wins:matches.filter(m=>m.result==="W").length,draws:matches.filter(m=>m.result==="D").length,losses:matches.filter(m=>m.result==="L").length,yellow:matches.reduce((n,m)=>n+(Number(m.yellowCards)||0),0),red:matches.reduce((n,m)=>n+(Number(m.redCards)||0),0)};
  };
- let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season / Team</th><th>Apps</th><th>Goals</th><th>Own Goals</th><th>Assists</th><th>Minutes</th><th>Avg Rating</th><th>W</th><th>D</th><th>L</th><th>Yellow</th><th>Red</th><th>Status</th><th>Edit</th></tr></thead><tbody>';
+ let html='<div style="overflow-x:auto"><table class="data-table" style="width:100%;border-collapse:collapse"><thead><tr><th>Season / Team</th><th>Apps</th><th>Goals</th><th>Own Goals</th><th>Assists</th><th>Minutes</th><th>Avg Rating</th><th>W</th><th>D</th><th>L</th><th>Yellow</th><th>Red</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
  seasons.sort((a,b)=>String(b.season).localeCompare(String(a.season))).forEach(season=>{
-  const all=(c.matches||[]).filter(m=>!season.season||m.season===season.season),club=statsFor(all.filter(m=>!m.international)),country=statsFor(all.filter(m=>m.international)),total=statsFor(all);
+  const seasonName=season.season||c.currentSeason,all=(c.matches||[]).filter(m=>!seasonName||m.season===seasonName),club=statsFor(all.filter(m=>!m.international)),country=statsFor(all.filter(m=>m.international)),total=statsFor(all);
   const row=(label,s)=>'<tr><td>'+label+'</td><td>'+s.apps+'</td><td>'+s.goals+'</td><td>'+s.ownGoals+'</td><td>'+s.assists+'</td><td>'+s.minutes+'</td><td>'+s.average+'</td><td>'+s.wins+'</td><td>'+s.draws+'</td><td>'+s.losses+'</td><td>'+s.yellow+'</td><td>'+s.red+'</td><td>'+(season.completed?"Completed":"In progress")+'</td><td></td></tr>';
-  html+='<tr><td colspan="13" style="font-weight:700;background:var(--panel-bg,rgba(128,128,128,.12))">'+escapeHTML(season.season||"Season")+' — '+escapeHTML(season.clubName||c.clubName||"Club")+' / '+escapeHTML(season.league||c.league||"League")+'</td><td><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(season.season||'')+'\')">Edit</button></td></tr>';
+  html+='<tr><td colspan="13" style="font-weight:700;background:var(--panel-bg,rgba(128,128,128,.12))">'+escapeHTML(seasonName||"Season")+' — '+escapeHTML(season.clubName||c.clubName||"Club")+' / '+escapeHTML(season.league||c.league||"League")+'</td><td style="white-space:nowrap"><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(seasonName||"")+'\')">Edit</button> <button class="secondary-btn" type="button" onclick="togglePlayerShirtHistory(\''+escapeJS(seasonName||"")+'\')">Shirt History</button></td></tr>';
   html+=row('Club',club)+row('Country',country)+row('Total',total);
+  html+='<tr id="shirtHistoryRow_'+escapeHTML(String(seasonName||"").replace(/[^a-zA-Z0-9_-]/g,"_"))+'" style="display:none"><td colspan="14"><div id="shirtHistoryPanel_'+escapeHTML(String(seasonName||"").replace(/[^a-zA-Z0-9_-]/g,"_"))+'"></div></td></tr>';
  });
  return html+'</tbody></table></div>';
+}
+function playerShirtSeasonKey(season){return String(season||"").replace(/[^a-zA-Z0-9_-]/g,"_");}
+function togglePlayerShirtHistory(seasonName){
+ const c=getCurrentCareer();if(!c)return;
+ const id=playerShirtSeasonKey(seasonName),row=document.getElementById("shirtHistoryRow_"+id),panel=document.getElementById("shirtHistoryPanel_"+id);if(!row||!panel)return;
+ const opening=row.style.display==="none"||!row.style.display;
+ document.querySelectorAll('[id^="shirtHistoryRow_"]').forEach(x=>x.style.display="none");
+ if(!opening)return;
+ row.style.display="table-row";renderPlayerShirtHistoryPanel(seasonName,panel);
+}
+function renderPlayerShirtHistoryPanel(seasonName,panel){
+ const c=getCurrentCareer();if(!c||!panel)return;
+ if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
+ const shirts=Array.isArray(c.shirtHistory[seasonName])?c.shirtHistory[seasonName]:[];
+ const season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName)),defaultTeam=season?.clubName||c.clubName||"";
+ const types=["Home","Away","Third"];
+ const cards=types.map(type=>{
+  const shirt=shirts.find(x=>x.type===type);
+  return '<div style="border:1px solid var(--border-color,#394452);border-radius:12px;padding:14px;min-width:0"><div style="font-weight:750;font-size:16px;margin-bottom:8px">'+type+' Kit</div>'+(shirt?'<div style="font-size:30px;text-align:center;margin:8px 0">👕</div><div style="font-weight:700;text-align:center">'+escapeHTML(shirt.name||"No name")+' · '+escapeHTML(String(shirt.number||"—"))+'</div><div style="text-align:center;color:var(--muted-text,#9ca3af);font-size:13px;margin-top:4px">'+escapeHTML(shirt.team||defaultTeam)+' · '+escapeHTML(shirt.sleeve||"Short sleeve")+'</div><div style="display:flex;justify-content:center;gap:8px;margin-top:12px"><button class="secondary-btn" type="button" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Edit</button><button class="secondary-btn" type="button" onclick="deletePlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Remove</button></div>':'<p style="color:var(--muted-text,#9ca3af);text-align:center">No '+type.toLowerCase()+' kit added yet.</p><button class="primary-btn" type="button" style="width:100%" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">+ Add '+type+' Kit</button>')+'</div>';
+ }).join("");
+ panel.innerHTML='<div style="padding:12px 4px"><div style="font-weight:750;font-size:17px;margin-bottom:4px">'+escapeHTML(seasonName)+' Shirt History</div><div class="panel-subtitle" style="margin-bottom:12px">Save the home, away and third shirts you wore during this season.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">'+cards+'</div></div>';
+}
+function editPlayerShirt(seasonName,type){
+ const c=getCurrentCareer();if(!c)return;
+ if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
+ const existing=(c.shirtHistory[seasonName]||[]).find(x=>x.type===type)||{},season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName)),team=existing.team||season?.clubName||c.clubName||"";
+ const panel=document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName));if(!panel)return;
+ panel.innerHTML='<div style="border:1px solid var(--border-color,#394452);border-radius:12px;padding:16px;margin-top:12px"><div style="font-weight:750;font-size:17px;margin-bottom:12px">'+(existing.type?'Edit ':'Add ')+type+' Kit · '+escapeHTML(seasonName)+'</div><form onsubmit="savePlayerShirt(event,\''+escapeJS(seasonName)+'\',\''+type+'\')"><div class="form-grid"><div class="setup-section"><label class="setup-label">Team / Club</label><input class="form-input" name="team" required value="'+escapeHTML(team)+'" placeholder="e.g. Brighton"></div><div class="setup-section"><label class="setup-label">Name on shirt</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||c.player?.name||"")+'" placeholder="Name printed on shirt"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" required value="'+escapeHTML(String(existing.number||c.player?.shirtNumber||""))+'" placeholder="e.g. 9"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div></div><div style="display:flex;gap:8px;margin-top:14px"><button class="primary-btn" type="submit">Save Kit</button><button class="secondary-btn" type="button" onclick="renderPlayerShirtHistoryPanel(\''+escapeJS(seasonName)+'\',document.getElementById(\'shirtHistoryPanel_'+playerShirtSeasonKey(seasonName)+'\'))">Cancel</button></div></form></div>';
+}
+function savePlayerShirt(event,seasonName,type){
+ event.preventDefault();const c=getCurrentCareer(),form=event.target;if(!c)return;
+ if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
+ if(!Array.isArray(c.shirtHistory[seasonName]))c.shirtHistory[seasonName]=[];
+ const data={type,team:form.elements.namedItem("team").value.trim(),name:form.elements.namedItem("name").value.trim(),number:Number(form.elements.namedItem("number").value),sleeve:form.elements.namedItem("sleeve").value};
+ if(!data.team||!data.name||!Number.isInteger(data.number)||data.number<1||data.number>99){alert("Please enter a team, shirt name and a number from 1 to 99.");return;}
+ const list=c.shirtHistory[seasonName],idx=list.findIndex(x=>x.type===type);if(idx>=0)list[idx]=data;else list.push(data);
+ saveCareers();renderPlayerShirtHistoryPanel(seasonName,document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName)));
+}
+function deletePlayerShirt(seasonName,type){
+ const c=getCurrentCareer();if(!c||!c.shirtHistory?.[seasonName])return;
+ if(!confirm("Remove this "+type.toLowerCase()+" shirt from "+seasonName+"?"))return;
+ c.shirtHistory[seasonName]=c.shirtHistory[seasonName].filter(x=>x.type!==type);saveCareers();
+ renderPlayerShirtHistoryPanel(seasonName,document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName)));
 }
 
 function playerSeasonCompetitionOptions(c,season,results){
