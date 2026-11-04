@@ -1074,6 +1074,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
 .pc-display-club-badge{position:relative;overflow:hidden}.pc-display-club-badge .pc-official-club-crest{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;padding:0;margin:0;background:transparent;transform:scale(1.22);transform-origin:center}.pc-display-club-badge .pc-club-initials{display:flex;align-items:center;justify-content:center;width:100%;height:100%}.pc-display-club-badge .pc-official-club-crest:not([hidden]){display:block}
+/* Show the club crest itself beneath each trophy, without a circular holder or outline. */
+.pc-display-club-badge{width:52px;height:48px;border-radius:0;background:transparent;border:0;outline:0;outline-offset:0;box-shadow:none;overflow:visible;margin:2px auto 7px;color:#f7ead7}
+.pc-display-club-badge .pc-official-club-crest{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:none}
+.pc-display-club-badge .pc-club-initials{width:100%;height:100%;border:0;border-radius:0;background:transparent;box-shadow:none}
 /* Two permanent cabinets: team trophies and grouped individual awards */
 .pc-individual-cabinet{padding-bottom:16px}
 .pc-individual-award-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start}
