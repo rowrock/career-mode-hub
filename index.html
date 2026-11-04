@@ -1141,7 +1141,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
    The silver trophy is close to neutral grey; the pink backdrop is keyed out by its red/green difference. */
 .conference-cutout{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;overflow:visible!important}
 .conference-cutout-image{background:transparent!important;filter:none!important;object-fit:contain!important}
-</style>
+\n/* Player Career Shirt History */\n.pc-shirt-season{margin-top:16px}.pc-shirt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.pc-shirt-card{min-width:0;border:1px solid var(--border-color,#34404d);border-radius:14px;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(0,0,0,.12));padding:14px;text-align:center}.pc-shirt-type{font-size:15px;font-weight:800;margin-bottom:12px}.pc-shirt-image-wrap{height:280px;display:flex;align-items:center;justify-content:center;background:rgba(128,128,128,.06);border-radius:10px;overflow:hidden}.pc-shirt-image{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}.pc-shirt-image-error{padding:20px;color:#e5a4a4}.pc-shirt-empty{height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted-text,#9ca3af);background:rgba(128,128,128,.06);border-radius:10px}.pc-shirt-empty-icon{font-size:54px;opacity:.5}.pc-shirt-personalisation{padding:12px 0 4px}.pc-shirt-player-name{font-weight:800;letter-spacing:1.5px;text-transform:uppercase;font-size:13px}.pc-shirt-player-number{font-size:32px;font-weight:900;line-height:1.15}.pc-shirt-meta{font-size:12px;color:var(--muted-text,#9ca3af);margin-top:6px}.pc-shirt-actions{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}@media(max-width:760px){.pc-shirt-grid{grid-template-columns:1fr 1fr}}@media(max-width:500px){.pc-shirt-grid{grid-template-columns:1fr}.pc-shirt-image-wrap,.pc-shirt-empty{height:240px}}\n</style>
 </head>
 
 <body>
@@ -1205,6 +1205,8 @@ League Centre
 <button class="nav-btn disabled" data-page="past" onclick="showPage('past')">
 Past Seasons
 </button>
+
+<button class="nav-btn disabled" data-page="shirtHistory" onclick="showPage('shirtHistory')">Shirt History</button>
 
 <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
 Trophy Cabinet
@@ -1422,7 +1424,7 @@ function updateNavigation(){
     const c=getCurrentCareer();
     const playerMode=!!(c&&c.mode==="player");
     const playerLabels={
-      mycareer:"Player Overview",matches:"Matches",
+      mycareer:"Player Overview",matches:"Matches",shirtHistory:"Shirt History",
       squad:"Player Stats",players:"Player Profile",youth:"Youth Academy",
       competitions:"Awards & Competitions",
       league:"League Centre",past:"Season History",trophies:"Trophy Cabinet",
@@ -6825,6 +6827,8 @@ function renderPlayerCareerPage(page){
     '<div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Objectives</button></div></form><div class="panel" style="margin-top:16px"><div class="panel-title">Progress</div>'+pcProgress(c,o)+'</div><div class="panel" style="margin-top:16px"><button class="primary-btn" data-kind="objectives" onclick="requestPlayerCareerAI(this.dataset.kind)">Generate AI Predictions & Objectives</button>'+pcAIResults(c,"objectives")+'</div></div>';
   }else if(page==="media"){
     html+=pcPress(c);
+  }else if(page==="shirtHistory"){
+    html+=renderPlayerShirtHistoryPage(c);
   }else if(page==="fullhistory"){
     const history=c.matches.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const competitions=[...new Set(history.map(m=>m.competition).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
@@ -7386,54 +7390,72 @@ function playerSeasonStatsTable(c){
  seasons.sort((a,b)=>String(b.season).localeCompare(String(a.season))).forEach(season=>{
   const seasonName=season.season||c.currentSeason,all=(c.matches||[]).filter(m=>!seasonName||m.season===seasonName),club=statsFor(all.filter(m=>!m.international)),country=statsFor(all.filter(m=>m.international)),total=statsFor(all);
   const row=(label,s)=>'<tr><td>'+label+'</td><td>'+s.apps+'</td><td>'+s.goals+'</td><td>'+s.ownGoals+'</td><td>'+s.assists+'</td><td>'+s.minutes+'</td><td>'+s.average+'</td><td>'+s.wins+'</td><td>'+s.draws+'</td><td>'+s.losses+'</td><td>'+s.yellow+'</td><td>'+s.red+'</td><td>'+(season.completed?"Completed":"In progress")+'</td><td></td></tr>';
-  html+='<tr><td colspan="13" style="font-weight:700;background:var(--panel-bg,rgba(128,128,128,.12))">'+escapeHTML(seasonName||"Season")+' — '+escapeHTML(season.clubName||c.clubName||"Club")+' / '+escapeHTML(season.league||c.league||"League")+'</td><td style="white-space:nowrap"><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(seasonName||"")+'\')">Edit</button> <button class="secondary-btn" type="button" onclick="togglePlayerShirtHistory(\''+escapeJS(seasonName||"")+'\')">Shirt History</button></td></tr>';
+  html+='<tr><td colspan="13" style="font-weight:700;background:var(--panel-bg,rgba(128,128,128,.12))">'+escapeHTML(seasonName||"Season")+' — '+escapeHTML(season.clubName||c.clubName||"Club")+' / '+escapeHTML(season.league||c.league||"League")+'</td><td><button class="secondary-btn" type="button" onclick="editPlayerSeason(\''+escapeJS(seasonName||"")+'\')">Edit</button></td></tr>';
   html+=row('Club',club)+row('Country',country)+row('Total',total);
-  html+='<tr id="shirtHistoryRow_'+escapeHTML(String(seasonName||"").replace(/[^a-zA-Z0-9_-]/g,"_"))+'" style="display:none"><td colspan="14"><div id="shirtHistoryPanel_'+escapeHTML(String(seasonName||"").replace(/[^a-zA-Z0-9_-]/g,"_"))+'"></div></td></tr>';
  });
  return html+'</tbody></table></div>';
 }
 function playerShirtSeasonKey(season){return String(season||"").replace(/[^a-zA-Z0-9_-]/g,"_");}
-function togglePlayerShirtHistory(seasonName){
- const c=getCurrentCareer();if(!c)return;
- const id=playerShirtSeasonKey(seasonName),row=document.getElementById("shirtHistoryRow_"+id),panel=document.getElementById("shirtHistoryPanel_"+id);if(!row||!panel)return;
- const opening=row.style.display==="none"||!row.style.display;
- document.querySelectorAll('[id^="shirtHistoryRow_"]').forEach(x=>x.style.display="none");
- if(!opening)return;
- row.style.display="table-row";renderPlayerShirtHistoryPanel(seasonName,panel);
+function playerShirtSearchUrl(team,season,type){
+ const q=[team,season,type,"football shirt kit"].filter(Boolean).join(" ");
+ return "https://www.google.com/search?tbm=isch&q="+encodeURIComponent(q);
 }
-function renderPlayerShirtHistoryPanel(seasonName,panel){
- const c=getCurrentCareer();if(!c||!panel)return;
+function renderPlayerShirtHistoryPage(c){
  if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
- const shirts=Array.isArray(c.shirtHistory[seasonName])?c.shirtHistory[seasonName]:[];
- const season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName)),defaultTeam=season?.clubName||c.clubName||"";
+ const seasons=(c.seasons||[]).slice();
+ if(!seasons.some(s=>String(s.season)===String(c.currentSeason)))seasons.push({season:c.currentSeason,clubName:c.clubName,league:c.league});
+ seasons.sort((a,b)=>String(b.season||"").localeCompare(String(a.season||"")));
+ if(!seasons.length)return '<div class="panel"><div class="panel-title">Shirt History</div><p>Add a season in Season History first.</p></div>';
  const types=["Home","Away","Third"];
- const cards=types.map(type=>{
-  const shirt=shirts.find(x=>x.type===type);
-  return '<div style="border:1px solid var(--border-color,#394452);border-radius:12px;padding:14px;min-width:0"><div style="font-weight:750;font-size:16px;margin-bottom:8px">'+type+' Kit</div>'+(shirt?'<div style="font-size:30px;text-align:center;margin:8px 0">👕</div><div style="font-weight:700;text-align:center">'+escapeHTML(shirt.name||"No name")+' · '+escapeHTML(String(shirt.number||"—"))+'</div><div style="text-align:center;color:var(--muted-text,#9ca3af);font-size:13px;margin-top:4px">'+escapeHTML(shirt.team||defaultTeam)+' · '+escapeHTML(shirt.sleeve||"Short sleeve")+'</div><div style="display:flex;justify-content:center;gap:8px;margin-top:12px"><button class="secondary-btn" type="button" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Edit</button><button class="secondary-btn" type="button" onclick="deletePlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Remove</button></div>':'<p style="color:var(--muted-text,#9ca3af);text-align:center">No '+type.toLowerCase()+' kit added yet.</p><button class="primary-btn" type="button" style="width:100%" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">+ Add '+type+' Kit</button>')+'</div>';
- }).join("");
- panel.innerHTML='<div style="padding:12px 4px"><div style="font-weight:750;font-size:17px;margin-bottom:4px">'+escapeHTML(seasonName)+' Shirt History</div><div class="panel-subtitle" style="margin-bottom:12px">Save the home, away and third shirts you wore during this season.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">'+cards+'</div></div>';
+ let html='<div class="panel"><div class="panel-title">Shirt History</div><div class="panel-subtitle">Your real club shirts from every season. Add the actual kit photo, then personalise it with your name, number and sleeve length. Choose the correct season and club for each shirt.</div></div>';
+ seasons.forEach(season=>{
+  const seasonName=String(season.season||c.currentSeason||"Season"),team=season.clubName||c.clubName||"Club",shirts=Array.isArray(c.shirtHistory[seasonName])?c.shirtHistory[seasonName]:[];
+  html+='<section class="panel pc-shirt-season"><div class="topbar"><div><div class="panel-title">'+escapeHTML(seasonName)+'</div><div class="panel-subtitle">'+escapeHTML(team)+'</div></div></div><div class="pc-shirt-grid">';
+  types.forEach(type=>{
+   const shirt=shirts.find(x=>x.type===type);
+   html+='<article class="pc-shirt-card"><div class="pc-shirt-type">'+type+' Kit</div>';
+   if(shirt&&shirt.imageUrl){
+    html+='<div class="pc-shirt-image-wrap"><img class="pc-shirt-image" src="'+escapeHTML(shirt.imageUrl)+'" alt="'+escapeHTML(team+' '+seasonName+' '+type+' shirt')+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><div class="pc-shirt-image-error" style="display:none">Kit image could not be loaded. Edit the kit and check its direct image URL.</div></div>';
+   }else{
+    html+='<div class="pc-shirt-empty"><div class="pc-shirt-empty-icon">👕</div><div>Actual '+type.toLowerCase()+' shirt photo not added</div></div>';
+   }
+   if(shirt){
+    html+='<div class="pc-shirt-personalisation"><div class="pc-shirt-player-name">'+escapeHTML(shirt.name||c.player?.name||"")+'</div><div class="pc-shirt-player-number">'+escapeHTML(String(shirt.number||""))+'</div><div class="pc-shirt-meta">'+escapeHTML(shirt.team||team)+' · '+escapeHTML(shirt.sleeve||"Short sleeve")+'</div></div><div class="pc-shirt-actions"><button class="secondary-btn" type="button" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Edit</button><button class="secondary-btn" type="button" onclick="deletePlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">Remove</button></div>';
+   }else{
+    html+='<div class="pc-shirt-actions"><button class="primary-btn" type="button" onclick="editPlayerShirt(\''+escapeJS(seasonName)+'\',\''+type+'\')">+ Add '+type+' Kit</button></div>';
+   }
+   html+='</article>';
+  });
+  html+='</div></section>';
+ });
+ return html;
 }
 function editPlayerShirt(seasonName,type){
  const c=getCurrentCareer();if(!c)return;
  if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
  const existing=(c.shirtHistory[seasonName]||[]).find(x=>x.type===type)||{},season=(c.seasons||[]).find(s=>String(s.season)===String(seasonName)),team=existing.team||season?.clubName||c.clubName||"";
- const panel=document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName));if(!panel)return;
- panel.innerHTML='<div style="border:1px solid var(--border-color,#394452);border-radius:12px;padding:16px;margin-top:12px"><div style="font-weight:750;font-size:17px;margin-bottom:12px">'+(existing.type?'Edit ':'Add ')+type+' Kit · '+escapeHTML(seasonName)+'</div><form onsubmit="savePlayerShirt(event,\''+escapeJS(seasonName)+'\',\''+type+'\')"><div class="form-grid"><div class="setup-section"><label class="setup-label">Team / Club</label><input class="form-input" name="team" required value="'+escapeHTML(team)+'" placeholder="e.g. Brighton"></div><div class="setup-section"><label class="setup-label">Name on shirt</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||c.player?.name||"")+'" placeholder="Name printed on shirt"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" required value="'+escapeHTML(String(existing.number||c.player?.shirtNumber||""))+'" placeholder="e.g. 9"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div></div><div style="display:flex;gap:8px;margin-top:14px"><button class="primary-btn" type="submit">Save Kit</button><button class="secondary-btn" type="button" onclick="renderPlayerShirtHistoryPanel(\''+escapeJS(seasonName)+'\',document.getElementById(\'shirtHistoryPanel_'+playerShirtSeasonKey(seasonName)+'\'))">Cancel</button></div></form></div>';
+ const search=playerShirtSearchUrl(team,seasonName,type);
+ const panel=document.getElementById("pageContent");
+ const old=document.getElementById("pcShirtEditor");if(old)old.remove();
+ const editor=document.createElement("div");editor.id="pcShirtEditor";editor.className="panel";
+ editor.innerHTML='<div class="panel-title">'+(existing.type?'Edit ':'Add ')+type+' Kit · '+escapeHTML(seasonName)+'</div><div class="panel-subtitle">Use a photo of the actual shirt worn by '+escapeHTML(team)+' in '+escapeHTML(seasonName)+'. Search for the exact season and kit type, then copy the image address.</div><p style="margin:10px 0"><a class="secondary-btn" href="'+escapeHTML(search)+'" target="_blank" rel="noopener">Find actual '+type.toLowerCase()+' kit photo ↗</a></p><form id="pcShirtForm" class="form-grid"><div class="setup-section"><label class="setup-label">Team / Club</label><input class="form-input" name="team" required value="'+escapeHTML(team)+'"></div><div class="setup-section"><label class="setup-label">Name on shirt</label><input class="form-input" name="name" required value="'+escapeHTML(existing.name||c.player?.name||"")+'"></div><div class="setup-section"><label class="setup-label">Shirt number</label><input class="form-input" name="number" type="number" min="1" max="99" required value="'+escapeHTML(String(existing.number||c.player?.shirtNumber||""))+'"></div><div class="setup-section"><label class="setup-label">Sleeve length</label><select class="form-input" name="sleeve"><option value="Short sleeve" '+((existing.sleeve||"Short sleeve")==="Short sleeve"?"selected":"")+'>Short sleeve</option><option value="Long sleeve" '+(existing.sleeve==="Long sleeve"?"selected":"")+'>Long sleeve</option></select></div><div class="setup-section" style="grid-column:1/-1"><label class="setup-label">Actual kit image URL</label><input class="form-input" name="imageUrl" type="url" value="'+escapeHTML(existing.imageUrl||"")+'" placeholder="Paste a direct image link ending in .jpg, .png or .webp"><small style="color:#9ca5b1">Use a direct image address, not the webpage address. The photo will show on your shirt history page.</small></div><div class="setup-section" style="align-self:end"><button class="primary-btn" type="submit">Save Kit</button> <button class="secondary-btn" type="button" onclick="document.getElementById(\'pcShirtEditor\')?.remove()">Cancel</button></div></form>';
+ panel.appendChild(editor);editor.scrollIntoView({behavior:"smooth",block:"center"});
+ editor.querySelector("#pcShirtForm").addEventListener("submit",function(event){savePlayerShirt(event,seasonName,type);});
 }
 function savePlayerShirt(event,seasonName,type){
  event.preventDefault();const c=getCurrentCareer(),form=event.target;if(!c)return;
  if(!c.shirtHistory||typeof c.shirtHistory!=="object")c.shirtHistory={};
  if(!Array.isArray(c.shirtHistory[seasonName]))c.shirtHistory[seasonName]=[];
- const data={type,team:form.elements.namedItem("team").value.trim(),name:form.elements.namedItem("name").value.trim(),number:Number(form.elements.namedItem("number").value),sleeve:form.elements.namedItem("sleeve").value};
+ const data={type,team:form.elements.namedItem("team").value.trim(),name:form.elements.namedItem("name").value.trim(),number:Number(form.elements.namedItem("number").value),sleeve:form.elements.namedItem("sleeve").value,imageUrl:form.elements.namedItem("imageUrl").value.trim()};
  if(!data.team||!data.name||!Number.isInteger(data.number)||data.number<1||data.number>99){alert("Please enter a team, shirt name and a number from 1 to 99.");return;}
+ if(data.imageUrl&&!/^https?:\/\//i.test(data.imageUrl)){alert("Please enter a valid image URL.");return;}
  const list=c.shirtHistory[seasonName],idx=list.findIndex(x=>x.type===type);if(idx>=0)list[idx]=data;else list.push(data);
- saveCareers();renderPlayerShirtHistoryPanel(seasonName,document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName)));
+ saveCareers();renderPlayerCareerPage("shirtHistory");
 }
 function deletePlayerShirt(seasonName,type){
  const c=getCurrentCareer();if(!c||!c.shirtHistory?.[seasonName])return;
  if(!confirm("Remove this "+type.toLowerCase()+" shirt from "+seasonName+"?"))return;
- c.shirtHistory[seasonName]=c.shirtHistory[seasonName].filter(x=>x.type!==type);saveCareers();
- renderPlayerShirtHistoryPanel(seasonName,document.getElementById("shirtHistoryPanel_"+playerShirtSeasonKey(seasonName)));
+ c.shirtHistory[seasonName]=c.shirtHistory[seasonName].filter(x=>x.type!==type);saveCareers();renderPlayerCareerPage("shirtHistory");
 }
 
 function playerSeasonCompetitionOptions(c,season,results){
