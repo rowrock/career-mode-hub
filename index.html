@@ -6406,7 +6406,7 @@ function pcRecords(c){const s=playerCareerStats(c,null),m=c.matches||[],g=m.redu
 
 function pcRecordTracker(c){
  const matches=(c.matches||[]).filter(m=>m&&String(m.competition||"").trim());
- const key=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\buefa\\b/g,"").replace(/[^a-z0-9]/g,"");
+ const key=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"").replace(/^uefa/,"");
  const sum=(a,k)=>a.reduce((n,m)=>n+(Number(m[k])||0),0);
  const known={
   premierleague:{goals:[260,"Alan Shearer"],assists:[162,"Ryan Giggs"]},
@@ -6447,6 +6447,8 @@ function pcRecordTracker(c){
  };
  const names={premierleague:"Premier League",laliga:"La Liga",bundesliga:"Bundesliga",seriea:"Serie A",ligue1:"Ligue 1",facup:"FA Cup",eflcup:"EFL Cup",copadelrey:"Copa del Rey",dfbpokal:"DFB-Pokal",coppaitalia:"Coppa Italia",coupedefrance:"Coupe de France",championsleague:"UEFA Champions League",europaleague:"UEFA Europa League",conferenceleague:"UEFA Conference League"};
  const groups=new Map();
+ // Seed the complete competition catalogue so records remain visible even before the player logs a match in that competition.
+ [...new Set([...Object.keys(known),...Object.keys(seasonBenchmarks)])].forEach(k=>groups.set(k,{name:names[k]||k,matches:[]}));
  matches.forEach(m=>{let k=key(m.competition);if(aliases[k])k=aliases[k];if(k.startsWith("ligue1"))k="ligue1";if(!groups.has(k))groups.set(k,{name:names[k]||String(m.competition).trim(),matches:[]});groups.get(k).matches.push(m);});
  const catalog=[];
  groups.forEach((g,k)=>{const ref=known[k]||{};["goals","assists"].forEach(field=>{const d=ref[field];if(!d)return;const value=sum(g.matches,field),record=d[0];catalog.push({name:g.name+" all-time "+field+" record",competition:g.name,unit:field,value,record,holder:d[1],pct:Math.min(100,value/record*100),remaining:Math.max(0,record-value)});});});
