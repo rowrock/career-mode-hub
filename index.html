@@ -1059,6 +1059,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(max-width:1000px){.history-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.history-stat-grid{grid-template-columns:1fr}.history-section{padding:15px}.history-winrate{gap:9px}.player-award-grid{grid-template-columns:1fr}}
 
+
+/* Player Career trophy cabinet */
+.pc-trophy-room{margin-top:20px;padding:20px 18px 26px;border:1px solid #75502f;border-radius:16px;background:linear-gradient(135deg,#26180f,#49301c 42%,#24170f);box-shadow:inset 0 0 35px #0009,0 18px 45px #0006;position:relative;overflow:hidden}
+.pc-cabinet-heading{display:flex;align-items:center;justify-content:center;gap:18px;text-align:center;padding:12px 8px 22px;color:#f5d99b;letter-spacing:2px}.pc-cabinet-heading>span{font-size:30px;filter:drop-shadow(0 3px 4px #000)}.pc-cabinet-heading strong{display:block;font-size:15px}.pc-cabinet-heading small{display:block;margin-top:6px;color:#c8ad8c;letter-spacing:.3px;font-size:12px}
+.pc-cabinet-controls{background:#17120e;border:1px solid #8b6744!important}.pc-cabinet-shelves{padding:0 2px}.pc-cabinet-shelves .season-trophy-groups{display:grid;grid-template-columns:1fr;gap:18px}
+.pc-cabinet-shelves .season-trophy-groups>details.panel{background:linear-gradient(180deg,#62442b,#392516 72%,#21160f)!important;border:1px solid #9a744c!important;border-radius:9px!important;box-shadow:inset 0 1px 0 #e2bd8b55,0 9px 0 #17100b,0 13px 20px #0008;position:relative;padding:18px 18px 24px!important}
+.pc-cabinet-shelves .season-trophy-groups>details.panel:after{content:"";position:absolute;bottom:-10px;left:-1px;right:-1px;height:10px;border-radius:0 0 5px 5px;background:linear-gradient(#a77a4c,#5a3920);box-shadow:0 4px 8px #0008}
+.pc-cabinet-shelves .season-trophy-groups>details.panel>summary{color:#f5dfb8}.pc-cabinet-shelves h4{color:#e9c994;text-transform:uppercase;letter-spacing:1px;font-size:12px}
+.pc-cabinet-shelves [style*="border-top:1px solid #2a323d"]{border-top:1px solid #9b795655!important;background:linear-gradient(90deg,#ffffff08,transparent);padding:14px 10px!important;border-radius:6px}
+.pc-cabinet-shelves .season-trophy-groups>details.panel>div{color:#f7ead7}.pc-cabinet-shelves .season-trophy-groups>details.panel details[style*="border:1px solid"]{background:#20170f;border-color:#876443!important}
+.pc-records-page{margin-top:18px}.pc-records-page .panel{margin-top:14px}
 </style>
 </head>
 
@@ -1125,6 +1136,10 @@ Past Seasons
 
 <button class="nav-btn disabled" data-page="trophies" onclick="showPage('trophies')">
 Trophy Cabinet
+</button>
+
+<button class="nav-btn disabled" data-page="records" onclick="showPage('records')">
+Records
 </button>
 
 <button class="nav-btn disabled" data-page="national" onclick="showPage('national')">
@@ -1339,7 +1354,7 @@ function updateNavigation(){
       squad:"Player Stats",players:"Player Profile",youth:"Youth Academy",
       competitions:"Awards & Competitions",
       league:"League Centre",past:"Season History",trophies:"Trophy Cabinet",
-      national:"International Career",fullhistory:"Full Career",contract:"Contract & Agent",objectives:"Season Predictions & Objectives",media:"Press"
+      national:"International Career",records:"Records",fullhistory:"Full Career",contract:"Contract & Agent",objectives:"Season Predictions & Objectives",media:"Press"
     };
     const managerLabels={
       mycareer:"My Career",calendar:"Calendar",matches:"Matches",squad:"Squad",
@@ -1350,7 +1365,7 @@ function updateNavigation(){
     document.querySelectorAll("#careerNavigation .nav-btn").forEach(btn=>{
       const page=btn.dataset.page;
       btn.classList.toggle("disabled",!currentCareerId);
-      btn.style.display=(playerMode&&(page==="transfers"||page==="league"||page==="contract"))?"none":(["fullhistory","objectives","media"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":""));
+      btn.style.display=(playerMode&&(page==="transfers"||page==="league"||page==="contract"))?"none":(["fullhistory","objectives","media","records"].includes(page)?(playerMode?"":"none"):(playerMode&&(page==="calendar"||page==="youth")?"none":""));
       const label=(playerMode?playerLabels:managerLabels)[page];
       if(label)btn.textContent=label;
     });
@@ -6677,7 +6692,9 @@ function renderPlayerCareerPage(page){
     const allTrophies=c.trophies||[];
     const teamCount=allTrophies.filter(t=>String(t.type||"").toLowerCase()==="team trophy").length;
     const individualCount=allTrophies.length-teamCount;
-    html+='<div class="topbar"><div><div class="panel-title">Trophy Cabinet</div><div class="panel-subtitle">Your recorded trophies and awards. Manage competitions and add awards in Awards & Competitions.</div></div><button class="secondary-btn" onclick="renderPlayerCareerPage(\'competitions\')">Awards & Competitions</button></div><div class="match-summary-grid">'+playerStatCard("Team Trophies",teamCount)+playerStatCard("Individual Awards",individualCount)+playerStatCard("Total Awards",allTrophies.length)+'</div><div class="panel" style="margin-top:18px"><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter type</label><select id="trophyCabinetFilter" class="form-input" onchange="filterPlayerTrophyCabinet()"><option value="all">All awards</option><option value="team">Team trophies</option><option value="individual">Individual awards</option></select></div><div class="setup-section"><label class="setup-label">Search</label><input id="trophyCabinetSearch" class="form-input" placeholder="Search trophy, team or season" oninput="filterPlayerTrophyCabinet()"></div></div><div id="playerTrophyCabinetList" style="margin-top:16px">'+playerTrophyTable(c)+'</div></div>'+pcRecordTracker(c);
+    html+='<div class="topbar"><div><div class="panel-title">Trophy Cabinet</div><div class="panel-subtitle">Your career silverware, displayed by season. Manage competitions and add awards in Awards & Competitions.</div></div><button class="secondary-btn" onclick="renderPlayerCareerPage(\'competitions\')">Awards & Competitions</button></div><div class="match-summary-grid">'+playerStatCard("Team Trophies",teamCount)+playerStatCard("Individual Awards",individualCount)+playerStatCard("Total Awards",allTrophies.length)+'</div><div class="pc-trophy-room"><div class="pc-cabinet-heading"><span>🏆</span><div><strong>CAREER TROPHY COLLECTION</strong><small>'+allTrophies.length+' honours displayed · Organised by season</small></div><span>🏆</span></div><div class="panel pc-cabinet-controls"><div class="form-grid"><div class="setup-section"><label class="setup-label">Filter type</label><select id="trophyCabinetFilter" class="form-input" onchange="filterPlayerTrophyCabinet()"><option value="all">All awards</option><option value="team">Team trophies</option><option value="individual">Individual awards</option></select></div><div class="setup-section"><label class="setup-label">Search</label><input id="trophyCabinetSearch" class="form-input" placeholder="Search trophy, team or season" oninput="filterPlayerTrophyCabinet()"></div></div></div><div id="playerTrophyCabinetList" class="pc-cabinet-shelves">'+playerTrophyTable(c)+'</div></div>';
+  }else if(page==="records"){
+    html+='<div class="topbar"><div><div class="panel-title">Career Records</div><div class="panel-subtitle">Your goals and assists compared with real-world all-time and single-season records.</div></div></div><div class="pc-records-page">'+pcRecordTracker(c)+'</div>';
   }else if(page==="past"){
     html+='<div class="topbar"><div><div class="panel-title">Season History</div><div class="panel-subtitle">Finish a season to save a summary before moving to the next season.</div></div><button class="primary-btn" onclick="finishPlayerSeason()">Finish Season & Start Next</button></div><div class="panel">'+playerSeasonStatsTable(c)+'</div>';
   }else if(page==="national"){
